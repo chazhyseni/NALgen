@@ -88,13 +88,13 @@ if (!doNotTrack) {
 <h2 id="color-palette">Color palette</h2>
 
 <pre><code class="language-r">library(ggsci)
-schwifty=pal_rickandmorty()
-schwifty.cols=colorRampPalette(schwifty(12)[c(3,12,4,6,1,9,8,2)])
-cols=schwifty.cols(10)
+schwifty &lt;- pal_rickandmorty()
+schwifty.cols &lt;- colorRampPalette(schwifty(12)[c(3,12,4,6,1,9,8,2)])
+cols &lt;- schwifty.cols(10)
 
-library(scales)
-show_col(schwifty(12))
-show_col(cols)
+#library(scales)
+#show_col(schwifty(12))
+#show_col(cols)
 </code></pre>
 
 <h1 id="phase-i-test-single-locus-genotypes">Phase I (Test): Single-locus genotypes</h1>
