@@ -1,4 +1,4 @@
-baseurl = "https://nalgen.github.io"
+baseurl = "https://chazhyseni.github.io/NALgen"
 languageCode = "en-us"
 title = "NALgen: Neutral and Adaptive Landscape Genetics"
 paginate = "10" # Number of posts per page
