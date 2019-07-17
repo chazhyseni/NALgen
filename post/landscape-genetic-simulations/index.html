@@ -280,6 +280,9 @@ habit2[habit2==1] &lt;- 25
 plot(habit2,breaks=seq(minValue(habit2),maxValue(habit2),length.out=11),col=cols)
 </code></pre>
 
+<p><img src="https://github.com/chazhyseni/NALgen/blob/master/post/landscape-genetic-simulations/figure-html/Simple-LowPermeability-Landscape.png" alt="Landscape 1: Simple Landscape - Low Permeability" />
+<img src="https://github.com/chazhyseni/NALgen/blob/master/post/landscape-genetic-simulations/figure-html/Simple-HighPermeability-Landscape.png" alt="Landscape 2: Simple Landscape - High Permeability" /></p>
+
 <h2 id="simulation-of-genotypes-based-on-simple-landscapes-1">Simulation of genotypes based on simple landscapes</h2>
 
 <p><em>popRange</em> package: simulating 20 <strong>selected</strong> and 180 <strong>neutral</strong> SNPs based on the <em>landscapeR</em>-generated landscape.</p>
@@ -500,6 +503,15 @@ pop3.complex.lowperm.Sel.df &lt;- cbind(rep(1,nrow(pop3.complex.lowperm.Sel)*nco
 colnames(pop3.complex.lowperm.Sel.df)=c(&quot;start&quot;,&quot;end&quot;,&quot;s&quot;,&quot;x&quot;,&quot;y&quot;)
 </code></pre>
 
+<p><img src="https://github.com/chazhyseni/NALgen/blob/master/post/landscape-genetic-simulations/figure-html/ComplexLandscape-LowPermeability-Metapopulation-1-distribution.png/" alt="Distributions of 3 metapopulations: Metapopulation 1 in low-permeability landscape" />
+<img src="https://github.com/chazhyseni/NALgen/blob/master/post/landscape-genetic-simulations/figure-html/ComplexLandscape-LowPermeability-Metapopulation-2-distribution.png/" alt="Distributions of 3 metapopulations: Metapopulation 2 in low-permeability landscape" />
+<img src="https://github.com/chazhyseni/NALgen/blob/master/post/landscape-genetic-simulations/figure-html/ComplexLandscape-LowPermeability-Metapopulation-3-distribution.png/" alt="Distributions of 3 metapopulations: Metapopulation 3 in low-permeability landscape" />
+<img src="https://github.com/chazhyseni/NALgen/blob/master/post/landscape-genetic-simulations/figure-html/Complex-LowPermeability-Landscape.png/" alt="Landscape 3: Complex Landscape - Low Permeability" />
+<img src="https://github.com/chazhyseni/NALgen/blob/master/post/landscape-genetic-simulations/figure-html/ComplexLandscape-HighPermeability-Metapopulation-1-distribution.png/" alt="Distributions of 3 metapopulations: Metapopulation 1 in high-permeability landscape" />
+<img src="https://github.com/chazhyseni/NALgen/blob/master/post/landscape-genetic-simulations/figure-html/ComplexLandscape-HighPermeability-Metapopulation-2-distribution.png/" alt="Distributions of 3 metapopulations: Metapopulation 2 in high-permeability landscape" />
+<img src="https://github.com/chazhyseni/NALgen/blob/master/post/landscape-genetic-simulations/figure-html/ComplexLandscape-HighPermeability-Metapopulation-3-distribution.png/" alt="Distributions of 3 metapopulations: Metapopulation 3 in high-permeability landscape" />
+<img src="https://github.com/chazhyseni/NALgen/blob/master/post/landscape-genetic-simulations/figure-html/Complex-HighPermeability-Landscape.png/" alt="Landscape 4: Complex Landscape - High Permeability" /></p>
+
 <p><em>popRange</em> package: simulating 20 <em>selected</em> and 180 <strong>neutral</strong> SNPs based on the <em>virtualspecies</em>-generated landscape.</p>
 
 <pre><code class="language-r">library(popRange)
@@ -598,6 +610,22 @@ write.table(cbind(rand.subset.20pops.hab2@other$x,rand.subset.20pops.hab2@other$
 write.table(cbind(rand.subset.20pops.hchp@other$x,rand.subset.20pops.hchp@other$y),&quot;HCHP_20pops_coords.txt&quot;, row.names=FALSE, col.names=FALSE)
 write.table(cbind(rand.subset.20pops.hclp@other$x,rand.subset.20pops.hclp@other$y),&quot;HCLP_20pops_coords.txt&quot;, row.names=FALSE, col.names=FALSE)
 </code></pre>
+
+<p><a href="https://github.com/chazhyseni/NALgen/blob/master/data/migr0.1-simulations_20-randomly-distributed-populations/habitat1_20pops.gen" target="_blank">Simple Landscape - Low Permeability - 20 Randomly-Distributed Populations - Neutral and Selected Loci</a></p>
+
+<p><a href="https://github.com/chazhyseni/NALgen/blob/master/data/migr0.1-simulations_20-randomly-distributed-populations/habitat1_only-neutr_20pops.gen" target="_blank">Simple Landscape - Low Permeability - 20 Randomly-Distributed Populations - Neutral Loci ONLY</a></p>
+
+<p><a href="https://github.com/chazhyseni/NALgen/blob/master/data/migr0.1-simulations_20-randomly-distributed-populations/habitat2_20pops.gen" target="_blank">Simple Landscape - High Permeability - 20 Randomly-Distributed Populations - Neutral and Selected Loci</a></p>
+
+<p><a href="https://github.com/chazhyseni/NALgen/blob/master/data/migr0.1-simulations_20-randomly-distributed-populations/habitat2_only-neutr_20pops.gen" target="_blank">Simple Landscape - High Permeability - 20 Randomly-Distributed Populations - Neutral Loci ONLY</a></p>
+
+<p><a href="https://github.com/chazhyseni/NALgen/blob/master/data/migr0.1-simulations_20-randomly-distributed-populations/HCLP_20pops.gen" target="_blank">Complex Landscape - Low Permeability - 20 Randomly-Distributed Populations - Neutral and Selected Loci</a></p>
+
+<p><a href="https://github.com/chazhyseni/NALgen/blob/master/data/migr0.1-simulations_20-randomly-distributed-populations/HCLP_only-neutr_20pops.gen" target="_blank">Complex Landscape - Low Permeability - 20 Randomly-Distributed Populations - Neutral Loci ONLY</a></p>
+
+<p><a href="https://github.com/chazhyseni/NALgen/blob/master/data/migr0.1-simulations_20-randomly-distributed-populations/HCHP_20pops.gen" target="_blank">Complex Landscape - High Permeability - 20 Randomly-Distributed Populations - Neutral and Selected Loci</a></p>
+
+<p><a href="https://github.com/chazhyseni/NALgen/blob/master/data/migr0.1-simulations_20-randomly-distributed-populations/HCHP_20pops.gen" target="_blank">Complex Landscape - High Permeability - 20 Randomly-Distributed Populations - Neutral Loci ONLY</a></p>
 
 <h2 id="preliminary-analysis-pt-1-inferring-population-structure-with-lea-package">Preliminary analysis pt.1: Inferring population structure with <em>LEA</em> package</h2>
 
