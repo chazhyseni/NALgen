@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en-us">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>Landscape Genetic Simulations - NALgen: Neutral and Adaptive Landscape Genetics</title>
+	<script>(function(d,e){d[e]=d[e].replace("no-js","js");})(document.documentElement,"className");</script>
+	<meta name="description" content="">
+	<meta property="og:title" content="Landscape Genetic Simulations" />
+<meta property="og:description" content="The main purpose of this article is to break down the simulation steps: landscape generation and simulation of genotpypes based on the generated landscapes." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="/post/landscape-genetic-simulations/" />
+<meta property="article:published_time" content="2019-07-15T00:00:00&#43;00:00"/>
+<meta property="article:modified_time" content="2019-07-15T00:00:00&#43;00:00"/>
+
+	
+	<link rel="dns-prefetch" href="//fonts.googleapis.com">
+	<link rel="dns-prefetch" href="//fonts.gstatic.com">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700">
+	<link rel="stylesheet" href="/css/style.css">
+	
+	<link rel="shortcut icon" href="/favicon.ico">
+		
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-139514839-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+</head>
+<body class="body">
+	<div class="container container--outer">
+		<header class="header">
+	<div class="container">
+		<div class="logo">
+			<a class="logo__link" href="/" title="NALgen: Neutral and Adaptive Landscape Genetics" rel="home">
+				<div class="logo__title">NALgen: Neutral and Adaptive Landscape Genetics</div>
+				<div class="logo__tagline">NALgen: Neutral and Adaptive Landscape Genetics</div>
+			</a>
+		</div>
+		
+<nav class="menu">
+	<button class="menu__btn" aria-haspopup="true" aria-expanded="false" tabindex="0">
+		<span class="menu__btn-title" tabindex="-1">Menu</span>
+	</button>
+	<ul class="menu__list">
+		<li class="menu__item">
+			<a class="menu__link" href="/about/">About</a>
+		</li>
+		<li class="menu__item">
+			<a class="menu__link" href="/vignettes/">Vignettes</a>
+		</li>
+		<li class="menu__item">
+			<a class="menu__link" href="/tutorials/">Tutorials</a>
+		</li>
+	</ul>
+</nav>
+
+	</div>
+</header>
+		<div class="wrapper flex">
+			<div class="primary">
+			
+<main class="main" role="main">
+	<article class="post">
+		<header class="post__header">
+			<h1 class="post__title">Landscape Genetic Simulations</h1>
+			<div class="post__meta meta">
+<div class="meta__item-datetime meta__item">
+	<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg>
+	<time class="meta__text" datetime="2019-07-15T00:00:00">July 15, 2019</time>
+</div>
+
+<div class="meta__item-categories meta__item">
+	<svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2l1 2h8v11h-16v-13z"/></svg>
+	<span class="meta__text"><a class="meta__link" href="/categories/simulations" rel="category">Simulations</a></span>
+</div>
+</div>
+		</header><div class="content post__content clearfix">
+			<p>The main purpose of this article is to break down the simulation steps: landscape generation and simulation of genotpypes based on the generated landscapes.</p>
+
+<h2 id="color-palette">Color palette</h2>
+
+<pre><code class="language-r">library(ggsci)
+schwifty=pal_rickandmorty()
+schwifty.cols=colorRampPalette(schwifty(12)[c(3,12,4,6,1,9,8,2)])
+cols=schwifty.cols(10)
+
+library(scales)
+show_col(schwifty(12))
+show_col(cols)
+</code></pre>
+
+<h1 id="phase-i-test-single-locus-genotypes">Phase I (Test): Single-locus genotypes</h1>
+
+<h2 id="generating-simple-landscapes-two-habitats">Generating simple landscapes: two habitats</h2>
+
+<p><em>landscapeR</em> package: simulating simple landscapes (barrier and two different values of carrying capacity/habitat suitability): habitat 1 has low permeability cells (carrying capacity = 5) between habitable patches (carrying capacity = 100), while habitat 2 has high permeability cells (carrying capacity = 25), in addition to barriers (carrying capacity = 0).</p>
+
+<pre><code class="language-r">library(landscapeR)
+library(raster)
+m &lt;- matrix(0, 13, 17)
+r &lt;- raster(m, xmn=-91, xmx=-74, ymn=28, ymx=41)
+rr &lt;- makeClass(r, 10, 4, val=1)
+rr &lt;- makeClass(rr, 10, 4, val=2)
+rex &lt;- rmSingle(rr)
+plot(rex,breaks=seq(0,2,length.out=11),col=cols)
+habit1 &lt;- rex
+habit1[habit1==1] &lt;- 100
+habit1[habit1==2] &lt;- 5
+plot(habit1,breaks=seq(minValue(habit1),maxValue(habit1),length.out=11),col=cols)
+habit2 &lt;- rex
+habit2[habit2==2] &lt;- 100
+habit2[habit2==1] &lt;- 25
+plot(habit2,breaks=seq(minValue(habit2),maxValue(habit2),length.out=11),col=cols)
+</code></pre>
+
+<h2 id="simulation-of-genotypes-based-on-simple-landscapes">Simulation of genotypes based on simple landscapes</h2>
+
+<p><em>landsim</em> package: simulating <strong>selected</strong> SNPs based on the <em>landscapeR</em>-generated landscape.</p>
+
+<ol>
+<li>Habitat/Population 1</li>
+</ol>
+
+<pre><code class="language-r">library(landsim)
+pop1 &lt;- make_population(
+                 habitat = habit1,
+                 inaccessible.value = &quot;NA&quot;,
+                 uninhabitable.value = 0,
+                 genotypes = c( &quot;aa&quot;, &quot;aA&quot;, &quot;AA&quot; ),
+                 N = c( 10, 10, 10)
+             )
+
+migr1 &lt;- migration(
+                 kern = &quot;gaussian&quot;,
+                 sigma = 1,
+                 radius = 10,
+                 normalize = 1
+             )
+
+migr1 &lt;- setup_migration(migr1, pop1)
+
+germ.vital1 &lt;- vital(
+             function (N, ...) {
+                out &lt;- r0 / ( 1 + migrate(rowSums(N),competition)/carrying.capacity )
+                return( cbind( aa=out, aA=s*out, AA=s^2*out) )
+             },
+             r0 = 0.1,
+             s = 1.05,  # multiplicative selective benefit of the A allele
+             carrying.capacity = values(pop1$habitat)[pop1$habitable],
+             competition = migration(
+                                     kern=&quot;gaussian&quot;,
+                                     sigma=1,
+                                     radius=10,
+                                     normalize=1
+                                 )
+         )
+
+germ.vital1 &lt;- setup_vital(germ.vital1,pop1)
+
+demog1 &lt;- demography(
+        prob.seed = 0.2,
+        fecundity = 80,
+        prob.germination = germ.vital1,
+        prob.survival = 0.8, 
+        seed.migration = migr1,
+        pollen.migration = migration(
+                         kern=&quot;gaussian&quot;,
+                         sigma=1,
+                         radius=10,
+                         normalize=1
+                     ),
+        genotypes = c(&quot;aa&quot;, &quot;aA&quot;, &quot;AA&quot;)
+     )
+
+
+demog1 &lt;- setup_demography(demog1,pop1)
+
+sim1 &lt;- simulate_pop(pop1, demog1, times=plot.times, 
+                carrying.capacity=values(pop1$habitat)[pop1$habitable],
+                summaries=list(totals=function(N){colSums(N)}))
+
+matplot(sim1$summaries[[&quot;totals&quot;]], type='l', xlab='time', ylab='numbers', lty=1 )
+legend(&quot;topright&quot;,lty=1,col=1:3,legend=colnames(sim1$summaries[[&quot;totals&quot;]]))
+</code></pre>
+
+<ol>
+<li>Habitat/Population 2</li>
+</ol>
+
+<pre><code class="language-r">pop2 &lt;- make_population(
+                 habitat = habit2,
+                 inaccessible.value = &quot;NA&quot;,
+                 uninhabitable.value = 0,
+                 genotypes = c( &quot;aa&quot;, &quot;aA&quot;, &quot;AA&quot; ),
+                 N = c( 10, 10, 10)
+             )
+
+migr2 &lt;- migration(
+                 kern = &quot;gaussian&quot;,
+                 sigma = 1,
+                 radius = 10,
+                 normalize = 1
+             )
+
+migr2 &lt;- setup_migration(migr2, pop2)
+
+germ.vital2 &lt;- vital(
+             function (N, ...) {
+                out &lt;- r0 / ( 1 + migrate(rowSums(N),competition)/carrying.capacity )
+                return( cbind( aa=s^2*out, aA=s*out, AA=out) )
+             },
+             r0 = 0.1,
+             s = 1.05,  # multiplicative selective benefit of the A allele
+             carrying.capacity = values(pop2$habitat)[pop2$habitable],
+             competition = migration(
+                                     kern=&quot;gaussian&quot;,
+                                     sigma=1,
+                                     radius=10,
+                                     normalize=1
+                                 )
+         )
+
+germ.vital2 &lt;- setup_vital(germ.vital2,pop2)
+
+demog2 &lt;- demography(
+        prob.seed = 0.2,
+        fecundity = 80,
+        prob.germination = germ.vital2,
+        prob.survival = 0.8, 
+        seed.migration = migr2,
+        pollen.migration = migration(
+                         kern=&quot;gaussian&quot;,
+                         sigma=1,
+                         radius=10,
+                         normalize=1
+                     ),
+        genotypes = c(&quot;aa&quot;, &quot;aA&quot;, &quot;AA&quot;)
+     )
+
+
+demog2 &lt;- setup_demography(demog2,pop2)
+
+sim2 &lt;- simulate_pop(pop2, demog2, times=plot.times, 
+                carrying.capacity=values(pop2$habitat)[pop2$habitable],
+                summaries=list(totals=function(N){colSums(N)}))
+
+matplot(sim2$summaries[[&quot;totals&quot;]], type='l', xlab='time', ylab='numbers', lty=1 )
+legend(&quot;topright&quot;,lty=1,col=1:3,legend=colnames(sim2$summaries[[&quot;totals&quot;]]))
+</code></pre>
+
+<h1 id="phase-ii-multi-locus-genotypes">Phase II: Multi-locus genotypes</h1>
+
+<h2 id="generating-simple-landscapes-two-habitats-1">Generating simple landscapes: two habitats</h2>
+
+<p><em>landscapeR</em> package: simulating simple landscapes (barrier and two different values of carrying capacity/habitat suitability): habitat 1 has low permeability cells (carrying capacity = 5) between habitable patches (carrying capacity = 100), while habitat 2 has high permeability cells (carrying capacity = 25), in addition to barriers (carrying capacity = 0).</p>
+
+<pre><code class="language-r">library(landscapeR)
+library(raster)
+m &lt;- matrix(0, 13, 17)
+r &lt;- raster(m, xmn=-91, xmx=-74, ymn=28, ymx=41)
+rr &lt;- makeClass(r, 10, 4, val=1)
+rr &lt;- makeClass(rr, 10, 4, val=2)
+rex &lt;- rmSingle(rr)
+plot(rex,breaks=seq(0,2,length.out=11),col=cols)
+habit1 &lt;- rex
+habit1[habit1==1] &lt;- 100
+habit1[habit1==2] &lt;- 5
+plot(habit1,breaks=seq(minValue(habit1),maxValue(habit1),length.out=11),col=cols)
+habit2 &lt;- rex
+habit2[habit2==2] &lt;- 100
+habit2[habit2==1] &lt;- 25
+plot(habit2,breaks=seq(minValue(habit2),maxValue(habit2),length.out=11),col=cols)
+</code></pre>
+
+<h2 id="simulation-of-genotypes-based-on-simple-landscapes-1">Simulation of genotypes based on simple landscapes</h2>
+
+<p><em>popRange</em> package: simulating 20 <strong>selected</strong> and 180 <strong>neutral</strong> SNPs based on the <em>landscapeR</em>-generated landscape.</p>
+
+<pre><code class="language-r">barrier &lt;- habit2
+barrier[barrier&lt;1] &lt;- -1
+barrier[barrier&gt;1] &lt;- 1
+plot(habit1,breaks=seq(minValue(habit1),maxValue(habit1),length.out=11),col=cols)
+plot(habit2,breaks=seq(minValue(habit2),maxValue(habit2),length.out=11),col=cols)
+plot(barrier,breaks=seq(minValue(barrier),maxValue(barrier),length.out=11),col=cols)
+
+habitat1.Sel &lt;- habit1
+habitat1.Sel[habitat1.Sel&lt;11] &lt;- 0
+habitat1.Sel[habitat1.Sel&gt;10] &lt;- 0.2
+#habitat1.Sel.df &lt;- cbind(rep(1,nrow(habitat1.Sel)*ncol(habitat1.Sel)),
+#                                  rep(20,nrow(habitat1.Sel)*ncol(habitat1.Sel)),
+#                                  as.data.frame(habitat1.Sel),
+#                                  coordinates(habitat1.Sel)-0.5)
+#colnames(habitat1.Sel.df) &lt;- c(&quot;sSNP&quot;,&quot;fSNP&quot;,&quot;s&quot;,&quot;x&quot;,&quot;y&quot;)
+
+habitat2.Sel &lt;- habit2
+habitat2.Sel[habitat2.Sel&lt;11] &lt;- 0
+habitat2.Sel[habitat2.Sel&gt;10] &lt;- 0.1
+#habitat2.Sel.df &lt;- cbind(rep(1,nrow(habitat2.Sel)*ncol(habitat2.Sel)),
+#                                  rep(20,nrow(habitat2.Sel)*ncol(habitat2.Sel)),
+#                                  as.data.frame(habitat2.Sel),
+#                                  coordinates(habitat2.Sel)-0.5)
+#colnames(habitat2.Sel.df) &lt;- c(&quot;sSNP&quot;,&quot;fSNP&quot;,&quot;s&quot;,&quot;x&quot;,&quot;y&quot;)
+
+#s.coords=c()
+#for(i in 1:11) s.coords &lt;- c(s.coords, paste0(seq(0,10)[i], seq(0,10)))
+#s.coeffs &lt;- c()
+#for (i in 1:11) s.coeffs &lt;- c(s.coeffs, as.matrix(habitat1.Sel)[i,])
+#sDiff.hab1 &lt;- rbind(c(1,20,s.coeffs),
+#                    c(21,200,rep(0,121)))
+#list.hab1 &lt;- list(coords=c(&quot;sSNP&quot;,&quot;fSNP&quot;,s.coords),
+#                  sel=c(1,20,s.coeffs),
+#                  neutr=c(21,200,rep(0,121)))
+
+
+#s.coords=c()
+#for(i in 1:11) s.coords &lt;- c(s.coords, paste0(seq(0,10)[i], seq(0,10)))
+#s.coeffs &lt;- c()
+#for (i in 1:11) s.coeffs &lt;- c(s.coeffs, as.matrix(habitat2.Sel)[i,])
+#sDiff.hab2 &lt;- rbind(c(1,20,s.coeffs),
+#                    c(21,200,rep(0,121)))
+#list.hab2 &lt;- list(coords=c(&quot;sSNP&quot;,&quot;fSNP&quot;,s.coords),
+#                  sel=c(1,20,s.coeffs),
+#                  neutr=c(21,200,rep(0,121)))
+
+library(popRange)
+
+setwd(&quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/landscapeR/Simulations_200neutrSNPs/habitat1&quot;)
+
+popRangeSim(world=as.matrix(barrier), popSize=20, K=as.matrix(habit1), 
+              diploid=TRUE, nGens=1000, mig=0.1, 
+              #gamma_shape=0.2, gamma_scale=1,
+              #SNP_model=1, gSize=1*10^9, mutRate=1*10^-8,
+              SNP_model=0, nSNPs=200, SNPs_starting_freq=0.5,
+              #rMean=0.5, rVar=0.5,
+              s=matrix(c(1,11,21,10,20,200,0.05,0.1,0),nrow=3,ncol=3),
+              #sDiff=sDiff.hab1,
+              #had to modify config.py float(catProb) instead of int(catProb)
+              catProb=0.0001,
+              outfile=&quot;habitat1&quot;, GENELAND=TRUE, GENEPOP=TRUE)
+
+writeRaster(habit1, &quot;habitat1.asc&quot;)
+
+setwd(&quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/landscapeR/Simulations_200neutrSNPs/habitat2&quot;)
+
+popRangeSim(world=as.matrix(barrier), popSize=20, K=as.matrix(habit2), 
+              diploid=TRUE, nGens=1000, mig=0.1, 
+              #gamma_shape=0.2, gamma_scale=1,
+              #SNP_model=1, gSize=1*10^9, mutRate=1*10^-8,
+              SNP_model=0, nSNPs=200, SNPs_starting_freq=0.5,
+              #rMean=0.5, rVar=0.5,
+              s=matrix(c(1,11,21,10,20,200,0.05,0.1,0),nrow=3,ncol=3),
+              #sDiff=sDiff.hab2,
+              #had to modify config.py float(catProb) instead of int(catProb)
+              catProb=0.0001,
+              outfile=&quot;habitat2&quot;, GENELAND=TRUE, GENEPOP=TRUE)
+
+writeRaster(habit2, &quot;habitat2.asc&quot;)
+</code></pre>
+
+<h2 id="simulation-of-genotypes-on-complex-landscapes-generated-based-on-bioclim-data">Simulation of genotypes on complex landscapes generated based on Bioclim data</h2>
+
+<p><em>virtualspecies</em> package: landscape generation based on Bioclim data:<br />
+   To generate distributions:<br />
+     1. collinearity removed from climatic variables,<br />
+     2. PCA of remaining variables performed,<br />
+     3. ranges of PCA values specified (for three populations).</p>
+
+<pre><code class="language-r">library(raster)
+library(virtualspecies)
+
+setwd(&quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Phylogeography/Geo_Analysis/Data/EnvData/bioclim/east coast/current&quot;)
+
+fn &lt;- list.files(pattern=&quot;.asc&quot;)
+stk &lt;- stack()
+for(i in 1:length(fn)) stk &lt;- addLayer(stk,raster(fn[i]))
+
+nampres &lt;- sub(pattern=&quot;Ecoast&quot;,replacement=&quot;&quot;,names(stk))
+nampres &lt;- sub(pattern=&quot;_&quot;,replacement=&quot;&quot;,nampres)
+nampres &lt;- sub(pattern=&quot;_&quot;,replacement=&quot;&quot;,nampres)
+
+names(stk) &lt;- nampres
+
+stk60 &lt;- aggregate(stk,60)
+rc_stk60 &lt;- removeCollinearity(stk60, select.variables = TRUE, plot = TRUE, multicollinearity.cutoff = 0.5)
+
+par(mfrow=c(1,1),fg=&quot;gray50&quot;,pty='m',bty='o',mar=c(2,2,2,2),cex.main=1.5,cex.axis=1.2,cex.lab=1.3)
+
+set.seed(36813911)
+
+##High Permeability##
+
+PCA_distrib_N &lt;- generateSpFromPCA(raster.stack=stk60[[rc_stk60]], axes=c(1:2), sample.points=TRUE, nb.points=850, means=c(2.5,1), sds=c(1.2,1.2), plot=FALSE)
+PCA_distrib_C &lt;- generateSpFromPCA(raster.stack=stk60[[rc_stk60]], axes=c(1:2), sample.points=TRUE, nb.points=850, means=c(-0.5,-0.5), sds=c(1.2,1.2), plot=FALSE)
+PCA_distrib_S &lt;- generateSpFromPCA(raster.stack=stk60[[rc_stk60]], axes=c(1:2), sample.points=TRUE, nb.points=850, means=c(-2.5,2), sds=c(1.2,1.2), plot=FALSE)
+
+spN &lt;- convertToPA(PCA_distrib_N, species.prevalence=NULL, alpha=-0.004, beta=0.4)
+spC &lt;- convertToPA(PCA_distrib_C, species.prevalence=NULL, alpha=-0.004, beta=0.4)
+spS &lt;- convertToPA(PCA_distrib_S, species.prevalence=NULL, alpha=-0.004, beta=0.4)
+
+pop3.complex.highperm.PA &lt;- 1*spN$pa.raster + 2*spC$pa.raster + 3*spS$pa.raster
+pop3.complex.highperm.PA &lt;- round(pop3.complex.highperm.PA, 0)
+pop3.complex.highperm.PA[pop3.complex.highperm.PA&gt;3] &lt;- 0
+pop3.complex.highperm.PA[is.na(pop3.complex.highperm.PA)] &lt;- 0
+
+spN$suitab.raster[spN$suitab.raster&lt;0.25] &lt;- 0
+spC$suitab.raster[spC$suitab.raster&lt;0.25] &lt;- 0
+spS$suitab.raster[spS$suitab.raster&lt;0.25] &lt;- 0
+
+spN_suitab &lt;- 100*spN$pa.raster*spN$suitab.raster
+spC_suitab &lt;- 100*spC$pa.raster*spC$suitab.raster
+spS_suitab &lt;- 100*spS$pa.raster*spS$suitab.raster
+
+pop3.complex.highperm.Suitab &lt;- spN_suitab + spC_suitab + spS_suitab
+pop3.complex.highperm.Suitab[pop3.complex.highperm.Suitab&gt;100] &lt;- 100
+pop3.complex.highperm.Suitab[is.na(pop3.complex.highperm.Suitab)] &lt;- 0
+pop3.complex.highperm.Suitab[pop3.complex.highperm.Suitab&lt;5] &lt;- 0
+pop3.complex.highperm.Suitab &lt;- round(pop3.complex.highperm.Suitab,0)
+
+plot(pop3.complex.highperm.Suitab,
+    breaks=seq(minValue(pop3.complex.highperm.Suitab),maxValue(pop3.complex.highperm.Suitab),length.out=11),
+    col=cols)
+
+pop3.complex.highperm.Barrier &lt;- pop3.complex.highperm.Suitab
+pop3.complex.highperm.Barrier[pop3.complex.highperm.Suitab&gt;24] &lt;- 1
+pop3.complex.highperm.Barrier[pop3.complex.highperm.Suitab&lt;25] &lt;- -1
+
+pop3.complex.highperm.catProb &lt;- pop3.complex.highperm.Barrier
+pop3.complex.highperm.catProb[pop3.complex.highperm.catProb==-1] &lt;- 1
+pop3.complex.highperm.catProb[pop3.complex.highperm.catProb==1] &lt;- 0.1
+
+pop3.complex.highperm.Sel &lt;- pop3.complex.highperm.PA
+pop3.complex.highperm.Sel[pop3.complex.highperm.Sel==1] &lt;- 0.2
+pop3.complex.highperm.Sel[pop3.complex.highperm.Sel==2] &lt;- 0.1
+pop3.complex.highperm.Sel[pop3.complex.highperm.Sel==3] &lt;- 0.05
+pop3.complex.highperm.Sel.df &lt;- cbind(rep(1,nrow(pop3.complex.highperm.Sel)*ncol(pop3.complex.highperm.Sel)),
+                                  rep(10,nrow(pop3.complex.highperm.Sel)*ncol(pop3.complex.highperm.Sel)),
+                                  as.data.frame(pop3.complex.highperm.Sel),
+                                  coordinates(pop3.complex.highperm.Sel))
+colnames(pop3.complex.highperm.Sel.df)=c(&quot;start&quot;,&quot;end&quot;,&quot;s&quot;,&quot;x&quot;,&quot;y&quot;)
+
+
+##Low Permeability##
+
+PCA_distrib_N &lt;- generateSpFromPCA(raster.stack=stk60[[rc_stk60]], axes=c(1:2), sample.points=TRUE, nb.points=850, means=c(3.5,2.5), sds=c(1,1), plot=FALSE)
+PCA_distrib_C &lt;- generateSpFromPCA(raster.stack=stk60[[rc_stk60]], axes=c(1:2), sample.points=TRUE, nb.points=850, means=c(0,-2.2), sds=c(1,1), plot=FALSE)
+PCA_distrib_S &lt;- generateSpFromPCA(raster.stack=stk60[[rc_stk60]], axes=c(1:2), sample.points=TRUE, nb.points=850, means=c(-2.5,2.5), sds=c(1,1), plot=FALSE)
+
+
+spN &lt;- convertToPA(PCA_distrib_N, species.prevalence=NULL, alpha=-0.002, beta=0.2)
+spC &lt;- convertToPA(PCA_distrib_C, species.prevalence=NULL, alpha=-0.002, beta=0.2)
+spS &lt;- convertToPA(PCA_distrib_S, species.prevalence=NULL, alpha=-0.002, beta=0.2)
+
+pop3.complex.lowperm.PA &lt;- 1*spN$pa.raster + 2*spC$pa.raster + 3*spS$pa.raster
+pop3.complex.lowperm.PA &lt;- round(pop3.complex.lowperm.PA, 0)
+pop3.complex.lowperm.PA[pop3.complex.lowperm.PA&gt;3] &lt;- 0
+pop3.complex.lowperm.PA[is.na(pop3.complex.lowperm.PA)] &lt;- 0
+
+spN$suitab.raster[spN$suitab.raster&lt;0.25] &lt;- 0
+spC$suitab.raster[spC$suitab.raster&lt;0.25] &lt;- 0
+spS$suitab.raster[spS$suitab.raster&lt;0.25] &lt;- 0
+
+spN_suitab &lt;- 100*spN$pa.raster*spN$suitab.raster
+spC_suitab &lt;- 100*spC$pa.raster*spC$suitab.raster
+spS_suitab &lt;- 100*spS$pa.raster*spS$suitab.raster
+
+pop3.complex.lowperm.Suitab &lt;- spN_suitab + spC_suitab + spS_suitab
+pop3.complex.lowperm.Suitab[pop3.complex.lowperm.Suitab&gt;100] &lt;- 100
+pop3.complex.lowperm.Suitab[is.na(pop3.complex.lowperm.Suitab)] &lt;- 0
+pop3.complex.lowperm.Suitab[pop3.complex.lowperm.Suitab&lt;5] &lt;- 0
+pop3.complex.lowperm.Suitab &lt;- round(pop3.complex.lowperm.Suitab,0)
+
+plot(pop3.complex.lowperm.Suitab,
+    breaks=seq(minValue(pop3.complex.lowperm.Suitab),maxValue(pop3.complex.lowperm.Suitab),length.out=11),
+    col=cols)
+
+pop3.complex.lowperm.Barrier &lt;- pop3.complex.lowperm.Suitab
+pop3.complex.lowperm.Barrier[pop3.complex.lowperm.Suitab&gt;24] &lt;- 1
+pop3.complex.lowperm.Barrier[pop3.complex.lowperm.Suitab&lt;25] &lt;- -1
+
+pop3.complex.lowperm.catProb &lt;- pop3.complex.lowperm.Barrier
+pop3.complex.lowperm.catProb[pop3.complex.lowperm.catProb==-1] &lt;- 1
+pop3.complex.lowperm.catProb[pop3.complex.lowperm.catProb==1] &lt;- 0.1
+
+pop3.complex.lowperm.Sel &lt;- pop3.complex.lowperm.PA
+pop3.complex.lowperm.Sel[pop3.complex.lowperm.Sel==1] &lt;- 0.2
+pop3.complex.lowperm.Sel[pop3.complex.lowperm.Sel==2] &lt;- 0.1
+pop3.complex.lowperm.Sel[pop3.complex.lowperm.Sel==3] &lt;- 0.05
+pop3.complex.lowperm.Sel.df &lt;- cbind(rep(1,nrow(pop3.complex.lowperm.Sel)*ncol(pop3.complex.lowperm.Sel)),
+                                  rep(10,nrow(pop3.complex.lowperm.Sel)*ncol(pop3.complex.lowperm.Sel)),
+                                  as.data.frame(pop3.complex.lowperm.Sel),
+                                  coordinates(pop3.complex.lowperm.Sel))
+colnames(pop3.complex.lowperm.Sel.df)=c(&quot;start&quot;,&quot;end&quot;,&quot;s&quot;,&quot;x&quot;,&quot;y&quot;)
+</code></pre>
+
+<p><em>popRange</em> package: simulating 20 <em>selected</em> and 180 <strong>neutral</strong> SNPs based on the <em>virtualspecies</em>-generated landscape.</p>
+
+<pre><code class="language-r">library(popRange)
+
+setwd(&quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/virtualspeciesWorld/Simulations_200neutrSNPs/BarrierComplexityHigh/BarrierPermeabilityHigh&quot;)
+
+popRangeSim(world=as.matrix(pop3.complex.highperm.Barrier), popSize=20, K=as.matrix(pop3.complex.highperm.Suitab), 
+              diploid=TRUE, nGens=1000, mig=0.1, 
+              #gamma_shape=0.2, gamma_scale=1,
+              #SNP_model=1, gSize=1*10^9, mutRate=1*10^-8,
+              SNP_model=0, nSNPs=200, SNPs_starting_freq=0.5,
+              #rMean=0.5, rVar=0.5,
+              s=matrix(c(1,11,21,10,20,200,0.05,0.1,0),nrow=3,ncol=3),
+              #had to modify config.py float(catProb) instead of int(catProb)
+              catProb=0.0001,
+              outfile=&quot;pop3_complex_highperm&quot;, GENELAND=TRUE, GENEPOP=TRUE)
+
+setwd(&quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/virtualspeciesWorld/Simulations_200neutrSNPs/BarrierComplexityHigh/BarrierPermeabilityLow&quot;)
+
+popRangeSim(world=as.matrix(pop3.complex.lowperm.Barrier), popSize=20, K=as.matrix(pop3.complex.lowperm.Suitab), 
+              diploid=TRUE, nGens=1000, mig=0.1, 
+              #gamma_shape=0.2, gamma_scale=1,
+              #SNP_model=1, gSize=1*10^9, mutRate=1*10^-8,
+              SNP_model=0, nSNPs=200, SNPs_starting_freq=0.5,
+              #rMean=0.5, rVar=0.5,
+              s=matrix(c(1,11,21,10,20,200,0.05,0.1,0),nrow=3,ncol=3),
+              #had to modify config.py float(catProb) instead of int(catProb)
+              catProb=0.0001,
+              outfile=&quot;pop3_complex_lowperm&quot;, GENELAND=TRUE, GENEPOP=TRUE)
+</code></pre>
+
+<h1 id="data-for-further-analysis">Data for further analysis</h1>
+
+<h2 id="subsets-of-simulated-genotypes">Subsets of simulated genotypes</h2>
+
+<pre><code class="language-r">library(adegenet)
+library(poppr)
+library(zvau)
+
+poprange &lt;- &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/&quot;
+
+hab1 &lt;- &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/landscapeR/Simulations_200neutrSNPs/habitat1/&quot;
+hab2 &lt;- &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/landscapeR/Simulations_200neutrSNPs/habitat2/&quot;
+
+hchp &lt;- &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/virtualspeciesWorld/Simulations_200neutrSNPs/BarrierComplexityHigh/BarrierPermeabilityHigh/&quot;
+hclp &lt;- &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/virtualspeciesWorld/Simulations_200neutrSNPs/BarrierComplexityHigh/BarrierPermeabilityLow/&quot;
+
+#after deleting duplicate &quot;Loc1&quot; line
+hab1_file &lt;- read.genepop(paste0(hab1,&quot;habitat1.GENEPOP.gen&quot;))
+hab1_file@other &lt;- read.table(paste0(hab1,&quot;habitat1.GENEPOP.PopCoor.txt&quot;), sep=&quot; &quot;,header=F)
+colnames(hab1_file@other)=c(&quot;x&quot;,&quot;y&quot;)
+hab2_file &lt;- read.genepop(paste0(hab2,&quot;habitat2.GENEPOP.gen&quot;))
+hab2_file@other &lt;- read.table(paste0(hab2,&quot;habitat2.GENEPOP.PopCoor.txt&quot;), sep=&quot; &quot;,header=F)
+colnames(hab2_file@other)=c(&quot;x&quot;,&quot;y&quot;)
+
+hchp_file &lt;- read.genepop(paste0(hchp,&quot;pop3_complex_highperm.GENEPOP.gen&quot;))
+hchp_file@other &lt;- read.table(paste0(hchp,&quot;pop3_complex_highperm.GENEPOP.PopCoor.txt&quot;), sep=&quot; &quot;,header=F)
+colnames(hchp_file@other)=c(&quot;x&quot;,&quot;y&quot;)
+hclp_file &lt;- read.genepop(paste0(hclp,&quot;pop3_complex_lowperm.GENEPOP.gen&quot;))
+hclp_file@other &lt;- read.table(paste0(hclp,&quot;pop3_complex_lowperm.GENEPOP.PopCoor.txt&quot;), sep=&quot; &quot;,header=F)
+colnames(hclp_file@other)=c(&quot;x&quot;,&quot;y&quot;)
+
+
+rand.subset.20pops.hab1 &lt;- popsub(hab1_file, sublist=sample(popNames(hab1_file),20))
+rand.subset.20pops.hab2 &lt;- popsub(hab2_file, sublist=sample(popNames(hab2_file),20))
+
+rand.subset.20pops.hchp &lt;- popsub(hchp_file, sublist=sample(popNames(hchp_file),20))
+rand.subset.20pops.hclp &lt;- popsub(hclp_file, sublist=sample(popNames(hclp_file),20))
+
+
+rand.subset.20pops.hab1.neutrloc &lt;- df2genind(genind2df(rand.subset.20pops.hab1)[,22:201],pop=genind2df(rand.subset.20pops.hab1)[,1],ncode=2)
+rand.subset.20pops.hab2.neutrloc &lt;- df2genind(genind2df(rand.subset.20pops.hab2)[,22:201],pop=genind2df(rand.subset.20pops.hab2)[,1],ncode=2)
+
+rand.subset.20pops.hchp.neutrloc &lt;- df2genind(genind2df(rand.subset.20pops.hchp)[,22:201],pop=genind2df(rand.subset.20pops.hchp)[,1],ncode=2)
+rand.subset.20pops.hclp.neutrloc &lt;- df2genind(genind2df(rand.subset.20pops.hclp)[,22:201],pop=genind2df(rand.subset.20pops.hclp)[,1],ncode=2)
+
+setwd(poprange)
+writeGenPop(rand.subset.20pops.hab1,&quot;habitat1_20pops.gen&quot;,
+            comment=&quot;Habitat1 - 20 pops - Simulated Genotypes&quot;)
+writeGenPop(rand.subset.20pops.hab2,&quot;habitat2_20pops.gen&quot;,
+            comment=&quot;Habitat2 - 20 pops - Simulated Genotypes&quot;)
+writeGenPop(rand.subset.20pops.hchp,&quot;HCHP_20pops.gen&quot;,
+            comment=&quot;High Complexity High Permeability Barrier - 20 pops - Simulated Genotypes&quot;)
+writeGenPop(rand.subset.20pops.hclp,&quot;HCLP_20pops.gen&quot;,
+            comment=&quot;High Complexity Low Permeability Barrier - 20 pops - Simulated Genotypes&quot;)
+writeGenPop(rand.subset.20pops.hab1.neutrloc,&quot;habitat1_only-neutr_20pops.gen&quot;,
+            comment=&quot;Habitat1 - Only Neutral Loci - 20 pops - Simulated Genotypes&quot;)
+writeGenPop(rand.subset.20pops.hab2.neutrloc,&quot;habitat2_only-neutr_20pops.gen&quot;,
+            comment=&quot;Habitat2 - Only Neutral Loci - 20 pops - Simulated Genotypes&quot;)
+writeGenPop(rand.subset.20pops.hchp.neutrloc,&quot;HCHP_only-neutr_20pops.gen&quot;,
+            comment=&quot;High Complexity High Permeability Barrier - Only Neutral Loci - 20 pops - Simulated Genotypes&quot;)
+writeGenPop(rand.subset.20pops.hclp.neutrloc,&quot;HCLP_only-neutr_20pops.gen&quot;,
+            comment=&quot;High Complexity Low Permeability Barrier - Only Neutral Loci - 20 pops - Simulated Genotypes&quot;)
+write.table(cbind(rand.subset.20pops.hab1@other$x,rand.subset.20pops.hab1@other$y),&quot;habitat1_20pops_coords.txt&quot;, row.names=FALSE, col.names=FALSE)
+write.table(cbind(rand.subset.20pops.hab2@other$x,rand.subset.20pops.hab2@other$y),&quot;habitat2_20pops_coords.txt&quot;, row.names=FALSE, col.names=FALSE)
+write.table(cbind(rand.subset.20pops.hchp@other$x,rand.subset.20pops.hchp@other$y),&quot;HCHP_20pops_coords.txt&quot;, row.names=FALSE, col.names=FALSE)
+write.table(cbind(rand.subset.20pops.hclp@other$x,rand.subset.20pops.hclp@other$y),&quot;HCLP_20pops_coords.txt&quot;, row.names=FALSE, col.names=FALSE)
+</code></pre>
+
+<h2 id="preliminary-analysis-pt-1-inferring-population-structure-with-lea-package">Preliminary analysis pt.1: Inferring population structure with <em>LEA</em> package</h2>
+
+<pre><code class="language-r">library(LEA)
+library(mapplots)
+library(maps)
+library(raster)
+library(adegenet)
+
+#setwd(hchp)
+#write.table(t(as.matrix(rand.subset.20pops.hchp@tab)),sep=&quot;&quot;,row.names=F,&quot;hchp.geno&quot;)
+#setwd(hclp)
+#write.table(t(as.matrix(rand.subset.20pops.hclp@tab)),sep=&quot;&quot;,row.names=F,&quot;hclp.geno&quot;)
+##remove the first line from the .geno files
+
+
+######HCHP SNMF###########
+
+setwd(hchp)
+hchp_geno &lt;- read.geno(&quot;hchp.geno&quot;)
+coord &lt;- rand.subset.20pops.hchp@other
+row.no &lt;- (cbind(coord$x, coord$y)+1)[,1]
+col.no &lt;- (cbind(coord$x, coord$y)+1)[,2]
+cell.no &lt;- cellFromRowCol(pop3.complex.highperm.Suitab,row=row.no,col=col.no)
+coord &lt;- xyFromCell(pop3.complex.highperm.Suitab, cell.no)
+setwd(paste0(hchp,&quot;LEA&quot;))
+source(&quot;POPSutilities.r&quot;)
+
+#after deleting first row from hchp.geno file
+setwd(hchp)
+reps &lt;- 5
+maxK &lt;- 10
+hchp.snmf &lt;- snmf(&quot;hchp.geno&quot;,K=1:maxK,repetitions=reps,alpha=10,project=&quot;new&quot;,iterations=100000,
+                  entropy=TRUE,percentage=0.25)
+par(mfrow=c(1,1),fg=&quot;gray50&quot;,pty='m',bty='o',mar=c(2,2,2,2),cex.main=1.5,cex.axis=1.2,cex.lab=1.3)
+plot(hchp.snmf,cex=1.2,col=&quot;lightblue&quot;,pch=19)
+
+par(mfrow=c(1,1),fg=&quot;gray50&quot;,pty='m',bty='o',mar=c(5,5,5,5),cex.main=1.5,cex.axis=1.2,cex.lab=1.3)
+
+ce &lt;- list()
+for(i in 1:maxK) ce[[i]] &lt;- cross.entropy(hchp.snmf,K=i)
+best &lt;- which.min(unlist(ce))
+#best.K &lt;- ceiling(best/reps)
+best.K &lt;- 2
+best.run &lt;- which.min(ce[[best.K]])
+
+my.colors &lt;- schwifty(best.K)
+
+barchart(hchp.snmf,K=best.K,run=best.run,
+         border=NA,space=0,col=my.colors,
+         xlab=&quot;Individuals&quot;,ylab=&quot;Ancestry proportions&quot;,
+         main=&quot;Ancestry matrix&quot;) -&gt; bp
+
+qmatrix &lt;- Q(hchp.snmf,K=best.K,run=best.run)
+
+grid &lt;- createGrid(min(coord[,1]),max(coord[,1]),
+                min(coord[,2]),max(coord[,2]),500,500)
+constraints &lt;- NULL
+
+schwifty.gradient=colorRampPalette(schwifty(best.K))
+grad.cols=schwifty.gradient(best.K*10)
+
+ColorGradients_bestK &lt;- list()
+for(i in 1:best.K){ 
+  k.start &lt;- i*10-9
+  k.fin &lt;- i*10
+  ColorGradients_bestK[[i]] &lt;- c(&quot;gray95&quot;, grad.cols[k.start:k.fin])
+}
+
+maps(matrix=qmatrix,cbind(coord[,1],coord[,2]),grid,constraints,method=&quot;max&quot;,
+     colorGradientsList=ColorGradients_bestK,
+     main=&quot;Ancestry coefficients&quot;,xlab=&quot;Longitude&quot;,ylab=&quot;Latitude&quot;,cex=.5)
+map(add=T,interior=F)
+
+
+######HCLP SNMF###########
+
+setwd(hclp)
+hclp_geno &lt;- read.geno(&quot;hclp.geno&quot;)
+coord &lt;- rand.subset.20pops.hclp@other
+row.no &lt;- (cbind(coord$x, coord$y)+1)[,1]
+col.no &lt;- (cbind(coord$x, coord$y)+1)[,2]
+cell.no &lt;- cellFromRowCol(pop3.complex.lowperm.Suitab,row=row.no,col=col.no)
+coord &lt;- xyFromCell(pop3.complex.lowperm.Suitab, cell.no)
+setwd(paste0(hclp,&quot;LEA&quot;))
+source(&quot;POPSutilities.r&quot;)
+
+#after deleting first row from hclp.geno file
+setwd(hclp)
+reps &lt;- 5
+maxK &lt;- 10
+hclp.snmf &lt;- snmf(&quot;hclp.geno&quot;,K=1:maxK,repetitions=reps,alpha=10,project=&quot;new&quot;,iterations=100000,
+                  entropy=TRUE,percentage=0.25)
+par(mfrow=c(1,1),fg=&quot;gray50&quot;,pty='m',bty='o',mar=c(2,2,2,2),cex.main=1.5,cex.axis=1.2,cex.lab=1.3)
+plot(hclp.snmf,cex=1.2,col=&quot;lightblue&quot;,pch=19)
+
+par(mfrow=c(1,1),fg=&quot;gray50&quot;,pty='m',bty='o',mar=c(5,5,5,5),cex.main=1.5,cex.axis=1.2,cex.lab=1.3)
+
+ce &lt;- list()
+for(i in 1:maxK) ce[[i]] &lt;- cross.entropy(hclp.snmf,K=i)
+best &lt;- which.min(unlist(ce))
+#best.K &lt;- ceiling(best/reps)
+best.K &lt;- 4
+best.run &lt;- which.min(ce[[best.K]])
+
+my.colors &lt;- schwifty(best.K)
+
+barchart(hclp.snmf,K=best.K,run=best.run,
+         border=NA,space=0,col=my.colors,
+         xlab=&quot;Individuals&quot;,ylab=&quot;Ancestry proportions&quot;,
+         main=&quot;Ancestry matrix&quot;) -&gt; bp
+
+qmatrix &lt;- Q(hclp.snmf,K=best.K,run=best.run)
+
+
+grid &lt;- createGrid(min(coord[,1]),max(coord[,1]),
+                min(coord[,2]),max(coord[,2]),500,500)
+constraints &lt;- NULL
+
+schwifty.gradient=colorRampPalette(schwifty(best.K))
+grad.cols=schwifty.gradient(best.K*10)
+
+ColorGradients_bestK &lt;- list()
+for(i in 1:best.K){ 
+  k.start &lt;- i*10-9
+  k.fin &lt;- i*10
+  ColorGradients_bestK[[i]] &lt;- c(&quot;gray95&quot;, grad.cols[k.start:k.fin])
+}
+
+maps(matrix=qmatrix,cbind(coord[,1],coord[,2]),grid,constraints,method=&quot;max&quot;,
+     colorGradientsList=ColorGradients_bestK,
+     main=&quot;Ancestry coefficients&quot;,xlab=&quot;Longitude&quot;,ylab=&quot;Latitude&quot;,cex=.5)
+map(add=T,interior=F)
+</code></pre>
+
+<h2 id="preliminary-analysis-pt-2-inferring-population-structure-with-tess3r-package">Preliminary analysis pt.2: Inferring population structure with <em>tess3r</em> package</h2>
+
+<pre><code class="language-r">library(tess3r)
+library(adegenet)
+
+simsubset.dir &lt;- &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/simulations_20pop-subsets/&quot;
+
+sims &lt;- c(&quot;habitat1&quot;, &quot;habitat2&quot;, &quot;HCHP&quot;, &quot;HCLP&quot;)
+
+for (i in 1:4){
+
+    genind.obj &lt;- read.genepop(paste0(simsubset.dir, sims[i], &quot;_20pops.gen&quot;))
+    genind.obj@other &lt;- read.table(paste0(simsubset.dir, sims[i], &quot;_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+    colnames(genind.obj@other)=c(&quot;x&quot;,&quot;y&quot;)
+
+    genotypes &lt;- genind.obj@tab
+    coord &lt;- genind.obj@other
+  row.no &lt;- (cbind(coord$x, coord$y)+1)[,1]
+  col.no &lt;- (cbind(coord$x, coord$y)+1)[,2]
+  cell.no &lt;- cellFromRowCol(pop3.complex.lowperm.Suitab,row=row.no,col=col.no)
+  coordinates &lt;- xyFromCell(pop3.complex.lowperm.Suitab, cell.no)
+    
+  reps &lt;- 5
+  maxK &lt;- 10
+  tess3.obj &lt;- tess3(X=genotypes, coord=coordinates, K=1:maxK,
+                   method=&quot;projected.ls&quot;, rep=reps, 
+                   max.iteration=1000, tolerance=1e-06, 
+                   #max.iteration = 10000, tolerance = 1e-07, 
+                   mask=0.25,
+                   ploidy=2)
+
+    ce &lt;- list()
+  for(i in 1:maxK) ce[[i]] &lt;- tess3.obj[[i]]$crossvalid.crossentropy
+    best &lt;- which.min(unlist(ce))
+  best.K &lt;- ceiling(best/reps)
+  best.run &lt;- which.min(ce[[best.K]])
+
+  q.matrix &lt;- qmatrix(tess3.obj, K=best.K)
+
+    schwifty.pal=CreatePalette(schwifty(best.K),10)
+
+  barplot(q.matrix, border = NA, space = 0,
+           col.palette = schwifty.pal,
+           xlab = &quot;Individuals&quot;, ylab = &quot;Ancestry proportions&quot;,
+           main = &quot;Ancestry matrix&quot;) -&gt; bp
+  #axis(1, at = 1:nrow(q.matrix), labels = bp$order, las = 3, cex.axis = .4)
+
+    plot(q.matrix, coordinates, method = &quot;map.max&quot;, interpol = FieldsKrigModel(10),
+         main = &quot;Ancestry coefficients&quot;,
+         xlab = &quot;Longitude&quot;, ylab = &quot;Latitude&quot;,
+         resolution = c(500,500), cex = .8,
+         col.palette = schwifty.pal)
+}
+</code></pre>
+		</div>
+		
+<div class="post__tags tags clearfix">
+	<svg class="tags__icon icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5 0 11V3C0 1.5.8.8.8.8S1.5 0 3 0h8c1.5 0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/></svg>
+	<ul class="tags__list">
+		<li class="tags__item"><a class="tags__link btn" href="/tags/landscape-genetics/" rel="tag">Landscape Genetics</a></li>
+		<li class="tags__item"><a class="tags__link btn" href="/tags/landscape-simulations/" rel="tag">Landscape Simulations</a></li>
+		<li class="tags__item"><a class="tags__link btn" href="/tags/genotype-simulations/" rel="tag">Genotype Simulations</a></li>
+	</ul>
+</div>
+	</article>
+</main>
+
+<div class="authorbox clearfix">
+	<figure class="authorbox__avatar">
+		<img alt="Chaz Hyseni avatar" src="/img/SpEcEvGen.png" class="avatar" height="90" width="90">
+	</figure>
+	<div class="authorbox__header">
+		<span class="authorbox__name">About Chaz Hyseni</span>
+	</div>
+	<div class="authorbox__description">
+		Chaz has been doing research in the field of Population Genetics since 2006. He is interested in the distribution of genetic variation (both neutral and adaptive) in natural environments, at different spatial and temporal scales (from Landscape Genetics to Phylogeography). To understand pattern and process, Chaz uses empirical data as well as spatial eco-evolutionary modeling.
+	</div>
+</div>
+
+<nav class="post-nav flex">
+	<div class="post-nav__item post-nav__item--prev">
+		<a class="post-nav__link" href="/post/simulations/" rel="prev"><span class="post-nav__caption">«&thinsp;Previous</span><p class="post-nav__post-title">Simulations</p></a>
+	</div>
+	<div class="post-nav__item post-nav__item--next">
+		<a class="post-nav__link" href="/post/analysis/" rel="next"><span class="post-nav__caption">Next&thinsp;»</span><p class="post-nav__post-title">NALgen Analysis</p></a>
+	</div>
+</nav>
+
+
+			</div>
+			<aside class="sidebar"><div class="widget-search widget">
+	<form class="widget-search__form" role="search" method="get" action="https://google.com/search">
+		<label>
+			<input class="widget-search__field" type="search" placeholder="SEARCH..." value="" name="q" aria-label="SEARCH...">
+		</label>
+		<input class="widget-search__submit" type="submit" value="Search">
+		<input type="hidden" name="sitesearch" value="/" />
+	</form>
+</div>
+<div class="widget-recent widget">
+	<h4 class="widget__title">Recent Posts</h4>
+	<div class="widget__content">
+		<ul class="widget__list">
+			<li class="widget__item"><a class="widget__link" href="/post/analysis/">NALgen Analysis</a></li>
+			<li class="widget__item"><a class="widget__link" href="/post/landscape-genetic-simulations/">Landscape Genetic Simulations</a></li>
+			<li class="widget__item"><a class="widget__link" href="/post/simulations/">Simulations</a></li>
+		</ul>
+	</div>
+</div>
+<div class="widget-categories widget">
+	<h4 class="widget__title">Categories</h4>
+	<div class="widget__content">
+		<ul class="widget__list">
+			<li class="widget__item"><a class="widget__link" href="/categories/analysis">Analysis</a></li>
+			<li class="widget__item"><a class="widget__link" href="/categories/simulations">Simulations</a></li>
+		</ul>
+	</div>
+</div>
+<div class="widget-taglist widget">
+	<h4 class="widget__title">Tags</h4>
+	<div class="widget__content">
+		<a class="widget-taglist__link widget__link btn" href="/tags/genotype-simulations" title="Genotype simulations">Genotype simulations</a>
+		<a class="widget-taglist__link widget__link btn" href="/tags/landscape-connectivity" title="Landscape connectivity">Landscape connectivity</a>
+		<a class="widget-taglist__link widget__link btn" href="/tags/landscape-genetics" title="Landscape genetics">Landscape genetics</a>
+		<a class="widget-taglist__link widget__link btn" href="/tags/landscape-simulations" title="Landscape simulations">Landscape simulations</a>
+		<a class="widget-taglist__link widget__link btn" href="/tags/multivariate-analysis" title="Multivariate analysis">Multivariate analysis</a>
+		<a class="widget-taglist__link widget__link btn" href="/tags/spatial-interpolation" title="Spatial interpolation">Spatial interpolation</a>
+	</div>
+</div>
+</aside>
+		</div>
+		<footer class="footer">
+	<div class="container footer__container flex">
+		
+		<div class="footer__copyright">
+			&copy; 2019 NALgen: Neutral and Adaptive Landscape Genetics.
+			<span class="footer__copyright-credits">Generated with <a href="https://gohugo.io/" rel="nofollow noopener" target="_blank">Hugo</a> and <a href="https://github.com/Vimux/Mainroad/" rel="nofollow noopener" target="_blank">Mainroad</a> theme.</span>
+		</div>
+	</div>
+</footer>
+	</div>
+<script async defer src="/js/menu.js"></script></body>
+</html>
