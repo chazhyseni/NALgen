@@ -97,6 +97,16 @@
   </url>
   
   <url>
+    <loc>/NALgen/post/multivariateanalysis_popstruct_simulateddata/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/NALgen/post/landgen-simulations/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>/NALgen/about/</loc>
   </url>
   

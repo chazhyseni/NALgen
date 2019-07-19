@@ -90,7 +90,7 @@ if (!doNotTrack) {
 </div>
 	</header>
 	<div class="content list__excerpt post__content clearfix">
-		Color palette library(ggsci) futr &lt;- pal_futurama() futr.cols &lt;- colorRampPalette(futr(12)[c(12,11,3,7,8,6,1,2)]) cols &lt;- futr.cols(12) library(scales) #show_col(futr(12)) show_col(cols)  Preliminary NALgen analysis pt.1: Multivariate ordinations Loading the environmental data library(raster)  ## Loading required package: sp  library(virtualspecies) #load bioclim files setwd(&quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Phylogeography/Geo_Analysis/Data/EnvData/bioclim/east coast/current&quot;) fn &lt;- list.files(pattern=&quot;.asc&quot;) bio_stk &lt;- stack() for(i in 1:length(fn)) bio_stk &lt;- addLayer(bio_stk,raster(fn[i])) #modify variable names nampres &lt;- sub(pattern=&quot;Ecoast&quot;,replacement=&quot;&quot;,names(bio_stk)) nampres &lt;- sub(pattern=&quot;_&quot;,replacement=&quot;&quot;,nampres) nampres &lt;- sub(pattern=&quot;_&quot;,replacement=&quot;&quot;,nampres) names(bio_stk) &lt;- nampres ##remove highly correlated variables #rc_bio &lt;- removeCollinearity(bio_stk, select.
+		<p>Here, I present the prequel to the NALgen method: using multivariate analyses to infer population structure in the simulated data as well as to find covariance between genetic and environmental data. In upcoming posts about modeling neutral and adaptive genetic variation across continuous landscapes, information about population structure will be used in creating the response variable, while transformed environmental data (based on genetic-environmental covariance) will be used as predictors.</p>
 	</div>
 </article><article class="list__item post">
 	<header class="list__header">
@@ -114,6 +114,30 @@ if (!doNotTrack) {
 	<div class="content list__excerpt post__content clearfix">
 		<p>The main purpose of this article is to break down the simulation steps: landscape generation and simulation of genotypes based on the generated landscapes.</p>
 	</div>
+</article><article class="list__item post">
+	<header class="list__header">
+		<h3 class="list__title post__title ">
+			<a href="/NALgen/post/multivariateanalysis_popstruct_simulateddata/" rel="bookmark">
+			
+			</a>
+		</h3>
+		
+	</header>
+	<div class="content list__excerpt post__content clearfix">
+		
+	</div>
+</article><article class="list__item post">
+	<header class="list__header">
+		<h3 class="list__title post__title ">
+			<a href="/NALgen/post/landgen-simulations/" rel="bookmark">
+			
+			</a>
+		</h3>
+		
+	</header>
+	<div class="content list__excerpt post__content clearfix">
+		
+	</div>
 </article>
 </main>
 
@@ -126,6 +150,8 @@ if (!doNotTrack) {
 		<ul class="widget__list">
 			<li class="widget__item"><a class="widget__link" href="/NALgen/post/multivariateanalysis_popstruct_simulateddata/">NALgen Analysis Pt.1</a></li>
 			<li class="widget__item"><a class="widget__link" href="/NALgen/post/landscape-genetic-simulations/">Landscape Genetic Simulations</a></li>
+			<li class="widget__item"><a class="widget__link" href="/NALgen/post/multivariateanalysis_popstruct_simulateddata/"></a></li>
+			<li class="widget__item"><a class="widget__link" href="/NALgen/post/landgen-simulations/"></a></li>
 		</ul>
 	</div>
 </div>

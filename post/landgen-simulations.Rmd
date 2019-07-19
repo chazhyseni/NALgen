@@ -32,7 +32,7 @@ The main purpose of this article is to break down the simulation steps: landscap
 
 Color palette
 ---
-```{r warning=FALSE}
+```{r echo=FALSE}
 library(ggsci)
 #schwifty <- pal_rickandmorty()
 #schwifty.cols <- colorRampPalette(schwifty(12)[c(3,12,4,6,1,9,8,2)])
@@ -56,7 +56,7 @@ Generating simple (low-complexity) landscapes
 
 _landscapeR_ package: simulating simple landscapes (barrier and two different values of carrying capacity/habitat suitability): landscape 1 has low permeability cells (carrying capacity = 5) between habitable patches (carrying capacity = 100), while landscape 2 has high permeability cells (carrying capacity = 25), in addition to barriers (carrying capacity = 0).
 
-```{r warning=FALSE}
+```{r echo=FALSE}
 library(landscapeR)
 library(raster)
 #consistency of results
@@ -216,7 +216,7 @@ Generating simple (low-complexity) landscapes
 
 _landscapeR_ package: simulating simple landscapes (barrier and two different values of carrying capacity/habitat suitability): landscape 1 has low permeability cells (carrying capacity = 5) between habitable patches (carrying capacity = 100), while landscape 2 has high permeability cells (carrying capacity = 25), in addition to barriers (carrying capacity = 0).
 
-```{r warning=FALSE}
+```{r echo=FALSE}
 library(landscapeR)
 library(raster)
 #same seed = same landscapes as above
@@ -357,7 +357,7 @@ _virtualspecies_ package: landscape generation based on Bioclim data:
      2. PCA of remaining variables performed,  
      3. ranges of PCA values specified (for three populations).    
 
-```{r warning=FALSE}
+```{r echo=FALSE}
 library(raster)
 library(virtualspecies)
 #consistency of results
