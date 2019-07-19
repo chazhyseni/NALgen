@@ -6,64 +6,9 @@
     <description>Recent content in Tags on NALgen</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 16 Jul 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/NALgen/tags/index.xml" rel="self" type="application/rss+xml" />
     
-    
-    <item>
-      <title>Landscape Connectivity</title>
-      <link>/NALgen/tags/landscape-connectivity/</link>
-      <pubDate>Tue, 16 Jul 2019 00:00:00 +0000</pubDate>
-      
-      <guid>/NALgen/tags/landscape-connectivity/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Landscape Genetics</title>
-      <link>/NALgen/tags/landscape-genetics/</link>
-      <pubDate>Tue, 16 Jul 2019 00:00:00 +0000</pubDate>
-      
-      <guid>/NALgen/tags/landscape-genetics/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Multivariate Analysis</title>
-      <link>/NALgen/tags/multivariate-analysis/</link>
-      <pubDate>Tue, 16 Jul 2019 00:00:00 +0000</pubDate>
-      
-      <guid>/NALgen/tags/multivariate-analysis/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Spatial Interpolation</title>
-      <link>/NALgen/tags/spatial-interpolation/</link>
-      <pubDate>Tue, 16 Jul 2019 00:00:00 +0000</pubDate>
-      
-      <guid>/NALgen/tags/spatial-interpolation/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Genotype Simulations</title>
-      <link>/NALgen/tags/genotype-simulations/</link>
-      <pubDate>Mon, 15 Jul 2019 00:00:00 +0000</pubDate>
-      
-      <guid>/NALgen/tags/genotype-simulations/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Landscape Simulations</title>
-      <link>/NALgen/tags/landscape-simulations/</link>
-      <pubDate>Mon, 15 Jul 2019 00:00:00 +0000</pubDate>
-      
-      <guid>/NALgen/tags/landscape-simulations/</guid>
-      <description></description>
-    </item>
     
   </channel>
 </rss>

@@ -1,0 +1,820 @@
+---
+title: "NALgen Analysis Pt.1"
+author: Chaz Hyseni
+date: '2019-07-19'
+description: "Multivariate Analyses: Inferring population structure in simulated data"
+categories:
+- Analysis
+tags:
+- Multivariate Ordination
+- Discriminant Analysis of Principal Components
+- Co-inertia Analysis
+- Population Structure
+- Genetic-Environmental Covariance
+output:
+  html_document:
+    df_print: tibble
+    fig_caption: yes
+    fig_height: 8
+    fig_width: 8.6
+    keep_md: yes
+    number_sections: yes
+    theme: sandstone
+    toc: yes
+  html_notebook: MultivariateAnalysis_PopStruct_SimulatedData
+  pdf_document: MultivariateAnalysis_PopStruct_SimulatedData
+  word_document:
+    toc: yes
+---
+
+
+Color palette
+---
+```{r warning=FALSE}
+library(ggsci)
+futr <- pal_futurama()
+futr.cols <- colorRampPalette(futr(12)[c(12,11,3,7,8,6,1,2)])
+cols <- futr.cols(12)
+
+library(scales)
+#show_col(futr(12))
+show_col(cols)
+```
+
+Preliminary NALgen analysis pt.1: Multivariate ordinations
+===
+Loading the environmental data
+---
+```{r warning=FALSE}
+library(raster)
+library(virtualspecies)
+#load bioclim files
+setwd("C:/Users/chazh/Documents/Research Projects/Reticulitermes/Phylogeography/Geo_Analysis/Data/EnvData/bioclim/east coast/current")
+fn <- list.files(pattern=".asc")
+bio_stk <- stack()
+for(i in 1:length(fn)) bio_stk <- addLayer(bio_stk,raster(fn[i]))
+
+#modify variable names
+nampres <- sub(pattern="Ecoast",replacement="",names(bio_stk))
+nampres <- sub(pattern="_",replacement="",nampres)
+nampres <- sub(pattern="_",replacement="",nampres)
+names(bio_stk) <- nampres
+
+##remove highly correlated variables
+#rc_bio <- removeCollinearity(bio_stk, select.variables = TRUE, plot = TRUE, multicollinearity.cutoff = 0.3)
+
+#plot parameters
+par(mfrow=c(1,1),fg="gray50",pty='m',bty='o',mar=c(4,4,4,4),cex.main=1.3,cex.axis=1.1,cex.lab=1.2)
+
+##names for plot titles
+#bionames <- c("Isothermality","Annual Mean Temperature","Annual Precipitation","Temperature Seasonality","Precipitation Seasonality","Mean Diurnal Range","Temperature Annual Range","Max. Temperature Warmest Month","Min. Temperature Coldest Month","Mean Temperature Warmest Quarter","Precipitation Warmest Quarter","Mean Temperature Coldest Quarter","Precipitation Coldest Quarter","Mean Temperature Wettest Quarter","Precipitation Wettest Quarter","Mean Temperature Driest Quarter","Precipitation Driest Quarter","Precipitation Wettest Month","Precipitation Driest Month")
+#biovars <- paste0("bio",c(3,1,12,4,15,2,7,5,6,10,18,19,11,8,16,9,17,13,14))
+
+##plot bioclim variables left after removing collinearity
+#for (i in rc_bio){
+#   plot(bio_stk[[i]], main=bionames[which(biovars==rc_bio[i])],
+#       breaks=seq(round(min(as.matrix(bio_stk[[i]]),na.rm=T),1),
+#                  round(max(as.matrix(bio_stk[[i]]),na.rm=T),1),length.out=11),
+#       col=cols)
+#}
+
+setwd("C:/Users/chazh/Documents/Research Projects/Reticulitermes/Phylogeography/Geo_Analysis/Data/EnvData/bioclim_FA/east coast/Finalized/current")
+fn <- list.files(pattern=".asc")
+fa_stk <- stack()
+for(i in 1:length(fn)) fa_stk=addLayer(fa_stk,raster(fn[i]))
+
+#names for plot titles
+fa_stk_names <- c("Annual Temperature Range", "Dry-Season Precipitation", "Summer Temperature", "Wet-Season Precipitation")
+
+#plot Environmental Factors (https://datadryad.org/resource/doi:10.5061/dryad.5hr7f31)
+for (i in 1:4){
+   plot(fa_stk[[i]], main=fa_stk_names[i],
+       breaks=seq(round(min(as.matrix(fa_stk[[i]]),na.rm=T),1),
+                  round(max(as.matrix(fa_stk[[i]]),na.rm=T),1),length.out=11),
+       col=cols)
+}
+```
+
+Loading the genetic data
+---
+```{r eval=FALSE}
+library(adegenet)
+
+
+m0.1_n <- "C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_1/Simulated_Genotypes/20pop_subsets/neutral_only"
+m0.1_n.s <- "C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_1/Simulated_Genotypes/20pop_subsets/neutral+selected"
+m0.1_s <- "C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_1/Simulated_Genotypes/20pop_subsets/selected_only"
+m0.5_n <- "C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_5/Simulated_Genotypes/20pop_subsets/neutral_only"
+m0.5_n.s <- "C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_5/Simulated_Genotypes/20pop_subsets/neutral+selected"
+m0.5_s <- "C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_5/Simulated_Genotypes/20pop_subsets/selected_only"
+
+
+setwd("C:/Users/chazh/Documents/Research Projects/Reticulitermes/NALgen_Analysis/Multivariate/")
+
+#define function
+xyFromRC <- function(genind, rastr){
+   coord <- genind$other
+   row.no <- coord[,1]+1
+   col.no <- coord[,2]+1
+   cell.no <- cellFromRowCol(rastr,row=row.no,col=col.no)
+   coord <- xyFromCell(rastr, cell.no)
+   as.data.frame(coord)
+}
+
+
+
+###m0.1###
+##neutral ONLY##
+m0.1_lclp_n <- read.genepop(paste0(m0.1_n,"lclp_only-neutr_20pops.gen"))
+m0.1_lclp_n$other <- read.table(paste0(m0.1_n,"lclp_20pops_coords.txt"), sep=" ",header=F)
+colnames(m0.1_lclp_n$other)=c("x","y")
+m0.1_lclp_n$other <- xyFromRC(m0.1_lclp_n, fa_stk)
+m0.1_lchp_n <- read.genepop(paste0(m0.1_n,"lchp_only-neutr_20pops.gen"))
+m0.1_lchp_n$other <- read.table(paste0(m0.1_n,"lchp_20pops_coords.txt"), sep=" ",header=F)
+colnames(m0.1_lchp_n$other)=c("x","y")
+m0.1_lchp_n$other <- xyFromRC(m0.1_lchp_n, fa_stk)
+m0.1_hchp_n <- read.genepop(paste0(m0.1_n,"hchp_only-neutr_20pops.gen"))
+m0.1_hchp_n$other <- read.table(paste0(m0.1_n,"hchp_20pops_coords.txt"), sep=" ",header=F)
+colnames(m0.1_hchp_n$other)=c("x","y")
+m0.1_hchp_n$other <- xyFromRC(m0.1_hchp_n, fa_stk)
+m0.1_hclp_n <- read.genepop(paste0(m0.1_n,"hclp_only-neutr_20pops.gen"))
+m0.1_hclp_n$other <- read.table(paste0(m0.1_n,"hclp_20pops_coords.txt"), sep=" ",header=F)
+colnames(m0.1_hclp_n$other)=c("x","y")
+m0.1_hclp_n$other <- xyFromRC(m0.1_hclp_n, fa_stk)
+
+##selected ONLY##
+m0.1_lclp_s <- read.genepop(paste0(m0.1_s,"lclp_only-sel_20pops.gen"))
+m0.1_lclp_s$other <- read.table(paste0(m0.1_s,"lclp_20pops_coords.txt"), sep=" ",header=F)
+colnames(m0.1_lclp_s$other)=c("x","y")
+m0.1_lclp_s$other <- xyFromRC(m0.1_lclp_s, fa_stk)
+m0.1_lchp_s <- read.genepop(paste0(m0.1_s,"lchp_only-sel_20pops.gen"))
+m0.1_lchp_s$other <- read.table(paste0(m0.1_s,"lchp_20pops_coords.txt"), sep=" ",header=F)
+colnames(m0.1_lchp_s$other)=c("x","y")
+m0.1_lchp_s$other <- xyFromRC(m0.1_lchp_s, fa_stk)
+m0.1_hchp_s <- read.genepop(paste0(m0.1_s,"hchp_only-sel_20pops.gen"))
+m0.1_hchp_s$other <- read.table(paste0(m0.1_s,"hchp_20pops_coords.txt"), sep=" ",header=F)
+colnames(m0.1_hchp_s$other)=c("x","y")
+m0.1_hchp_s$other <- xyFromRC(m0.1_hchp_s, fa_stk)
+m0.1_hclp_s <- read.genepop(paste0(m0.1_s,"hclp_only-sel_20pops.gen"))
+m0.1_hclp_s$other <- read.table(paste0(m0.1_s,"hclp_20pops_coords.txt"), sep=" ",header=F)
+colnames(m0.1_hclp_s$other)=c("x","y")
+m0.1_hclp_s$other <- xyFromRC(m0.1_hclp_s, fa_stk)
+
+##neutral AND selected##
+m0.1_lclp_n.s <- read.genepop(paste0(m0.1_n.s,"lclp_20pops.gen"))
+m0.1_lclp_n.s$other <- read.table(paste0(m0.1_n.s,"lclp_20pops_coords.txt"), sep=" ",header=F)
+colnames(m0.1_lclp_n.s$other)=c("x","y")
+m0.1_lclp_n.s$other <- xyFromRC(m0.1_lclp_n.s, fa_stk)
+m0.1_lchp_n.s <- read.genepop(paste0(m0.1_n.s,"lchp_20pops.gen"))
+m0.1_lchp_n.s$other <- read.table(paste0(m0.1_n.s,"lchp_20pops_coords.txt"), sep=" ",header=F)
+colnames(m0.1_lchp_n.s$other)=c("x","y")
+m0.1_lchp_n.s$other <- xyFromRC(m0.1_lchp_n.s, fa_stk)
+m0.1_hchp_n.s <- read.genepop(paste0(m0.1_n.s,"hchp_20pops.gen"))
+m0.1_hchp_n.s$other <- read.table(paste0(m0.1_n.s,"hchp_20pops_coords.txt"), sep=" ",header=F)
+colnames(m0.1_hchp_n.s$other)=c("x","y")
+m0.1_hchp_n.s$other <- xyFromRC(m0.1_hchp_n.s, fa_stk)
+m0.1_hclp_n.s <- read.genepop(paste0(m0.1_n.s,"hclp_20pops.gen"))
+m0.1_hclp_n.s$other <- read.table(paste0(m0.1_n.s,"hclp_20pops_coords.txt"), sep=" ",header=F)
+colnames(m0.1_hclp_n.s$other)=c("x","y")
+m0.1_hclp_n.s$other <- xyFromRC(m0.1_hclp_n.s, fa_stk)
+
+
+###m0.5###
+##neutral ONLY##
+m0.5_lclp_n <- read.genepop(paste0(m0.5_n,"lclp_only-neutr_20pops.gen"))
+m0.5_lclp_n$other <- read.table(paste0(m0.5_n,"lclp_20pops_coords.txt"), sep=" ",header=F)
+colnames(m0.5_lclp_n$other)=c("x","y")
+m0.5_lclp_n$other <- xyFromRC(m0.5_lclp_n, fa_stk)
+m0.5_lchp_n <- read.genepop(paste0(m0.5_n,"lchp_only-neutr_20pops.gen"))
+m0.5_lchp_n$other <- read.table(paste0(m0.5_n,"lchp_20pops_coords.txt"), sep=" ",header=F)
+colnames(m0.5_lchp_n$other)=c("x","y")
+m0.5_lchp_n$other <- xyFromRC(m0.5_lchp_n, fa_stk)
+m0.5_hchp_n <- read.genepop(paste0(m0.5_n,"hchp_only-neutr_20pops.gen"))
+m0.5_hchp_n$other <- read.table(paste0(m0.5_n,"hchp_20pops_coords.txt"), sep=" ",header=F)
+colnames(m0.5_hchp_n$other)=c("x","y")
+m0.5_hchp_n$other <- xyFromRC(m0.5_hchp_n, fa_stk)
+m0.5_hclp_n <- read.genepop(paste0(m0.5_n,"hclp_only-neutr_20pops.gen"))
+m0.5_hclp_n$other <- read.table(paste0(m0.5_n,"hclp_20pops_coords.txt"), sep=" ",header=F)
+colnames(m0.5_hclp_n$other)=c("x","y")
+m0.5_hclp_n$other <- xyFromRC(m0.5_hclp_n, fa_stk)
+
+##selected ONLY##
+m0.5_lclp_s <- read.genepop(paste0(m0.5_s,"lclp_only-sel_20pops.gen"))
+m0.5_lclp_s$other <- read.table(paste0(m0.5_s,"lclp_20pops_coords.txt"), sep=" ",header=F)
+colnames(m0.5_lclp_s$other)=c("x","y")
+m0.5_lclp_s$other <- xyFromRC(m0.5_lclp_s, fa_stk)
+m0.5_lchp_s <- read.genepop(paste0(m0.5_s,"lchp_only-sel_20pops.gen"))
+m0.5_lchp_s$other <- read.table(paste0(m0.5_s,"lchp_20pops_coords.txt"), sep=" ",header=F)
+colnames(m0.5_lchp_s$other)=c("x","y")
+m0.5_lchp_s$other <- xyFromRC(m0.5_lchp_s, fa_stk)
+m0.5_hchp_s <- read.genepop(paste0(m0.5_s,"hchp_only-sel_20pops.gen"))
+m0.5_hchp_s$other <- read.table(paste0(m0.5_s,"hchp_20pops_coords.txt"), sep=" ",header=F)
+colnames(m0.5_hchp_s$other)=c("x","y")
+m0.5_hchp_s$other <- xyFromRC(m0.5_hchp_s, fa_stk)
+m0.5_hclp_s <- read.genepop(paste0(m0.5_s,"hclp_only-sel_20pops.gen"))
+m0.5_hclp_s$other <- read.table(paste0(m0.5_s,"hclp_20pops_coords.txt"), sep=" ",header=F)
+colnames(m0.5_hclp_s$other)=c("x","y")
+m0.5_hclp_s$other <- xyFromRC(m0.5_hclp_s, fa_stk)
+
+##neutral AND selected##
+m0.5_lclp_n.s <- read.genepop(paste0(m0.5_n.s,"lclp_20pops.gen"))
+m0.5_lclp_n.s$other <- read.table(paste0(m0.5_n.s,"lclp_20pops_coords.txt"), sep=" ",header=F)
+colnames(m0.5_lclp_n.s$other)=c("x","y")
+m0.5_lclp_n.s$other <- xyFromRC(m0.5_lclp_n.s, fa_stk)
+m0.5_lchp_n.s <- read.genepop(paste0(m0.5_n.s,"lchp_20pops.gen"))
+m0.5_lchp_n.s$other <- read.table(paste0(m0.5_n.s,"lchp_20pops_coords.txt"), sep=" ",header=F)
+colnames(m0.5_lchp_n.s$other)=c("x","y")
+m0.5_lchp_n.s$other <- xyFromRC(m0.5_lchp_n.s, fa_stk)
+m0.5_hchp_n.s <- read.genepop(paste0(m0.5_n.s,"hchp_20pops.gen"))
+m0.5_hchp_n.s$other <- read.table(paste0(m0.5_n.s,"hchp_20pops_coords.txt"), sep=" ",header=F)
+colnames(m0.5_hchp_n.s$other)=c("x","y")
+m0.5_hchp_n.s$other <- xyFromRC(m0.5_hchp_n.s, fa_stk)
+m0.5_hclp_n.s <- read.genepop(paste0(m0.5_n.s,"hclp_20pops.gen"))
+m0.5_hclp_n.s$other <- read.table(paste0(m0.5_n.s,"hclp_20pops_coords.txt"), sep=" ",header=F)
+colnames(m0.5_hclp_n.s$other)=c("x","y")
+m0.5_hclp_n.s$other <- xyFromRC(m0.5_hclp_n.s, fa_stk)
+
+```
+
+
+```{r eval=FALSE}
+temp.dapc.obj <- dapc(m0.1_lclp_n,center=T,scale=F,n.pca=500,n.da=2)
+temp <- optim.a.score(temp.dapc.obj)
+best.n.pca <- temp$best
+dapc.obj <- dapc(m0.1_lclp_n,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+
+scatter(dapc.obj,col=cols,ratio.pca=0.3,bg="white",main="m = 0.1, low complexity, low permeability, neutral loci only",
+	pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,
+	mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(m0.1_lclp_n))
+par(xpd=TRUE)
+points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col="black",bg=cols)
+```
+
+```{r eval=FALSE}
+temp.dapc.obj <- dapc(m0.1_lclp_s,center=T,scale=F,n.pca=500,n.da=2)
+temp <- optim.a.score(temp.dapc.obj)
+best.n.pca <- temp$best
+dapc.obj <- dapc(m0.1_lclp_s,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+
+scatter(dapc.obj,col=cols,ratio.pca=0.3,bg="white",main="m = 0.1, low complexity, low permeability, selected loci only",
+	pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,
+	mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(m0.1_lclp_n))
+par(xpd=TRUE)
+points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col="black",bg=cols)
+```
+
+```{r eval=FALSE}
+temp.dapc.obj <- dapc(m0.1_lclp_n.s,center=T,scale=F,n.pca=500,n.da=2)
+temp <- optim.a.score(temp.dapc.obj)
+best.n.pca <- temp$best
+dapc.obj <- dapc(m0.1_lclp_n.s,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+
+scatter(dapc.obj,col=cols,ratio.pca=0.3,bg="white",main="m = 0.1, low complexity, low permeability, neutral and selected loci",
+	pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,
+	mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(m0.1_lclp_n))
+par(xpd=TRUE)
+points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col="black",bg=cols)
+```
+
+```{r eval=FALSE}
+temp.dapc.obj <- dapc(m0.5_lclp_n,center=T,scale=F,n.pca=500,n.da=2)
+temp <- optim.a.score(temp.dapc.obj)
+best.n.pca <- temp$best
+dapc.obj <- dapc(m0.5_lclp_n,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+
+scatter(dapc.obj,col=cols,ratio.pca=0.3,bg="white",main="m = 0.5, low complexity, low permeability, neutral loci only",
+	pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,
+	mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(m0.5_lclp_n))
+par(xpd=TRUE)
+points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col="black",bg=cols)
+```
+
+```{r eval=FALSE}
+temp.dapc.obj <- dapc(m0.5_lclp_s,center=T,scale=F,n.pca=500,n.da=2)
+temp <- optim.a.score(temp.dapc.obj)
+best.n.pca <- temp$best
+dapc.obj <- dapc(m0.5_lclp_s,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+
+scatter(dapc.obj,col=cols,ratio.pca=0.3,bg="white",main="m = 0.5, low complexity, low permeability, selected loci only",
+	pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,
+	mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(m0.5_lclp_n))
+par(xpd=TRUE)
+points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col="black",bg=cols)
+```
+
+```{r eval=FALSE}
+temp.dapc.obj <- dapc(m0.5_lclp_n.s,center=T,scale=F,n.pca=500,n.da=2)
+temp <- optim.a.score(temp.dapc.obj)
+best.n.pca <- temp$best
+dapc.obj <- dapc(m0.5_lclp_n.s,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+
+scatter(dapc.obj,col=cols,ratio.pca=0.3,bg="white",main="m = 0.5, low complexity, low permeability, neutral and selected loci",
+	pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,
+	mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(m0.5_lclp_n))
+par(xpd=TRUE)
+points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col="black",bg=cols)
+```
+
+```{r eval=FALSE}
+temp.dapc.obj <- dapc(m0.1_lchp_n,center=T,scale=F,n.pca=500,n.da=2)
+temp <- optim.a.score(temp.dapc.obj)
+best.n.pca <- temp$best
+dapc.obj <- dapc(m0.1_lchp_n,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+
+scatter(dapc.obj,col=cols,ratio.pca=0.3,bg="white",main="m = 0.1, low complexity, high permeability, neutral loci only",
+	pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,
+	mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(m0.1_lchp_n))
+par(xpd=TRUE)
+points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col="black",bg=cols)
+```
+
+```{r eval=FALSE}
+temp.dapc.obj <- dapc(m0.1_lchp_s,center=T,scale=F,n.pca=500,n.da=2)
+temp <- optim.a.score(temp.dapc.obj)
+best.n.pca <- temp$best
+dapc.obj <- dapc(m0.1_lchp_s,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+
+scatter(dapc.obj,col=cols,ratio.pca=0.3,bg="white",main="m = 0.1, low complexity, high permeability, selected loci only",
+	pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,
+	mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(m0.1_lchp_n))
+par(xpd=TRUE)
+points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col="black",bg=cols)
+```
+
+```{r eval=FALSE}
+temp.dapc.obj <- dapc(m0.1_lchp_n.s,center=T,scale=F,n.pca=500,n.da=2)
+temp <- optim.a.score(temp.dapc.obj)
+best.n.pca <- temp$best
+dapc.obj <- dapc(m0.1_lchp_n.s,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+
+scatter(dapc.obj,col=cols,ratio.pca=0.3,bg="white",main="m = 0.1, low complexity, high permeability, neutral and selected loci",
+	pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,
+	mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(m0.1_lchp_n))
+par(xpd=TRUE)
+points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col="black",bg=cols)
+```
+
+```{r eval=FALSE}
+temp.dapc.obj <- dapc(m0.5_lchp_n,center=T,scale=F,n.pca=500,n.da=2)
+temp <- optim.a.score(temp.dapc.obj)
+best.n.pca <- temp$best
+dapc.obj <- dapc(m0.5_lchp_n,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+
+scatter(dapc.obj,col=cols,ratio.pca=0.3,bg="white",main="m = 0.5, low complexity, high permeability, neutral loci only",
+	pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,
+	mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(m0.5_lchp_n))
+par(xpd=TRUE)
+points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col="black",bg=cols)
+```
+
+```{r eval=FALSE}
+temp.dapc.obj <- dapc(m0.5_lchp_s,center=T,scale=F,n.pca=500,n.da=2)
+temp <- optim.a.score(temp.dapc.obj)
+best.n.pca <- temp$best
+dapc.obj <- dapc(m0.5_lchp_s,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+
+scatter(dapc.obj,col=cols,ratio.pca=0.3,bg="white",main="m = 0.5, low complexity, high permeability, selected loci only",
+	pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,
+	mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(m0.5_lchp_n))
+par(xpd=TRUE)
+points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col="black",bg=cols)
+```
+
+```{r eval=FALSE}
+temp.dapc.obj <- dapc(m0.5_lchp_n.s,center=T,scale=F,n.pca=500,n.da=2)
+temp <- optim.a.score(temp.dapc.obj)
+best.n.pca <- temp$best
+dapc.obj <- dapc(m0.5_lchp_n.s,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+
+scatter(dapc.obj,col=cols,ratio.pca=0.3,bg="white",main="m = 0.5, low complexity, high permeability, neutral and selected loci",
+	pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,
+	mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(m0.5_lchp_n))
+par(xpd=TRUE)
+points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col="black",bg=cols)
+```
+
+
+
+```{r eval=FALSE}
+temp.dapc.obj <- dapc(m0.1_hclp_n,center=T,scale=F,n.pca=500,n.da=2)
+temp <- optim.a.score(temp.dapc.obj)
+best.n.pca <- temp$best
+dapc.obj <- dapc(m0.1_hclp_n,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+
+scatter(dapc.obj,col=cols,ratio.pca=0.3,bg="white",main="m = 0.1, high complexity, low permeability, neutral loci only",
+	pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,
+	mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(m0.1_hclp_n))
+par(xpd=TRUE)
+points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col="black",bg=cols)
+```
+
+```{r eval=FALSE}
+temp.dapc.obj <- dapc(m0.1_hclp_s,center=T,scale=F,n.pca=500,n.da=2)
+temp <- optim.a.score(temp.dapc.obj)
+best.n.pca <- temp$best
+dapc.obj <- dapc(m0.1_hclp_s,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+
+scatter(dapc.obj,col=cols,ratio.pca=0.3,bg="white",main="m = 0.1, high complexity, low permeability, selected loci only",
+	pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,
+	mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(m0.1_hclp_n))
+par(xpd=TRUE)
+points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col="black",bg=cols)
+```
+
+```{r eval=FALSE}
+temp.dapc.obj <- dapc(m0.1_hclp_n.s,center=T,scale=F,n.pca=500,n.da=2)
+temp <- optim.a.score(temp.dapc.obj)
+best.n.pca <- temp$best
+dapc.obj <- dapc(m0.1_hclp_n.s,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+
+scatter(dapc.obj,col=cols,ratio.pca=0.3,bg="white",main="m = 0.1, high complexity, low permeability, neutral and selected loci",
+	pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,
+	mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(m0.1_hclp_n))
+par(xpd=TRUE)
+points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col="black",bg=cols)
+```
+
+```{r eval=FALSE}
+temp.dapc.obj <- dapc(m0.5_hclp_n,center=T,scale=F,n.pca=500,n.da=2)
+temp <- optim.a.score(temp.dapc.obj)
+best.n.pca <- temp$best
+dapc.obj <- dapc(m0.5_hclp_n,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+
+scatter(dapc.obj,col=cols,ratio.pca=0.3,bg="white",main="m = 0.5, high complexity, low permeability, neutral loci only",
+	pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,
+	mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(m0.5_hclp_n))
+par(xpd=TRUE)
+points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col="black",bg=cols)
+```
+
+```{r eval=FALSE}
+temp.dapc.obj <- dapc(m0.5_hclp_s,center=T,scale=F,n.pca=500,n.da=2)
+temp <- optim.a.score(temp.dapc.obj)
+best.n.pca <- temp$best
+dapc.obj <- dapc(m0.5_hclp_s,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+
+scatter(dapc.obj,col=cols,ratio.pca=0.3,bg="white",main="m = 0.5, high complexity, low permeability, selected loci only",
+	pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,
+	mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(m0.5_hclp_n))
+par(xpd=TRUE)
+points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col="black",bg=cols)
+```
+
+```{r eval=FALSE}
+temp.dapc.obj <- dapc(m0.5_hclp_n.s,center=T,scale=F,n.pca=500,n.da=2)
+temp <- optim.a.score(temp.dapc.obj)
+best.n.pca <- temp$best
+dapc.obj <- dapc(m0.5_hclp_n.s,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+
+scatter(dapc.obj,col=cols,ratio.pca=0.3,bg="white",main="m = 0.5, high complexity, low permeability, neutral and selected loci",
+	pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,
+	mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(m0.5_hclp_n))
+par(xpd=TRUE)
+points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col="black",bg=cols)
+```
+
+```{r eval=FALSE}
+temp.dapc.obj <- dapc(m0.1_hchp_n,center=T,scale=F,n.pca=500,n.da=2)
+temp <- optim.a.score(temp.dapc.obj)
+best.n.pca <- temp$best
+dapc.obj <- dapc(m0.1_hchp_n,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+
+scatter(dapc.obj,col=cols,ratio.pca=0.3,bg="white",main="m = 0.1, high complexity, high permeability, neutral loci only",
+	pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,
+	mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(m0.1_hchp_n))
+par(xpd=TRUE)
+points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col="black",bg=cols)
+```
+
+```{r eval=FALSE}
+temp.dapc.obj <- dapc(m0.1_hchp_s,center=T,scale=F,n.pca=500,n.da=2)
+temp <- optim.a.score(temp.dapc.obj)
+best.n.pca <- temp$best
+dapc.obj <- dapc(m0.1_hchp_s,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+
+scatter(dapc.obj,col=cols,ratio.pca=0.3,bg="white",main="m = 0.1, high complexity, high permeability, selected loci only",
+	pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,
+	mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(m0.1_hchp_n))
+par(xpd=TRUE)
+points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col="black",bg=cols)
+```
+
+```{r eval=FALSE}
+temp.dapc.obj <- dapc(m0.1_hchp_n.s,center=T,scale=F,n.pca=500,n.da=2)
+temp <- optim.a.score(temp.dapc.obj)
+best.n.pca <- temp$best
+dapc.obj <- dapc(m0.1_hchp_n.s,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+
+scatter(dapc.obj,col=cols,ratio.pca=0.3,bg="white",main="m = 0.1, high complexity, high permeability, neutral and selected loci",
+	pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,
+	mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(m0.1_hchp_n))
+par(xpd=TRUE)
+points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col="black",bg=cols)
+```
+
+```{r eval=FALSE}
+temp.dapc.obj <- dapc(m0.5_hchp_n,center=T,scale=F,n.pca=500,n.da=2)
+temp <- optim.a.score(temp.dapc.obj)
+best.n.pca <- temp$best
+dapc.obj <- dapc(m0.5_hchp_n,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+
+scatter(dapc.obj,col=cols,ratio.pca=0.3,bg="white",main="m = 0.5, high complexity, high permeability, neutral loci only",
+	pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,
+	mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(m0.5_hchp_n))
+par(xpd=TRUE)
+points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col="black",bg=cols)
+```
+
+```{r eval=FALSE}
+temp.dapc.obj <- dapc(m0.5_hchp_s,center=T,scale=F,n.pca=500,n.da=2)
+temp <- optim.a.score(temp.dapc.obj)
+best.n.pca <- temp$best
+dapc.obj <- dapc(m0.5_hchp_s,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+
+scatter(dapc.obj,col=cols,ratio.pca=0.3,bg="white",main="m = 0.5, high complexity, high permeability, selected loci only",
+	pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,
+	mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(m0.5_hchp_n))
+par(xpd=TRUE)
+points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col="black",bg=cols)
+```
+
+```{r eval=FALSE}
+temp.dapc.obj <- dapc(m0.5_hchp_n.s,center=T,scale=F,n.pca=500,n.da=2)
+temp <- optim.a.score(temp.dapc.obj)
+best.n.pca <- temp$best
+dapc.obj <- dapc(m0.5_hchp_n.s,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+
+scatter(dapc.obj,col=cols,ratio.pca=0.3,bg="white",main="m = 0.5, high complexity, high permeability, neutral and selected loci",
+	pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,
+	mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(m0.5_hchp_n))
+par(xpd=TRUE)
+points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col="black",bg=cols)
+```
+
+
+```{r eval=FALSE}
+#plot parameters
+par(mfrow=c(1,1),fg="gray50",pty='m',bty='o',mar=c(4,4,4,4),cex.main=1.3,cex.axis=1.1,cex.lab=1.2)
+
+##Gen and Env data frames
+##make this iterative for all simulated datasets: currently only one of them shown here
+gen <- m0.1_lchp_n.s
+dfenv <- extract(fa_stk,gen$other)
+dfenv.obj <- dfenv
+dfgen.obj <- gen$tab
+dfgenenv <- cbind(gen$tab,dfenv)
+dfgenenv <- na.omit(dfgenenv)
+dfgen <- dfgenenv[,1:180]
+dfenv <- dfgenenv[,181:185]
+
+###Co-inertia###by individual###
+
+pcenv <- dudi.pca(dfenv, cent=T,scale=T,scannf=F,nf=2)
+pcgen <- dudi.pca(dfgen, cent=T, scale=F, scannf=F, nf=2)
+coi <- coinertia(pcenv,pcgen,scan=F,nf=2)
+#plot(coi)
+summary(coi)
+#rvind=RV.rtest(pcenv$l1,pcgen$l1,nrepet=9999)$obs
+#rvindpval=RV.rtest(pcenv$l1,pcgen$l1,nrepet=9999)$pvalue
+rvind=RV.rtest(coi$lX,coi$lY,nrepet=9999)$obs
+rvindpval=RV.rtest(coi$lX,coi$lY,nrepet=9999)$pvalue
+
+
+###Co-inertia###by site/pop###
+
+dap20 <- dapc.obj$grp
+dfdap20 <- cbind(dap20,dfenv.obj)
+dfdap20 <- na.omit(dfdap20)
+dfdap20 <- dfdap20[,1]
+dfdap20 <- as.factor(as.numeric(dfdap20))
+
+pcenv <- dudi.pca(dfenv, cent=T, scale=T, scannf=F, nf=2)
+bet1 <- bca(pcenv, dfdap20, scannf=F, nf=2)
+pcgen <- dudi.pca(dfgen, cent=T, scale=F, scannf=F, nf=2)
+bet2 <- bca(pcgen, dfdap20, scannf=F, nf=2)
+coi20 <- coinertia(bet1,bet2,scan=F,nf=2)
+plot(coi20)
+summary(coi20)
+rv20 <- RV.rtest(coi20$lX,coi20$lY,nrepet=9999)$obs
+rv20pval <- RV.rtest(coi20$lX,coi20$lY,nrepet=9999)$pvalue
+
+
+###Co-inertia###by cluster###
+
+##Clusters##
+clust <- find.clusters(gen,cent=T,scale=F,n.pca=best.n.pca,method="kmeans",n.iter=1e7,n.clust=10,stat="BIC")
+cl <- as.factor(as.vector(clust$grp))
+gen$pop <- cl
+sq <- as.character(seq(1,10))
+popNames(gen) <- sq
+dapc10 <- dapc(gen,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+scatter(dapc10,col=cols,ratio.pca=0.3,bg="white",pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(gen))
+par(xpd=TRUE)
+points(dapc10$grp.coord[,1],dapc10$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col="black",bg=cols)
+
+dap10 <- as.data.frame(dapc10$assign)
+
+dfdap10 <- cbind(dap10,dfenv.obj)
+dfdap10 <- na.omit(dfdap10)
+dfenv10 <- dfdap10[,2:length(dfdap10[1,])]
+dfdap10 <- dfdap10[,1]
+
+dfgenenv10 <- cbind(dap10,gen$tab,dfenv.obj)
+dfgenenv10 <- na.omit(dfgenenv10)
+dfdap10 <- dfgenenv10[,1]
+dfgenenv10.gen <- dfgenenv10[,2:181]
+dfgenenv10.env <- dfgenenv10[,182:186]
+
+
+pcenv10 <- dudi.pca(dfenv10, cent=T, scale=T, scannf=F, nf=2)
+bet1 <- bca(pcenv10, dfdap10, scannf=F, nf=2)
+pcgen10 <- dudi.pca(dfgen, cent=T, scale=F, scannf=F, nf=2)
+bet2 <- bca(pcgen10, dfdap10, scannf=F, nf=2)
+coi10 <- coinertia(bet1,bet2,scan=F,nf=2)
+plot(coi10)
+summary(coi10)
+s.class(pcgen10$l1,dfdap10)
+s.class(pcenv10$l1,dfdap10)
+
+rv10=RV.rtest(coi10$lX,coi10$lY,nrepet=9999)$obs
+rv10pval=RV.rtest(coi10$lX,coi10$lY,nrepet=9999)$pvalue
+```
+
+Comparison to DAPC: Inferring population structure with _LEA_ package
+---
+```{r eval=FALSE}
+library(LEA)
+library(mapplots)
+library(maps)
+library(raster)
+library(adegenet)
+
+#plot parameters
+par(mfrow=c(1,1),fg="gray50",pty='m',bty='o',mar=c(4,4,4,4),cex.main=1.3,cex.axis=1.1,cex.lab=1.2)
+
+simsubset.dir <- c(
+		"C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_1/Simulated_Genotypes/20pop_subsets/neutral+selected/",
+		"C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_5/Simulated_Genotypes/20pop_subsets/neutral+selected/"
+		)
+
+sims <- c("lclp", "lchp", "hclp", "hchp")
+
+ls_names <- c("LCLP landscape", "LCHP landscape", "HCLP landscape", "HCHP landscape")
+
+lea.dir <- c(
+	   "C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_1/Simulated_Landscapes/500neutral+50selectedSNPs/Low_Complexity_Landscapes/landscapeR/Low_Permeability/",
+	   "C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_1/Simulated_Landscapes/500neutral+50selectedSNPs/Low_Complexity_Landscapes/landscapeR/High_Permeability/",
+	   "C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_1/Simulated_Landscapes/500neutral+50selectedSNPs/High_Complexity_Landscapes/virtualspecies/Low_Permeability/",
+    	   "C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_1/Simulated_Landscapes/500neutral+50selectedSNPs/High_Complexity_Landscapes/virtualspecies/High_Permeability/",
+	   "C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_5/Simulated_Landscapes/500neutral+50selectedSNPs/Low_Complexity_Landscapes/landscapeR/Low_Permeability/",
+	   "C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_5/Simulated_Landscapes/500neutral+50selectedSNPs/Low_Complexity_Landscapes/landscapeR/High_Permeability/",
+	   "C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_5/Simulated_Landscapes/500neutral+50selectedSNPs/High_Complexity_Landscapes/virtualspecies/Low_Permeability/",
+	   "C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_5/Simulated_Landscapes/500neutral+50selectedSNPs/High_Complexity_Landscapes/virtualspecies/High_Permeability/"
+           )
+for (j in 1:2){
+   for (i in 1:4){
+      genind.obj <- read.genepop(paste0(simsubset.dir[j], sims[i], "_20pops.gen"))
+      genind.obj$other <- read.table(paste0(simsubset.dir[j], sims[i], "_20pops_coords.txt"), sep=" ",header=F)
+      colnames(genind.obj$other)=c("x","y")
+      genind.obj$other <- xyFromRC(genind.obj, fa_stk)
+      genotypes <- genind.obj@tab
+      coordinates <- genind.obj$other
+      
+      ji <- (j - 1) * 4 + i           
+      setwd(lea.dir[ji])
+      write.table(t(as.matrix(genotypes)), sep="", row.names=F, col.names=F, paste0(sims[i], ".geno"))
+      geno <- read.geno(paste0(sims[i],".geno"))
+      coord <- coordinates
+      setwd(paste0(lea.dir[ji],"LEA"))
+      source("POPSutilities.r")
+      setwd(lea.dir[ji])
+
+      reps <- 5
+      maxK <- 10
+
+      #running pop structure inference
+      snmf.obj <- snmf(paste0(sims[i],".geno"), K=1:maxK, repetitions=reps, project="new", 
+      		  alpha=10, iterations=100000,
+                  entropy=TRUE,percentage=0.25)
+      plot(snmf.obj,cex=1.2,col="lightblue",pch=19)
+
+      #determining best K and picking best replicate for best K
+      ce <- list()
+      for(i in 1:maxK) ce[[i]] <- cross.entropy(snmf.obj, K=i)
+      best <- which.min(unlist(ce))
+      best.K <- ceiling(best/reps)
+      best.run <- which.min(ce[[best.K]])
+      
+      my.colors <- futr(best.K)
+      
+      barchart(snmf.obj, K=best.K, run=best.run,
+      	   border=NA, space=0, col=my.colors,
+      	   xlab="Individuals", ylab="Ancestry proportions",
+      	   main=paste("Ancestry bar chart for", ls_names[i]))
+      
+      qmatrix <- Q(snmf.obj,K=best.K,run=best.run)
+      
+      grid <- createGrid(min(coord[,1]),max(coord[,1]),
+                min(coord[,2]),max(coord[,2]),500,500)
+      constraints <- NULL
+      
+      futr.gradient=colorRampPalette(futr(best.K))
+      grad.cols=futr.gradient(best.K*10)
+      
+      ColorGradients_bestK <- list()
+	for(i in 1:best.K){ 
+	  k.start <- i*10-9
+	  k.fin <- i*10
+	  ColorGradients_bestK[[i]] <- c("gray95", grad.cols[k.start:k.fin])
+	}
+
+       maps(matrix=qmatrix, cbind(coord[,1],coord[,2]), grid, constraints, method="max",
+	     colorGradientsList=ColorGradients_bestK,
+	     main=paste("Mapped ancestry coefficients for", ls_names[i]), 
+	     xlab="Longitude", ylab="Latitude", cex=.5)
+       map(add=T,interior=F)
+   }
+}
+```
+
+Comparison to DAPC: Inferring population structure with _tess3r_ package
+---
+```{r eval=FALSE}
+library(tess3r)
+library(adegenet)
+
+#plot parameters
+par(mfrow=c(1,1),fg="gray50",pty='m',bty='o',mar=c(4,4,4,4),cex.main=1.3,cex.axis=1.1,cex.lab=1.2)
+
+simsubset.dir <- c(
+		"C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_1/Simulated_Genotypes/20pop_subsets/neutral+selected/",
+		"C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_5/Simulated_Genotypes/20pop_subsets/neutral+selected/"
+		)
+
+sims <- c("lclp", "lchp", "hclp", "hchp")
+
+ls_names <- c("LCLP landscape", "LCHP landscape", "HCLP landscape", "HCHP landscape")
+
+lea.dir <- c(
+	   "C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_1/Simulated_Landscapes/500neutral+50selectedSNPs/Low_Complexity_Landscapes/landscapeR/Low_Permeability/",
+	   "C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_1/Simulated_Landscapes/500neutral+50selectedSNPs/Low_Complexity_Landscapes/landscapeR/High_Permeability/",
+	   "C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_1/Simulated_Landscapes/500neutral+50selectedSNPs/High_Complexity_Landscapes/virtualspecies/Low_Permeability/",
+    	   "C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_1/Simulated_Landscapes/500neutral+50selectedSNPs/High_Complexity_Landscapes/virtualspecies/High_Permeability/",
+	   "C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_5/Simulated_Landscapes/500neutral+50selectedSNPs/Low_Complexity_Landscapes/landscapeR/Low_Permeability/",
+	   "C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_5/Simulated_Landscapes/500neutral+50selectedSNPs/Low_Complexity_Landscapes/landscapeR/High_Permeability/",
+	   "C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_5/Simulated_Landscapes/500neutral+50selectedSNPs/High_Complexity_Landscapes/virtualspecies/Low_Permeability/",
+	   "C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_5/Simulated_Landscapes/500neutral+50selectedSNPs/High_Complexity_Landscapes/virtualspecies/High_Permeability/"
+           )
+           
+for (j in 1:2){
+   for (i in 1:4){
+      genind.obj <- read.genepop(paste0(simsubset.dir[j], sims[i], "_20pops.gen"))
+      genind.obj$other <- read.table(paste0(simsubset.dir[j], sims[i], "_20pops_coords.txt"), sep=" ",header=F)
+      colnames(genind.obj$other)=c("x","y")
+      genind.obj$other <- xyFromRC(genind.obj, fa_stk)
+      genotypes <- genind.obj@tab
+      coords <- genind.obj$other
+      
+      ji <- (j - 1) * 4 + i           
+      setwd(lea.dir[ji])
+      write.table(t(as.matrix(genotypes)), sep="", row.names=F, col.names=F, paste0(sims[i], ".geno"))
+      geno <- read.geno(paste0(sims[i],".geno"))
+      setwd(paste0(lea.dir[ji],"LEA"))
+      source("POPSutilities.r")
+      setwd(lea.dir[ji])
+
+      reps <- 5
+      maxK <- 10
+
+      #running pop structure inference
+      tess3.obj <- tess3(X=genotypes, coord=coordinates, K=1:maxK,
+                         method="projected.ls", rep=reps, 
+                         max.iteration=1000, tolerance=1e-06, 
+                         #max.iteration = 10000, tolerance = 1e-07, 
+                         mask=0.25,
+                         ploidy=2)
+
+      #determining best K and picking best replicate for best K
+      ce <- list()
+      for(i in 1:maxK) ce[[i]] <- tess3.obj[[i]]$crossvalid.crossentropy
+      best <- which.min(unlist(ce))
+      best.K <- ceiling(best/reps)
+      best.run <- which.min(ce[[best.K]])
+
+      q.matrix <- qmatrix(tess3.obj, K=best.K)
+
+      futr.pal <- CreatePalette(futr(best.K),10)
+
+      barplot(q.matrix, border = NA, space = 0,
+ 	      col.palette = futr.pal,
+	      xlab = "Individuals", ylab = "Ancestry proportions",
+ 	      main = paste("Ancestry bar chart for", ls_names[i]))
+  
+      plot(q.matrix, coordinates, method = "map.max", interpol = FieldsKrigModel(10),
+	   main = paste("Mapped ancestry coefficients for", ls_names[i]),
+	   xlab = "Longitude", ylab = "Latitude",
+	   resolution = c(500,500), cex = .8,
+	   col.palette = futr.pal)
+   }
+}
+```
