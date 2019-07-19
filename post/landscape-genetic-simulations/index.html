@@ -85,11 +85,26 @@ if (!doNotTrack) {
 		</header><div class="content post__content clearfix">
 			<p>To evaluate the NALgen method of modeling neutral and adaptive genetic variation across continuous landscapes, I first generated several landscapes, and then simulated genotypes based on the generated landscapes. In this post, I break down the simulation steps.</p>
 
-<p><a href="https://github.com/chazhyseni/NALgen/blob/master/data" target="_blank">Simulated genotypes (50 selected and 500 neutral biallelic loci (SNPs), separately and combined): two migration coefficients (m=0.1 and 0.5) x two levels of landscape complexity (low and high) x two levels of landscape permeability (low and high)</a></p>
+<p><a href="https://github.com/chazhyseni/NALgen/tree/master/data" target="_blank">Simulated genotypes (50 selected and 500 neutral biallelic loci (SNPs), separately and combined): two migration coefficients (m=0.1 and 0.5) x two levels of landscape complexity (low and high) x two levels of landscape permeability (low and high)</a></p>
 
 <h2 id="color-palette">Color palette</h2>
 
-<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-1-1.png" alt="" /><!--Color palette--></p>
+<pre><code class="language-r">library(ggsci)
+#schwifty &lt;- pal_rickandmorty()
+#schwifty.cols &lt;- colorRampPalette(schwifty(12)[c(3,12,4,6,1,9,8,2)])
+#cols &lt;- schwifty.cols(10)
+futr &lt;- pal_futurama()
+futr.cols &lt;- colorRampPalette(futr(12)[c(12,11,3,7,8,6,1,2)])
+cols &lt;- futr.cols(12)
+
+library(scales)
+#show_col(schwifty(12))
+#show_col(cols)
+#show_col(futr(12))
+show_col(cols)
+</code></pre>
+
+<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-1-1.png" alt="" /><!-- --></p>
 
 <h1 id="phase-i-test-single-locus-genotypes">Phase I (Test): Single-locus genotypes</h1>
 
@@ -97,9 +112,30 @@ if (!doNotTrack) {
 
 <p><em>landscapeR</em> package: simulating simple landscapes (barrier and two different values of carrying capacity/habitat suitability): landscape 1 has low permeability cells (carrying capacity = 5) between habitable patches (carrying capacity = 100), while landscape 2 has high permeability cells (carrying capacity = 25), in addition to barriers (carrying capacity = 0).</p>
 
-<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-2-1.png" alt="" /><!--Low-complexity low-permeability landscape--></p>
+<pre><code class="language-r">library(landscapeR)
+library(raster)
+#consistency of results
+set.seed(49137)
+m &lt;- matrix(0, 26, 34)
+r &lt;- raster(m, xmn=-91, xmx=-74, ymn=28, ymx=41)
+r &lt;- makeClass(r, 20, 20, val=1)
+r &lt;- makeClass(r, 20, 20, val=2)
+r &lt;- rmSingle(r)
+lclp &lt;- r
+lclp[lclp==1] &lt;- 100
+lclp[lclp==2] &lt;- 5
+plot(lclp,breaks=seq(0,100,length.out=11),col=cols)
+</code></pre>
 
-<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-2-2.png" alt="" /><!--Low-complexity high-permeability landscape--></p>
+<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-2-1.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">lchp &lt;- r
+lchp[lchp==2] &lt;- 100
+lchp[lchp==1] &lt;- 25
+plot(lchp,breaks=seq(0,100,length.out=11),col=cols)
+</code></pre>
+
+<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-2-2.png" alt="" /><!-- --></p>
 
 <h2 id="simulation-of-genotypes-based-on-simple-landscapes">Simulation of genotypes based on simple landscapes</h2>
 
@@ -239,9 +275,30 @@ for (i in 1:3){
 
 <p><em>landscapeR</em> package: simulating simple landscapes (barrier and two different values of carrying capacity/habitat suitability): landscape 1 has low permeability cells (carrying capacity = 5) between habitable patches (carrying capacity = 100), while landscape 2 has high permeability cells (carrying capacity = 25), in addition to barriers (carrying capacity = 0).</p>
 
-<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-5-1.png" alt="" /><!--Low-complexity low-permeability landscape--></p>
+<pre><code class="language-r">library(landscapeR)
+library(raster)
+#same seed = same landscapes as above
+set.seed(49137)
+m &lt;- matrix(0, 26, 34)
+r &lt;- raster(m, xmn=-91, xmx=-74, ymn=28, ymx=41)
+r &lt;- makeClass(r, 20, 20, val=1)
+r &lt;- makeClass(r, 20, 20, val=2)
+r &lt;- rmSingle(r)
+lclp &lt;- r
+lclp[lclp==1] &lt;- 100
+lclp[lclp==2] &lt;- 5
+plot(lclp,breaks=seq(0,100,length.out=11),col=cols)
+</code></pre>
 
-<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-5-2.png" alt="" /><!--Low-complexity high-permeability landscape--></p>
+<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-5-1.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">lchp &lt;- r
+lchp[lchp==2] &lt;- 100
+lchp[lchp==1] &lt;- 25
+plot(lchp,breaks=seq(0,100,length.out=11),col=cols)
+</code></pre>
+
+<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-5-2.png" alt="" /><!-- --></p>
 
 <h2 id="simulation-of-genotypes-based-on-simple-landscapes-1">Simulation of genotypes based on simple landscapes</h2>
 
@@ -361,23 +418,165 @@ writeRaster(lchp, &quot;lchp.asc&quot;, overwrite=TRUE)
      2. PCA of remaining variables performed,<br />
      3. ranges of PCA values specified (for three metapopulations).</p>
 
-<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-7-1.png" alt="" /><!--Selecting non-collinear bioclimatic variables--></p>
+<pre><code class="language-r">library(raster)
+library(virtualspecies)
+#consistency of results
+set.seed(946516341)
 
-<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-7-2.png" alt="" /><!--Occurrence probability of metapopulation 1 (out of 3)--></p>
+setwd(&quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Phylogeography/Geo_Analysis/Data/EnvData/bioclim/east coast/current&quot;)
 
-<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-7-3.png" alt="" /><!--Occurrence probability of metapopulation 2 (out of 3)--></p>
+fn &lt;- list.files(pattern=&quot;.asc&quot;)
+stk &lt;- stack()
+for(i in 1:length(fn)) stk &lt;- addLayer(stk,raster(fn[i]))
 
-<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-7-4.png" alt="" /><!--Occurrence probability of metapopulation 3 (out of 3)--></p>
+nampres &lt;- sub(pattern=&quot;Ecoast&quot;,replacement=&quot;&quot;,names(stk))
+nampres &lt;- sub(pattern=&quot;_&quot;,replacement=&quot;&quot;,nampres)
+nampres &lt;- sub(pattern=&quot;_&quot;,replacement=&quot;&quot;,nampres)
 
-<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-7-5.png" alt="" /><!--Putting the three metapopulations together: High-complexity low-permeability landscape--></p>
+names(stk) &lt;- nampres
 
-<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-7-6.png" alt="" /><!--Occurrence probability of metapopulation 1 (out of 3)--></p>
+stk60 &lt;- aggregate(stk,60)
+rc_stk60 &lt;- removeCollinearity(stk60, select.variables = TRUE, plot = TRUE, multicollinearity.cutoff = 0.5)
+</code></pre>
 
-<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-7-7.png" alt="" /><!--Occurrence probability of metapopulation 2 (out of 3)--></p>
+<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-7-1.png" alt="" /><!-- --></p>
 
-<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-7-8.png" alt="" /><!--Occurrence probability of metapopulation 3 (out of 3)--></p>
+<pre><code class="language-r">#plot parameters
+par(mfrow=c(1,1),fg=&quot;gray50&quot;,pty='m',bty='o',mar=c(4,4,4,4),cex.main=1.3,cex.axis=1.1,cex.lab=1.2)
 
-<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-7-9.png" alt="" /><!--Putting the three metapopulations together: High-complexity high-permeability landscape--></p>
+
+##Low Permeability##
+
+PCA_distrib_N &lt;- generateSpFromPCA(raster.stack=stk60[[rc_stk60]], axes=c(1:2), sample.points=TRUE, nb.points=850, means=c(3.5,2.5), sds=c(1,1), plot=FALSE)
+PCA_distrib_C &lt;- generateSpFromPCA(raster.stack=stk60[[rc_stk60]], axes=c(1:2), sample.points=TRUE, nb.points=850, means=c(0,-2.2), sds=c(1,1), plot=FALSE)
+PCA_distrib_S &lt;- generateSpFromPCA(raster.stack=stk60[[rc_stk60]], axes=c(1:2), sample.points=TRUE, nb.points=850, means=c(-2.5,2.5), sds=c(1,1), plot=FALSE)
+
+
+spN &lt;- convertToPA(PCA_distrib_N, species.prevalence=NULL, alpha=-0.002, beta=0.2)
+</code></pre>
+
+<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-7-2.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">spC &lt;- convertToPA(PCA_distrib_C, species.prevalence=NULL, alpha=-0.002, beta=0.2)
+</code></pre>
+
+<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-7-3.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">spS &lt;- convertToPA(PCA_distrib_S, species.prevalence=NULL, alpha=-0.002, beta=0.2)
+</code></pre>
+
+<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-7-4.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">pop3.complex.lowperm.PA &lt;- 1*spN$pa.raster + 2*spC$pa.raster + 3*spS$pa.raster
+pop3.complex.lowperm.PA &lt;- round(pop3.complex.lowperm.PA, 0)
+pop3.complex.lowperm.PA[pop3.complex.lowperm.PA&gt;3] &lt;- 0
+pop3.complex.lowperm.PA[is.na(pop3.complex.lowperm.PA)] &lt;- 0
+
+spN$suitab.raster[spN$suitab.raster&lt;0.25] &lt;- 0
+spC$suitab.raster[spC$suitab.raster&lt;0.25] &lt;- 0
+spS$suitab.raster[spS$suitab.raster&lt;0.25] &lt;- 0
+
+spN_suitab &lt;- 100*spN$pa.raster*spN$suitab.raster
+spC_suitab &lt;- 100*spC$pa.raster*spC$suitab.raster
+spS_suitab &lt;- 100*spS$pa.raster*spS$suitab.raster
+
+pop3.complex.lowperm.Suitab &lt;- spN_suitab + spC_suitab + spS_suitab
+pop3.complex.lowperm.Suitab[pop3.complex.lowperm.Suitab&gt;100] &lt;- 100
+pop3.complex.lowperm.Suitab[is.na(pop3.complex.lowperm.Suitab)] &lt;- 0
+pop3.complex.lowperm.Suitab[pop3.complex.lowperm.Suitab&lt;5] &lt;- 0
+pop3.complex.lowperm.Suitab &lt;- round(pop3.complex.lowperm.Suitab,0)
+
+plot(pop3.complex.lowperm.Suitab,
+    breaks=seq(minValue(pop3.complex.lowperm.Suitab),maxValue(pop3.complex.lowperm.Suitab),length.out=11),
+    col=cols)
+</code></pre>
+
+<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-7-5.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">pop3.complex.lowperm.Barrier &lt;- pop3.complex.lowperm.Suitab
+pop3.complex.lowperm.Barrier[pop3.complex.lowperm.Suitab&gt;24] &lt;- 1
+pop3.complex.lowperm.Barrier[pop3.complex.lowperm.Suitab&lt;25] &lt;- -1
+
+pop3.complex.lowperm.catProb &lt;- pop3.complex.lowperm.Barrier
+pop3.complex.lowperm.catProb[pop3.complex.lowperm.catProb==-1] &lt;- 1
+pop3.complex.lowperm.catProb[pop3.complex.lowperm.catProb==1] &lt;- 0.0001
+
+pop3.complex.lowperm.Sel &lt;- pop3.complex.lowperm.PA
+pop3.complex.lowperm.Sel[pop3.complex.lowperm.Sel==1] &lt;- 0.01
+pop3.complex.lowperm.Sel[pop3.complex.lowperm.Sel==2] &lt;- 0.02
+pop3.complex.lowperm.Sel[pop3.complex.lowperm.Sel==3] &lt;- 0.03
+pop3.complex.lowperm.Sel.df &lt;- cbind(rep(1,nrow(pop3.complex.lowperm.Sel)*ncol(pop3.complex.lowperm.Sel)),
+                                  rep(50,nrow(pop3.complex.lowperm.Sel)*ncol(pop3.complex.lowperm.Sel)),
+                                  as.data.frame(pop3.complex.lowperm.Sel),
+                                  coordinates(pop3.complex.lowperm.Sel))
+colnames(pop3.complex.lowperm.Sel.df)=c(&quot;start&quot;,&quot;end&quot;,&quot;s&quot;,&quot;x&quot;,&quot;y&quot;)
+
+
+##High Permeability##
+
+PCA_distrib_N &lt;- generateSpFromPCA(raster.stack=stk60[[rc_stk60]], axes=c(1:2), sample.points=TRUE, nb.points=850, means=c(2.5,1), sds=c(1.2,1.2), plot=FALSE)
+PCA_distrib_C &lt;- generateSpFromPCA(raster.stack=stk60[[rc_stk60]], axes=c(1:2), sample.points=TRUE, nb.points=850, means=c(-0.5,-0.5), sds=c(1.2,1.2), plot=FALSE)
+PCA_distrib_S &lt;- generateSpFromPCA(raster.stack=stk60[[rc_stk60]], axes=c(1:2), sample.points=TRUE, nb.points=850, means=c(-2.5,2), sds=c(1.2,1.2), plot=FALSE)
+
+spN &lt;- convertToPA(PCA_distrib_N, species.prevalence=NULL, alpha=-0.004, beta=0.4)
+</code></pre>
+
+<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-7-6.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">spC &lt;- convertToPA(PCA_distrib_C, species.prevalence=NULL, alpha=-0.004, beta=0.4)
+</code></pre>
+
+<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-7-7.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">spS &lt;- convertToPA(PCA_distrib_S, species.prevalence=NULL, alpha=-0.004, beta=0.4)
+</code></pre>
+
+<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-7-8.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">pop3.complex.highperm.PA &lt;- 1*spN$pa.raster + 2*spC$pa.raster + 3*spS$pa.raster
+pop3.complex.highperm.PA &lt;- round(pop3.complex.highperm.PA, 0)
+pop3.complex.highperm.PA[pop3.complex.highperm.PA&gt;3] &lt;- 0
+pop3.complex.highperm.PA[is.na(pop3.complex.highperm.PA)] &lt;- 0
+
+spN$suitab.raster[spN$suitab.raster&lt;0.25] &lt;- 0
+spC$suitab.raster[spC$suitab.raster&lt;0.25] &lt;- 0
+spS$suitab.raster[spS$suitab.raster&lt;0.25] &lt;- 0
+
+spN_suitab &lt;- 100*spN$pa.raster*spN$suitab.raster
+spC_suitab &lt;- 100*spC$pa.raster*spC$suitab.raster
+spS_suitab &lt;- 100*spS$pa.raster*spS$suitab.raster
+
+pop3.complex.highperm.Suitab &lt;- spN_suitab + spC_suitab + spS_suitab
+pop3.complex.highperm.Suitab[pop3.complex.highperm.Suitab&gt;100] &lt;- 100
+pop3.complex.highperm.Suitab[is.na(pop3.complex.highperm.Suitab)] &lt;- 0
+pop3.complex.highperm.Suitab[pop3.complex.highperm.Suitab&lt;5] &lt;- 0
+pop3.complex.highperm.Suitab &lt;- round(pop3.complex.highperm.Suitab,0)
+
+plot(pop3.complex.highperm.Suitab,
+    breaks=seq(minValue(pop3.complex.highperm.Suitab),maxValue(pop3.complex.highperm.Suitab),length.out=11),
+    col=cols)
+</code></pre>
+
+<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-7-9.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">pop3.complex.highperm.Barrier &lt;- pop3.complex.highperm.Suitab
+pop3.complex.highperm.Barrier[pop3.complex.highperm.Suitab&gt;24] &lt;- 1
+pop3.complex.highperm.Barrier[pop3.complex.highperm.Suitab&lt;25] &lt;- -1
+
+pop3.complex.highperm.catProb &lt;- pop3.complex.highperm.Barrier
+pop3.complex.highperm.catProb[pop3.complex.highperm.catProb==-1] &lt;- 1
+pop3.complex.highperm.catProb[pop3.complex.highperm.catProb==1] &lt;- 0.0001  #see catProb value for popRange sims
+
+pop3.complex.highperm.Sel &lt;- pop3.complex.highperm.PA
+pop3.complex.highperm.Sel[pop3.complex.highperm.Sel==1] &lt;- 0.01
+pop3.complex.highperm.Sel[pop3.complex.highperm.Sel==2] &lt;- 0.02
+pop3.complex.highperm.Sel[pop3.complex.highperm.Sel==3] &lt;- 0.03
+pop3.complex.highperm.Sel.df &lt;- cbind(rep(1,nrow(pop3.complex.highperm.Sel)*ncol(pop3.complex.highperm.Sel)),
+                                  rep(50,nrow(pop3.complex.highperm.Sel)*ncol(pop3.complex.highperm.Sel)),
+                                  as.data.frame(pop3.complex.highperm.Sel),
+                                  coordinates(pop3.complex.highperm.Sel))
+colnames(pop3.complex.highperm.Sel.df)=c(&quot;start&quot;,&quot;end&quot;,&quot;s&quot;,&quot;x&quot;,&quot;y&quot;)
+</code></pre>
 
 <p><em>popRange</em> package: simulating 50 <em>selected</em> and 500 <strong>neutral</strong> SNPs based on the <em>virtualspecies</em>-generated landscape.</p>
 
@@ -677,7 +876,7 @@ writeGenPop(rand.subset.20pops.hchp.selloc,&quot;hchp_only-sel_20pops.gen&quot;,
 write.table(cbind(rand.subset.20pops.hchp@other$x,rand.subset.20pops.hchp@other$y),&quot;hchp_20pops_coords.txt&quot;, row.names=FALSE, col.names=FALSE)
 </code></pre>
 
-<p><a href="https://github.com/chazhyseni/NALgen/blob/master/data" target="_blank">Simulated genotypes (50 selected and 500 neutral biallelic loci (SNPs), separately and combined): two migration coefficients (m=0.1 and 0.5) x two levels of landscape complexity (low and high) x two levels of landscape permeability (low and high)</a></p>
+<p><a href="https://github.com/chazhyseni/NALgen/tree/master/data" target="_blank">Simulated genotypes (50 selected and 500 neutral biallelic loci (SNPs), separately and combined): two migration coefficients (m=0.1 and 0.5) x two levels of landscape complexity (low and high) x two levels of landscape permeability (low and high)</a></p>
 		</div>
 		
 <div class="post__tags tags clearfix">
@@ -704,6 +903,9 @@ write.table(cbind(rand.subset.20pops.hchp@other$x,rand.subset.20pops.hchp@other$
 </div>
 
 <nav class="post-nav flex">
+	<div class="post-nav__item post-nav__item--prev">
+		<a class="post-nav__link" href="/NALgen/post/multivariateanalysis_popstruct_simulateddata/" rel="prev"><span class="post-nav__caption">«&thinsp;Previous</span><p class="post-nav__post-title"></p></a>
+	</div>
 	<div class="post-nav__item post-nav__item--next">
 		<a class="post-nav__link" href="/NALgen/post/multivariateanalysis_popstruct_simulateddata/" rel="next"><span class="post-nav__caption">Next&thinsp;»</span><p class="post-nav__post-title">NALgen Analysis Pt.1</p></a>
 	</div>
@@ -718,6 +920,8 @@ write.table(cbind(rand.subset.20pops.hchp@other$x,rand.subset.20pops.hchp@other$
 		<ul class="widget__list">
 			<li class="widget__item"><a class="widget__link" href="/NALgen/post/multivariateanalysis_popstruct_simulateddata/">NALgen Analysis Pt.1</a></li>
 			<li class="widget__item"><a class="widget__link" href="/NALgen/post/landscape-genetic-simulations/">Landscape Genetic Simulations</a></li>
+			<li class="widget__item"><a class="widget__link" href="/NALgen/post/multivariateanalysis_popstruct_simulateddata/"></a></li>
+			<li class="widget__item"><a class="widget__link" href="/NALgen/post/landgen-simulations/"></a></li>
 		</ul>
 	</div>
 </div>
