@@ -13,10 +13,10 @@
     
     <item>
       <title>NALgen Analysis Pt.1</title>
-      <link>/NALgen/post/multivariateanalysis_popstruct_simulateddata/</link>
+      <link>/NALgen/post/multivariate-analysis_simulated-data/</link>
       <pubDate>Fri, 19 Jul 2019 00:00:00 +0000</pubDate>
       
-      <guid>/NALgen/post/multivariateanalysis_popstruct_simulateddata/</guid>
+      <guid>/NALgen/post/multivariate-analysis_simulated-data/</guid>
       <description>&lt;p&gt;Here, I present the prequel to the NALgen method: using multivariate analyses to infer population structure in the simulated data as well as to find covariance between genetic and environmental data. In upcoming posts about modeling neutral and adaptive genetic variation across continuous landscapes, information about population structure will be used in creating the response variable, while transformed environmental data (based on genetic-environmental covariance) will be used as predictors.&lt;/p&gt;</description>
     </item>
     
