@@ -159,12 +159,12 @@ for (i in 1:4){
 <pre><code class="language-r">library(adegenet)
 
 
-m0.1_n &lt;- &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_1/Simulated_Genotypes/20pop_subsets/neutral_only&quot;
-m0.1_n.s &lt;- &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_1/Simulated_Genotypes/20pop_subsets/neutral+selected&quot;
-m0.1_s &lt;- &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_1/Simulated_Genotypes/20pop_subsets/selected_only&quot;
-m0.5_n &lt;- &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_5/Simulated_Genotypes/20pop_subsets/neutral_only&quot;
-m0.5_n.s &lt;- &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_5/Simulated_Genotypes/20pop_subsets/neutral+selected&quot;
-m0.5_s &lt;- &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_5/Simulated_Genotypes/20pop_subsets/selected_only&quot;
+m0.1_n &lt;- &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_1/Simulated_Genotypes/20pop_subsets/neutral_only/&quot;
+m0.1_n.s &lt;- &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_1/Simulated_Genotypes/20pop_subsets/neutral+selected/&quot;
+m0.1_s &lt;- &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_1/Simulated_Genotypes/20pop_subsets/selected_only/&quot;
+m0.5_n &lt;- &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_5/Simulated_Genotypes/20pop_subsets/neutral_only/&quot;
+m0.5_n.s &lt;- &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_5/Simulated_Genotypes/20pop_subsets/neutral+selected/&quot;
+m0.5_s &lt;- &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_5/Simulated_Genotypes/20pop_subsets/selected_only/&quot;
 
 
 setwd(&quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/NALgen_Analysis/Multivariate/&quot;)
@@ -184,55 +184,187 @@ xyFromRC &lt;- function(genind, rastr){
 ###m0.1###
 ##neutral ONLY##
 m0.1_lclp_n &lt;- read.genepop(paste0(m0.1_n,&quot;lclp_only-neutr_20pops.gen&quot;))
-m0.1_lclp_n$other &lt;- read.table(paste0(m0.1_n,&quot;lclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+</code></pre>
+
+<pre><code>## 
+##  Converting data from a Genepop .gen file to a genind object... 
+## 
+## 
+## File description:  Low Complexity Low Permeability - Only Neutral Loci - 20 pops - Simulated Genotypes  
+## 
+## ...done.
+</code></pre>
+
+<pre><code class="language-r">m0.1_lclp_n$other &lt;- read.table(paste0(m0.1_n,&quot;lclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
 colnames(m0.1_lclp_n$other)=c(&quot;x&quot;,&quot;y&quot;)
 m0.1_lclp_n$other &lt;- xyFromRC(m0.1_lclp_n, fa_stk)
 m0.1_lchp_n &lt;- read.genepop(paste0(m0.1_n,&quot;lchp_only-neutr_20pops.gen&quot;))
-m0.1_lchp_n$other &lt;- read.table(paste0(m0.1_n,&quot;lchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+</code></pre>
+
+<pre><code>## 
+##  Converting data from a Genepop .gen file to a genind object... 
+## 
+## 
+## File description:  Low Complexity High Permeability - Only Neutral Loci - 20 pops - Simulated Genotypes  
+## 
+## ...done.
+</code></pre>
+
+<pre><code class="language-r">m0.1_lchp_n$other &lt;- read.table(paste0(m0.1_n,&quot;lchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
 colnames(m0.1_lchp_n$other)=c(&quot;x&quot;,&quot;y&quot;)
 m0.1_lchp_n$other &lt;- xyFromRC(m0.1_lchp_n, fa_stk)
 m0.1_hchp_n &lt;- read.genepop(paste0(m0.1_n,&quot;hchp_only-neutr_20pops.gen&quot;))
-m0.1_hchp_n$other &lt;- read.table(paste0(m0.1_n,&quot;hchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+</code></pre>
+
+<pre><code>## 
+##  Converting data from a Genepop .gen file to a genind object... 
+## 
+## 
+## File description:  High Complexity High Permeability - Only Neutral Loci - 20 pops - Simulated Genotypes  
+## 
+## ...done.
+</code></pre>
+
+<pre><code class="language-r">m0.1_hchp_n$other &lt;- read.table(paste0(m0.1_n,&quot;hchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
 colnames(m0.1_hchp_n$other)=c(&quot;x&quot;,&quot;y&quot;)
 m0.1_hchp_n$other &lt;- xyFromRC(m0.1_hchp_n, fa_stk)
 m0.1_hclp_n &lt;- read.genepop(paste0(m0.1_n,&quot;hclp_only-neutr_20pops.gen&quot;))
-m0.1_hclp_n$other &lt;- read.table(paste0(m0.1_n,&quot;hclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+</code></pre>
+
+<pre><code>## 
+##  Converting data from a Genepop .gen file to a genind object... 
+## 
+## 
+## File description:  High Complexity Low Permeability - Only Neutral Loci - 20 pops - Simulated Genotypes  
+## 
+## ...done.
+</code></pre>
+
+<pre><code class="language-r">m0.1_hclp_n$other &lt;- read.table(paste0(m0.1_n,&quot;hclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
 colnames(m0.1_hclp_n$other)=c(&quot;x&quot;,&quot;y&quot;)
 m0.1_hclp_n$other &lt;- xyFromRC(m0.1_hclp_n, fa_stk)
 
 ##selected ONLY##
 m0.1_lclp_s &lt;- read.genepop(paste0(m0.1_s,&quot;lclp_only-sel_20pops.gen&quot;))
-m0.1_lclp_s$other &lt;- read.table(paste0(m0.1_s,&quot;lclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+</code></pre>
+
+<pre><code>## 
+##  Converting data from a Genepop .gen file to a genind object... 
+## 
+## 
+## File description:  Low Complexity Low Permeability - Only Selected Loci - 20 pops - Simulated Genotypes  
+## 
+## ...done.
+</code></pre>
+
+<pre><code class="language-r">m0.1_lclp_s$other &lt;- read.table(paste0(m0.1_s,&quot;lclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
 colnames(m0.1_lclp_s$other)=c(&quot;x&quot;,&quot;y&quot;)
 m0.1_lclp_s$other &lt;- xyFromRC(m0.1_lclp_s, fa_stk)
 m0.1_lchp_s &lt;- read.genepop(paste0(m0.1_s,&quot;lchp_only-sel_20pops.gen&quot;))
-m0.1_lchp_s$other &lt;- read.table(paste0(m0.1_s,&quot;lchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+</code></pre>
+
+<pre><code>## 
+##  Converting data from a Genepop .gen file to a genind object... 
+## 
+## 
+## File description:  Low Complexity High Permeability - Only Selected Loci - 20 pops - Simulated Genotypes  
+## 
+## ...done.
+</code></pre>
+
+<pre><code class="language-r">m0.1_lchp_s$other &lt;- read.table(paste0(m0.1_s,&quot;lchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
 colnames(m0.1_lchp_s$other)=c(&quot;x&quot;,&quot;y&quot;)
 m0.1_lchp_s$other &lt;- xyFromRC(m0.1_lchp_s, fa_stk)
 m0.1_hchp_s &lt;- read.genepop(paste0(m0.1_s,&quot;hchp_only-sel_20pops.gen&quot;))
-m0.1_hchp_s$other &lt;- read.table(paste0(m0.1_s,&quot;hchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+</code></pre>
+
+<pre><code>## 
+##  Converting data from a Genepop .gen file to a genind object... 
+## 
+## 
+## File description:  High Complexity High Permeability - Only Selected Loci - 20 pops - Simulated Genotypes  
+## 
+## ...done.
+</code></pre>
+
+<pre><code class="language-r">m0.1_hchp_s$other &lt;- read.table(paste0(m0.1_s,&quot;hchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
 colnames(m0.1_hchp_s$other)=c(&quot;x&quot;,&quot;y&quot;)
 m0.1_hchp_s$other &lt;- xyFromRC(m0.1_hchp_s, fa_stk)
 m0.1_hclp_s &lt;- read.genepop(paste0(m0.1_s,&quot;hclp_only-sel_20pops.gen&quot;))
-m0.1_hclp_s$other &lt;- read.table(paste0(m0.1_s,&quot;hclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+</code></pre>
+
+<pre><code>## 
+##  Converting data from a Genepop .gen file to a genind object... 
+## 
+## 
+## File description:  High Complexity Low Permeability - Only Selected Loci - 20 pops - Simulated Genotypes  
+## 
+## ...done.
+</code></pre>
+
+<pre><code class="language-r">m0.1_hclp_s$other &lt;- read.table(paste0(m0.1_s,&quot;hclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
 colnames(m0.1_hclp_s$other)=c(&quot;x&quot;,&quot;y&quot;)
 m0.1_hclp_s$other &lt;- xyFromRC(m0.1_hclp_s, fa_stk)
 
 ##neutral AND selected##
 m0.1_lclp_n.s &lt;- read.genepop(paste0(m0.1_n.s,&quot;lclp_20pops.gen&quot;))
-m0.1_lclp_n.s$other &lt;- read.table(paste0(m0.1_n.s,&quot;lclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+</code></pre>
+
+<pre><code>## 
+##  Converting data from a Genepop .gen file to a genind object... 
+## 
+## 
+## File description:  Low Complexity Low Permeability - 20 pops - Simulated Genotypes  
+## 
+## ...done.
+</code></pre>
+
+<pre><code class="language-r">m0.1_lclp_n.s$other &lt;- read.table(paste0(m0.1_n.s,&quot;lclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
 colnames(m0.1_lclp_n.s$other)=c(&quot;x&quot;,&quot;y&quot;)
 m0.1_lclp_n.s$other &lt;- xyFromRC(m0.1_lclp_n.s, fa_stk)
 m0.1_lchp_n.s &lt;- read.genepop(paste0(m0.1_n.s,&quot;lchp_20pops.gen&quot;))
-m0.1_lchp_n.s$other &lt;- read.table(paste0(m0.1_n.s,&quot;lchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+</code></pre>
+
+<pre><code>## 
+##  Converting data from a Genepop .gen file to a genind object... 
+## 
+## 
+## File description:  Low Complexity High Permeability - 20 pops - Simulated Genotypes  
+## 
+## ...done.
+</code></pre>
+
+<pre><code class="language-r">m0.1_lchp_n.s$other &lt;- read.table(paste0(m0.1_n.s,&quot;lchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
 colnames(m0.1_lchp_n.s$other)=c(&quot;x&quot;,&quot;y&quot;)
 m0.1_lchp_n.s$other &lt;- xyFromRC(m0.1_lchp_n.s, fa_stk)
 m0.1_hchp_n.s &lt;- read.genepop(paste0(m0.1_n.s,&quot;hchp_20pops.gen&quot;))
-m0.1_hchp_n.s$other &lt;- read.table(paste0(m0.1_n.s,&quot;hchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+</code></pre>
+
+<pre><code>## 
+##  Converting data from a Genepop .gen file to a genind object... 
+## 
+## 
+## File description:  High Complexity High Permeability - 20 pops - Simulated Genotypes  
+## 
+## ...done.
+</code></pre>
+
+<pre><code class="language-r">m0.1_hchp_n.s$other &lt;- read.table(paste0(m0.1_n.s,&quot;hchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
 colnames(m0.1_hchp_n.s$other)=c(&quot;x&quot;,&quot;y&quot;)
 m0.1_hchp_n.s$other &lt;- xyFromRC(m0.1_hchp_n.s, fa_stk)
 m0.1_hclp_n.s &lt;- read.genepop(paste0(m0.1_n.s,&quot;hclp_20pops.gen&quot;))
-m0.1_hclp_n.s$other &lt;- read.table(paste0(m0.1_n.s,&quot;hclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+</code></pre>
+
+<pre><code>## 
+##  Converting data from a Genepop .gen file to a genind object... 
+## 
+## 
+## File description:  High Complexity Low Permeability - 20 pops - Simulated Genotypes  
+## 
+## ...done.
+</code></pre>
+
+<pre><code class="language-r">m0.1_hclp_n.s$other &lt;- read.table(paste0(m0.1_n.s,&quot;hclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
 colnames(m0.1_hclp_n.s$other)=c(&quot;x&quot;,&quot;y&quot;)
 m0.1_hclp_n.s$other &lt;- xyFromRC(m0.1_hclp_n.s, fa_stk)
 
@@ -240,55 +372,187 @@ m0.1_hclp_n.s$other &lt;- xyFromRC(m0.1_hclp_n.s, fa_stk)
 ###m0.5###
 ##neutral ONLY##
 m0.5_lclp_n &lt;- read.genepop(paste0(m0.5_n,&quot;lclp_only-neutr_20pops.gen&quot;))
-m0.5_lclp_n$other &lt;- read.table(paste0(m0.5_n,&quot;lclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+</code></pre>
+
+<pre><code>## 
+##  Converting data from a Genepop .gen file to a genind object... 
+## 
+## 
+## File description:  Low Complexity Low Permeability - Only Neutral Loci - 20 pops - Simulated Genotypes  
+## 
+## ...done.
+</code></pre>
+
+<pre><code class="language-r">m0.5_lclp_n$other &lt;- read.table(paste0(m0.5_n,&quot;lclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
 colnames(m0.5_lclp_n$other)=c(&quot;x&quot;,&quot;y&quot;)
 m0.5_lclp_n$other &lt;- xyFromRC(m0.5_lclp_n, fa_stk)
 m0.5_lchp_n &lt;- read.genepop(paste0(m0.5_n,&quot;lchp_only-neutr_20pops.gen&quot;))
-m0.5_lchp_n$other &lt;- read.table(paste0(m0.5_n,&quot;lchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+</code></pre>
+
+<pre><code>## 
+##  Converting data from a Genepop .gen file to a genind object... 
+## 
+## 
+## File description:  Low Complexity High Permeability - Only Neutral Loci - 20 pops - Simulated Genotypes  
+## 
+## ...done.
+</code></pre>
+
+<pre><code class="language-r">m0.5_lchp_n$other &lt;- read.table(paste0(m0.5_n,&quot;lchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
 colnames(m0.5_lchp_n$other)=c(&quot;x&quot;,&quot;y&quot;)
 m0.5_lchp_n$other &lt;- xyFromRC(m0.5_lchp_n, fa_stk)
 m0.5_hchp_n &lt;- read.genepop(paste0(m0.5_n,&quot;hchp_only-neutr_20pops.gen&quot;))
-m0.5_hchp_n$other &lt;- read.table(paste0(m0.5_n,&quot;hchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+</code></pre>
+
+<pre><code>## 
+##  Converting data from a Genepop .gen file to a genind object... 
+## 
+## 
+## File description:  High Complexity High Permeability - Only Neutral Loci - 20 pops - Simulated Genotypes  
+## 
+## ...done.
+</code></pre>
+
+<pre><code class="language-r">m0.5_hchp_n$other &lt;- read.table(paste0(m0.5_n,&quot;hchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
 colnames(m0.5_hchp_n$other)=c(&quot;x&quot;,&quot;y&quot;)
 m0.5_hchp_n$other &lt;- xyFromRC(m0.5_hchp_n, fa_stk)
 m0.5_hclp_n &lt;- read.genepop(paste0(m0.5_n,&quot;hclp_only-neutr_20pops.gen&quot;))
-m0.5_hclp_n$other &lt;- read.table(paste0(m0.5_n,&quot;hclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+</code></pre>
+
+<pre><code>## 
+##  Converting data from a Genepop .gen file to a genind object... 
+## 
+## 
+## File description:  High Complexity Low Permeability - Only Neutral Loci - 20 pops - Simulated Genotypes  
+## 
+## ...done.
+</code></pre>
+
+<pre><code class="language-r">m0.5_hclp_n$other &lt;- read.table(paste0(m0.5_n,&quot;hclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
 colnames(m0.5_hclp_n$other)=c(&quot;x&quot;,&quot;y&quot;)
 m0.5_hclp_n$other &lt;- xyFromRC(m0.5_hclp_n, fa_stk)
 
 ##selected ONLY##
 m0.5_lclp_s &lt;- read.genepop(paste0(m0.5_s,&quot;lclp_only-sel_20pops.gen&quot;))
-m0.5_lclp_s$other &lt;- read.table(paste0(m0.5_s,&quot;lclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+</code></pre>
+
+<pre><code>## 
+##  Converting data from a Genepop .gen file to a genind object... 
+## 
+## 
+## File description:  Low Complexity Low Permeability - Only Selected Loci - 20 pops - Simulated Genotypes  
+## 
+## ...done.
+</code></pre>
+
+<pre><code class="language-r">m0.5_lclp_s$other &lt;- read.table(paste0(m0.5_s,&quot;lclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
 colnames(m0.5_lclp_s$other)=c(&quot;x&quot;,&quot;y&quot;)
 m0.5_lclp_s$other &lt;- xyFromRC(m0.5_lclp_s, fa_stk)
 m0.5_lchp_s &lt;- read.genepop(paste0(m0.5_s,&quot;lchp_only-sel_20pops.gen&quot;))
-m0.5_lchp_s$other &lt;- read.table(paste0(m0.5_s,&quot;lchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+</code></pre>
+
+<pre><code>## 
+##  Converting data from a Genepop .gen file to a genind object... 
+## 
+## 
+## File description:  Low Complexity High Permeability - Only Selected Loci - 20 pops - Simulated Genotypes  
+## 
+## ...done.
+</code></pre>
+
+<pre><code class="language-r">m0.5_lchp_s$other &lt;- read.table(paste0(m0.5_s,&quot;lchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
 colnames(m0.5_lchp_s$other)=c(&quot;x&quot;,&quot;y&quot;)
 m0.5_lchp_s$other &lt;- xyFromRC(m0.5_lchp_s, fa_stk)
 m0.5_hchp_s &lt;- read.genepop(paste0(m0.5_s,&quot;hchp_only-sel_20pops.gen&quot;))
-m0.5_hchp_s$other &lt;- read.table(paste0(m0.5_s,&quot;hchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+</code></pre>
+
+<pre><code>## 
+##  Converting data from a Genepop .gen file to a genind object... 
+## 
+## 
+## File description:  High Complexity High Permeability - Only Selected Loci - 20 pops - Simulated Genotypes  
+## 
+## ...done.
+</code></pre>
+
+<pre><code class="language-r">m0.5_hchp_s$other &lt;- read.table(paste0(m0.5_s,&quot;hchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
 colnames(m0.5_hchp_s$other)=c(&quot;x&quot;,&quot;y&quot;)
 m0.5_hchp_s$other &lt;- xyFromRC(m0.5_hchp_s, fa_stk)
 m0.5_hclp_s &lt;- read.genepop(paste0(m0.5_s,&quot;hclp_only-sel_20pops.gen&quot;))
-m0.5_hclp_s$other &lt;- read.table(paste0(m0.5_s,&quot;hclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+</code></pre>
+
+<pre><code>## 
+##  Converting data from a Genepop .gen file to a genind object... 
+## 
+## 
+## File description:  High Complexity Low Permeability - Only Selected Loci - 20 pops - Simulated Genotypes  
+## 
+## ...done.
+</code></pre>
+
+<pre><code class="language-r">m0.5_hclp_s$other &lt;- read.table(paste0(m0.5_s,&quot;hclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
 colnames(m0.5_hclp_s$other)=c(&quot;x&quot;,&quot;y&quot;)
 m0.5_hclp_s$other &lt;- xyFromRC(m0.5_hclp_s, fa_stk)
 
 ##neutral AND selected##
 m0.5_lclp_n.s &lt;- read.genepop(paste0(m0.5_n.s,&quot;lclp_20pops.gen&quot;))
-m0.5_lclp_n.s$other &lt;- read.table(paste0(m0.5_n.s,&quot;lclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+</code></pre>
+
+<pre><code>## 
+##  Converting data from a Genepop .gen file to a genind object... 
+## 
+## 
+## File description:  Low Complexity Low Permeability - 20 pops - Simulated Genotypes  
+## 
+## ...done.
+</code></pre>
+
+<pre><code class="language-r">m0.5_lclp_n.s$other &lt;- read.table(paste0(m0.5_n.s,&quot;lclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
 colnames(m0.5_lclp_n.s$other)=c(&quot;x&quot;,&quot;y&quot;)
 m0.5_lclp_n.s$other &lt;- xyFromRC(m0.5_lclp_n.s, fa_stk)
 m0.5_lchp_n.s &lt;- read.genepop(paste0(m0.5_n.s,&quot;lchp_20pops.gen&quot;))
-m0.5_lchp_n.s$other &lt;- read.table(paste0(m0.5_n.s,&quot;lchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+</code></pre>
+
+<pre><code>## 
+##  Converting data from a Genepop .gen file to a genind object... 
+## 
+## 
+## File description:  Low Complexity High Permeability - 20 pops - Simulated Genotypes  
+## 
+## ...done.
+</code></pre>
+
+<pre><code class="language-r">m0.5_lchp_n.s$other &lt;- read.table(paste0(m0.5_n.s,&quot;lchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
 colnames(m0.5_lchp_n.s$other)=c(&quot;x&quot;,&quot;y&quot;)
 m0.5_lchp_n.s$other &lt;- xyFromRC(m0.5_lchp_n.s, fa_stk)
 m0.5_hchp_n.s &lt;- read.genepop(paste0(m0.5_n.s,&quot;hchp_20pops.gen&quot;))
-m0.5_hchp_n.s$other &lt;- read.table(paste0(m0.5_n.s,&quot;hchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+</code></pre>
+
+<pre><code>## 
+##  Converting data from a Genepop .gen file to a genind object... 
+## 
+## 
+## File description:  High Complexity High Permeability - 20 pops - Simulated Genotypes  
+## 
+## ...done.
+</code></pre>
+
+<pre><code class="language-r">m0.5_hchp_n.s$other &lt;- read.table(paste0(m0.5_n.s,&quot;hchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
 colnames(m0.5_hchp_n.s$other)=c(&quot;x&quot;,&quot;y&quot;)
 m0.5_hchp_n.s$other &lt;- xyFromRC(m0.5_hchp_n.s, fa_stk)
 m0.5_hclp_n.s &lt;- read.genepop(paste0(m0.5_n.s,&quot;hclp_20pops.gen&quot;))
-m0.5_hclp_n.s$other &lt;- read.table(paste0(m0.5_n.s,&quot;hclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+</code></pre>
+
+<pre><code>## 
+##  Converting data from a Genepop .gen file to a genind object... 
+## 
+## 
+## File description:  High Complexity Low Permeability - 20 pops - Simulated Genotypes  
+## 
+## ...done.
+</code></pre>
+
+<pre><code class="language-r">m0.5_hclp_n.s$other &lt;- read.table(paste0(m0.5_n.s,&quot;hclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
 colnames(m0.5_hclp_n.s$other)=c(&quot;x&quot;,&quot;y&quot;)
 m0.5_hclp_n.s$other &lt;- xyFromRC(m0.5_hclp_n.s, fa_stk)
 </code></pre>
@@ -297,7 +561,11 @@ m0.5_hclp_n.s$other &lt;- xyFromRC(m0.5_hclp_n.s, fa_stk)
 
 <pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.1_lclp_n,center=T,scale=F,n.pca=500,n.da=2)
 temp &lt;- optim.a.score(temp.dapc.obj)
-best.n.pca &lt;- temp$best
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-4-1.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">best.n.pca &lt;- temp$best
 dapc.obj &lt;- dapc(m0.1_lclp_n,center=T,scale=F,n.pca=best.n.pca,n.da=2)
 
 scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.1, low complexity, low permeability, neutral loci only&quot;,
@@ -307,9 +575,15 @@ par(xpd=TRUE)
 points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
 </code></pre>
 
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-4-2.png" alt="" /><!-- --></p>
+
 <pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.1_lclp_s,center=T,scale=F,n.pca=500,n.da=2)
 temp &lt;- optim.a.score(temp.dapc.obj)
-best.n.pca &lt;- temp$best
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-5-1.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">best.n.pca &lt;- temp$best
 dapc.obj &lt;- dapc(m0.1_lclp_s,center=T,scale=F,n.pca=best.n.pca,n.da=2)
 
 scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.1, low complexity, low permeability, selected loci only&quot;,
@@ -319,9 +593,15 @@ par(xpd=TRUE)
 points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
 </code></pre>
 
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-5-2.png" alt="" /><!-- --></p>
+
 <pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.1_lclp_n.s,center=T,scale=F,n.pca=500,n.da=2)
 temp &lt;- optim.a.score(temp.dapc.obj)
-best.n.pca &lt;- temp$best
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-6-1.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">best.n.pca &lt;- temp$best
 dapc.obj &lt;- dapc(m0.1_lclp_n.s,center=T,scale=F,n.pca=best.n.pca,n.da=2)
 
 scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.1, low complexity, low permeability, neutral and selected loci&quot;,
@@ -331,9 +611,15 @@ par(xpd=TRUE)
 points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
 </code></pre>
 
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-6-2.png" alt="" /><!-- --></p>
+
 <pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.5_lclp_n,center=T,scale=F,n.pca=500,n.da=2)
 temp &lt;- optim.a.score(temp.dapc.obj)
-best.n.pca &lt;- temp$best
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-7-1.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">best.n.pca &lt;- temp$best
 dapc.obj &lt;- dapc(m0.5_lclp_n,center=T,scale=F,n.pca=best.n.pca,n.da=2)
 
 scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.5, low complexity, low permeability, neutral loci only&quot;,
@@ -343,9 +629,15 @@ par(xpd=TRUE)
 points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
 </code></pre>
 
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-7-2.png" alt="" /><!-- --></p>
+
 <pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.5_lclp_s,center=T,scale=F,n.pca=500,n.da=2)
 temp &lt;- optim.a.score(temp.dapc.obj)
-best.n.pca &lt;- temp$best
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-8-1.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">best.n.pca &lt;- temp$best
 dapc.obj &lt;- dapc(m0.5_lclp_s,center=T,scale=F,n.pca=best.n.pca,n.da=2)
 
 scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.5, low complexity, low permeability, selected loci only&quot;,
@@ -355,9 +647,15 @@ par(xpd=TRUE)
 points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
 </code></pre>
 
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-8-2.png" alt="" /><!-- --></p>
+
 <pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.5_lclp_n.s,center=T,scale=F,n.pca=500,n.da=2)
 temp &lt;- optim.a.score(temp.dapc.obj)
-best.n.pca &lt;- temp$best
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-9-1.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">best.n.pca &lt;- temp$best
 dapc.obj &lt;- dapc(m0.5_lclp_n.s,center=T,scale=F,n.pca=best.n.pca,n.da=2)
 
 scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.5, low complexity, low permeability, neutral and selected loci&quot;,
@@ -367,9 +665,15 @@ par(xpd=TRUE)
 points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
 </code></pre>
 
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-9-2.png" alt="" /><!-- --></p>
+
 <pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.1_lchp_n,center=T,scale=F,n.pca=500,n.da=2)
 temp &lt;- optim.a.score(temp.dapc.obj)
-best.n.pca &lt;- temp$best
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-10-1.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">best.n.pca &lt;- temp$best
 dapc.obj &lt;- dapc(m0.1_lchp_n,center=T,scale=F,n.pca=best.n.pca,n.da=2)
 
 scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.1, low complexity, high permeability, neutral loci only&quot;,
@@ -379,9 +683,15 @@ par(xpd=TRUE)
 points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
 </code></pre>
 
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-10-2.png" alt="" /><!-- --></p>
+
 <pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.1_lchp_s,center=T,scale=F,n.pca=500,n.da=2)
 temp &lt;- optim.a.score(temp.dapc.obj)
-best.n.pca &lt;- temp$best
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-11-1.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">best.n.pca &lt;- temp$best
 dapc.obj &lt;- dapc(m0.1_lchp_s,center=T,scale=F,n.pca=best.n.pca,n.da=2)
 
 scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.1, low complexity, high permeability, selected loci only&quot;,
@@ -391,9 +701,15 @@ par(xpd=TRUE)
 points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
 </code></pre>
 
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-11-2.png" alt="" /><!-- --></p>
+
 <pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.1_lchp_n.s,center=T,scale=F,n.pca=500,n.da=2)
 temp &lt;- optim.a.score(temp.dapc.obj)
-best.n.pca &lt;- temp$best
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-12-1.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">best.n.pca &lt;- temp$best
 dapc.obj &lt;- dapc(m0.1_lchp_n.s,center=T,scale=F,n.pca=best.n.pca,n.da=2)
 
 scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.1, low complexity, high permeability, neutral and selected loci&quot;,
@@ -403,9 +719,15 @@ par(xpd=TRUE)
 points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
 </code></pre>
 
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-12-2.png" alt="" /><!-- --></p>
+
 <pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.5_lchp_n,center=T,scale=F,n.pca=500,n.da=2)
 temp &lt;- optim.a.score(temp.dapc.obj)
-best.n.pca &lt;- temp$best
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-13-1.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">best.n.pca &lt;- temp$best
 dapc.obj &lt;- dapc(m0.5_lchp_n,center=T,scale=F,n.pca=best.n.pca,n.da=2)
 
 scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.5, low complexity, high permeability, neutral loci only&quot;,
@@ -415,9 +737,15 @@ par(xpd=TRUE)
 points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
 </code></pre>
 
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-13-2.png" alt="" /><!-- --></p>
+
 <pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.5_lchp_s,center=T,scale=F,n.pca=500,n.da=2)
 temp &lt;- optim.a.score(temp.dapc.obj)
-best.n.pca &lt;- temp$best
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-14-1.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">best.n.pca &lt;- temp$best
 dapc.obj &lt;- dapc(m0.5_lchp_s,center=T,scale=F,n.pca=best.n.pca,n.da=2)
 
 scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.5, low complexity, high permeability, selected loci only&quot;,
@@ -427,9 +755,15 @@ par(xpd=TRUE)
 points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
 </code></pre>
 
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-14-2.png" alt="" /><!-- --></p>
+
 <pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.5_lchp_n.s,center=T,scale=F,n.pca=500,n.da=2)
 temp &lt;- optim.a.score(temp.dapc.obj)
-best.n.pca &lt;- temp$best
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-15-1.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">best.n.pca &lt;- temp$best
 dapc.obj &lt;- dapc(m0.5_lchp_n.s,center=T,scale=F,n.pca=best.n.pca,n.da=2)
 
 scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.5, low complexity, high permeability, neutral and selected loci&quot;,
@@ -439,9 +773,15 @@ par(xpd=TRUE)
 points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
 </code></pre>
 
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-15-2.png" alt="" /><!-- --></p>
+
 <pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.1_hclp_n,center=T,scale=F,n.pca=500,n.da=2)
 temp &lt;- optim.a.score(temp.dapc.obj)
-best.n.pca &lt;- temp$best
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-16-1.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">best.n.pca &lt;- temp$best
 dapc.obj &lt;- dapc(m0.1_hclp_n,center=T,scale=F,n.pca=best.n.pca,n.da=2)
 
 scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.1, high complexity, low permeability, neutral loci only&quot;,
@@ -451,9 +791,15 @@ par(xpd=TRUE)
 points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
 </code></pre>
 
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-16-2.png" alt="" /><!-- --></p>
+
 <pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.1_hclp_s,center=T,scale=F,n.pca=500,n.da=2)
 temp &lt;- optim.a.score(temp.dapc.obj)
-best.n.pca &lt;- temp$best
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-17-1.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">best.n.pca &lt;- temp$best
 dapc.obj &lt;- dapc(m0.1_hclp_s,center=T,scale=F,n.pca=best.n.pca,n.da=2)
 
 scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.1, high complexity, low permeability, selected loci only&quot;,
@@ -463,9 +809,15 @@ par(xpd=TRUE)
 points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
 </code></pre>
 
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-17-2.png" alt="" /><!-- --></p>
+
 <pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.1_hclp_n.s,center=T,scale=F,n.pca=500,n.da=2)
 temp &lt;- optim.a.score(temp.dapc.obj)
-best.n.pca &lt;- temp$best
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-18-1.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">best.n.pca &lt;- temp$best
 dapc.obj &lt;- dapc(m0.1_hclp_n.s,center=T,scale=F,n.pca=best.n.pca,n.da=2)
 
 scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.1, high complexity, low permeability, neutral and selected loci&quot;,
@@ -475,9 +827,15 @@ par(xpd=TRUE)
 points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
 </code></pre>
 
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-18-2.png" alt="" /><!-- --></p>
+
 <pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.5_hclp_n,center=T,scale=F,n.pca=500,n.da=2)
 temp &lt;- optim.a.score(temp.dapc.obj)
-best.n.pca &lt;- temp$best
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-19-1.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">best.n.pca &lt;- temp$best
 dapc.obj &lt;- dapc(m0.5_hclp_n,center=T,scale=F,n.pca=best.n.pca,n.da=2)
 
 scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.5, high complexity, low permeability, neutral loci only&quot;,
@@ -487,9 +845,15 @@ par(xpd=TRUE)
 points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
 </code></pre>
 
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-19-2.png" alt="" /><!-- --></p>
+
 <pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.5_hclp_s,center=T,scale=F,n.pca=500,n.da=2)
 temp &lt;- optim.a.score(temp.dapc.obj)
-best.n.pca &lt;- temp$best
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-20-1.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">best.n.pca &lt;- temp$best
 dapc.obj &lt;- dapc(m0.5_hclp_s,center=T,scale=F,n.pca=best.n.pca,n.da=2)
 
 scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.5, high complexity, low permeability, selected loci only&quot;,
@@ -499,9 +863,15 @@ par(xpd=TRUE)
 points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
 </code></pre>
 
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-20-2.png" alt="" /><!-- --></p>
+
 <pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.5_hclp_n.s,center=T,scale=F,n.pca=500,n.da=2)
 temp &lt;- optim.a.score(temp.dapc.obj)
-best.n.pca &lt;- temp$best
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-21-1.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">best.n.pca &lt;- temp$best
 dapc.obj &lt;- dapc(m0.5_hclp_n.s,center=T,scale=F,n.pca=best.n.pca,n.da=2)
 
 scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.5, high complexity, low permeability, neutral and selected loci&quot;,
@@ -511,9 +881,15 @@ par(xpd=TRUE)
 points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
 </code></pre>
 
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-21-2.png" alt="" /><!-- --></p>
+
 <pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.1_hchp_n,center=T,scale=F,n.pca=500,n.da=2)
 temp &lt;- optim.a.score(temp.dapc.obj)
-best.n.pca &lt;- temp$best
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-22-1.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">best.n.pca &lt;- temp$best
 dapc.obj &lt;- dapc(m0.1_hchp_n,center=T,scale=F,n.pca=best.n.pca,n.da=2)
 
 scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.1, high complexity, high permeability, neutral loci only&quot;,
@@ -523,9 +899,15 @@ par(xpd=TRUE)
 points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
 </code></pre>
 
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-22-2.png" alt="" /><!-- --></p>
+
 <pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.1_hchp_s,center=T,scale=F,n.pca=500,n.da=2)
 temp &lt;- optim.a.score(temp.dapc.obj)
-best.n.pca &lt;- temp$best
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-23-1.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">best.n.pca &lt;- temp$best
 dapc.obj &lt;- dapc(m0.1_hchp_s,center=T,scale=F,n.pca=best.n.pca,n.da=2)
 
 scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.1, high complexity, high permeability, selected loci only&quot;,
@@ -535,9 +917,15 @@ par(xpd=TRUE)
 points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
 </code></pre>
 
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-23-2.png" alt="" /><!-- --></p>
+
 <pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.1_hchp_n.s,center=T,scale=F,n.pca=500,n.da=2)
 temp &lt;- optim.a.score(temp.dapc.obj)
-best.n.pca &lt;- temp$best
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-24-1.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">best.n.pca &lt;- temp$best
 dapc.obj &lt;- dapc(m0.1_hchp_n.s,center=T,scale=F,n.pca=best.n.pca,n.da=2)
 
 scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.1, high complexity, high permeability, neutral and selected loci&quot;,
@@ -547,9 +935,15 @@ par(xpd=TRUE)
 points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
 </code></pre>
 
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-24-2.png" alt="" /><!-- --></p>
+
 <pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.5_hchp_n,center=T,scale=F,n.pca=500,n.da=2)
 temp &lt;- optim.a.score(temp.dapc.obj)
-best.n.pca &lt;- temp$best
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-25-1.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">best.n.pca &lt;- temp$best
 dapc.obj &lt;- dapc(m0.5_hchp_n,center=T,scale=F,n.pca=best.n.pca,n.da=2)
 
 scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.5, high complexity, high permeability, neutral loci only&quot;,
@@ -559,9 +953,15 @@ par(xpd=TRUE)
 points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
 </code></pre>
 
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-25-2.png" alt="" /><!-- --></p>
+
 <pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.5_hchp_s,center=T,scale=F,n.pca=500,n.da=2)
 temp &lt;- optim.a.score(temp.dapc.obj)
-best.n.pca &lt;- temp$best
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-26-1.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">best.n.pca &lt;- temp$best
 dapc.obj &lt;- dapc(m0.5_hchp_s,center=T,scale=F,n.pca=best.n.pca,n.da=2)
 
 scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.5, high complexity, high permeability, selected loci only&quot;,
@@ -571,9 +971,15 @@ par(xpd=TRUE)
 points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
 </code></pre>
 
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-26-2.png" alt="" /><!-- --></p>
+
 <pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.5_hchp_n.s,center=T,scale=F,n.pca=500,n.da=2)
 temp &lt;- optim.a.score(temp.dapc.obj)
-best.n.pca &lt;- temp$best
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-27-1.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">best.n.pca &lt;- temp$best
 dapc.obj &lt;- dapc(m0.5_hchp_n.s,center=T,scale=F,n.pca=best.n.pca,n.da=2)
 
 scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.5, high complexity, high permeability, neutral and selected loci&quot;,
@@ -582,6 +988,8 @@ scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.5,
 par(xpd=TRUE)
 points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
 </code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-27-2.png" alt="" /><!-- --></p>
 
 <h2 id="inferring-genetic-environmental-covariance-with-co-inertia-analysis">Inferring genetic-environmental covariance with Co-inertia Analysis</h2>
 
@@ -606,7 +1014,47 @@ pcgen &lt;- dudi.pca(dfgen, cent=T, scale=F, scannf=F, nf=2)
 coi &lt;- coinertia(pcenv,pcgen,scan=F,nf=2)
 #plot(coi)
 summary(coi)
-#rvind=RV.rtest(pcenv$l1,pcgen$l1,nrepet=9999)$obs
+</code></pre>
+
+<pre><code>## Coinertia analysis
+## 
+## Class: coinertia dudi
+## Call: coinertia(dudiX = pcenv, dudiY = pcgen, scannf = F, nf = 2)
+## 
+## Total inertia: 2.588
+## 
+## Eigenvalues:
+##     Ax1     Ax2     Ax3 
+##  1.7596  0.4729  0.3553 
+## 
+## Projected inertia (%):
+##     Ax1     Ax2     Ax3 
+##   68.00   18.27   13.73 
+## 
+## Cumulative projected inertia (%):
+##     Ax1   Ax1:2   Ax1:3 
+##   68.00   86.27  100.00 
+## 
+## Eigenvalues decomposition:
+##        eig     covar      sdX      sdY      corr
+## 1 1.759581 1.3264922 1.559164 1.452113 0.5858851
+## 2 0.472895 0.6876736 1.109017 1.405719 0.4411086
+## 
+## Inertia &amp; coinertia X (pcenv):
+##     inertia      max     ratio
+## 1  2.430994 2.442048 0.9954734
+## 12 3.660913 4.005326 0.9140113
+## 
+## Inertia &amp; coinertia Y (pcgen):
+##     inertia      max     ratio
+## 1  2.108631 3.852952 0.5472768
+## 12 4.084677 7.176375 0.5691839
+## 
+## RV:
+##  0.08915289
+</code></pre>
+
+<pre><code class="language-r">#rvind=RV.rtest(pcenv$l1,pcgen$l1,nrepet=9999)$obs
 #rvindpval=RV.rtest(pcenv$l1,pcgen$l1,nrepet=9999)$pvalue
 rvind=RV.rtest(coi$lX,coi$lY,nrepet=9999)$obs
 rvindpval=RV.rtest(coi$lX,coi$lY,nrepet=9999)$pvalue
@@ -626,8 +1074,52 @@ pcgen &lt;- dudi.pca(dfgen, cent=T, scale=F, scannf=F, nf=2)
 bet2 &lt;- bca(pcgen, dfdap20, scannf=F, nf=2)
 coi20 &lt;- coinertia(bet1,bet2,scan=F,nf=2)
 plot(coi20)
-summary(coi20)
-rv20 &lt;- RV.rtest(coi20$lX,coi20$lY,nrepet=9999)$obs
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-28-1.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">summary(coi20)
+</code></pre>
+
+<pre><code>## Coinertia analysis
+## 
+## Class: coinertia dudi
+## Call: coinertia(dudiX = bet1, dudiY = bet2, scannf = F, nf = 2)
+## 
+## Total inertia: 1.49
+## 
+## Eigenvalues:
+##     Ax1     Ax2     Ax3 
+##  1.0104  0.3458  0.1335 
+## 
+## Projected inertia (%):
+##     Ax1     Ax2     Ax3 
+##   67.83   23.21    8.96 
+## 
+## Cumulative projected inertia (%):
+##     Ax1   Ax1:2   Ax1:3 
+##   67.83   91.04  100.00 
+## 
+## Eigenvalues decomposition:
+##         eig     covar       sdX      sdY      corr
+## 1 1.0103701 1.0051717 0.9779356 1.353076 0.7596399
+## 2 0.3457998 0.5880474 0.6109938 1.078438 0.8924427
+## 
+## Inertia &amp; coinertia X (bet1):
+##     inertia       max     ratio
+## 1  0.956358 0.9679242 0.9880506
+## 12 1.329671 1.3451082 0.9885238
+## 
+## Inertia &amp; coinertia Y (bet2):
+##     inertia      max     ratio
+## 1  1.830815 2.939445 0.6228437
+## 12 2.993843 4.995198 0.5993443
+## 
+## RV:
+##  0.2991802
+</code></pre>
+
+<pre><code class="language-r">rv20 &lt;- RV.rtest(coi20$lX,coi20$lY,nrepet=9999)$obs
 rv20pval &lt;- RV.rtest(coi20$lX,coi20$lY,nrepet=9999)$pvalue
 
 
@@ -643,8 +1135,11 @@ dapc10 &lt;- dapc(gen,center=T,scale=F,n.pca=best.n.pca,n.da=2)
 scatter(dapc10,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(gen))
 par(xpd=TRUE)
 points(dapc10$grp.coord[,1],dapc10$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
+</code></pre>
 
-dap10 &lt;- as.data.frame(dapc10$assign)
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-28-2.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">dap10 &lt;- as.data.frame(dapc10$assign)
 
 dfdap10 &lt;- cbind(dap10,dfenv.obj)
 dfdap10 &lt;- na.omit(dfdap10)
@@ -664,11 +1159,62 @@ pcgen10 &lt;- dudi.pca(dfgen, cent=T, scale=F, scannf=F, nf=2)
 bet2 &lt;- bca(pcgen10, dfdap10, scannf=F, nf=2)
 coi10 &lt;- coinertia(bet1,bet2,scan=F,nf=2)
 plot(coi10)
-summary(coi10)
-s.class(pcgen10$l1,dfdap10)
-s.class(pcenv10$l1,dfdap10)
+</code></pre>
 
-rv10=RV.rtest(coi10$lX,coi10$lY,nrepet=9999)$obs
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-28-3.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">summary(coi10)
+</code></pre>
+
+<pre><code>## Coinertia analysis
+## 
+## Class: coinertia dudi
+## Call: coinertia(dudiX = bet1, dudiY = bet2, scannf = F, nf = 2)
+## 
+## Total inertia: 7.614
+## 
+## Eigenvalues:
+##      Ax1      Ax2      Ax3      Ax4 
+## 6.958085 0.600614 0.050348 0.004932 
+## 
+## Projected inertia (%):
+##      Ax1      Ax2      Ax3      Ax4 
+## 91.38566  7.88831  0.66126  0.06478 
+## 
+## Cumulative projected inertia (%):
+##     Ax1   Ax1:2   Ax1:3   Ax1:4 
+##   91.39   99.27   99.94  100.00 
+## 
+## Eigenvalues decomposition:
+##         eig     covar       sdX      sdY      corr
+## 1 6.9580851 2.6378182 1.8160708 1.578628 0.9200942
+## 2 0.6006139 0.7749928 0.5773254 1.447405 0.9274425
+## 
+## Inertia &amp; coinertia X (bet1):
+##     inertia      max     ratio
+## 1  3.298113 3.312019 0.9958013
+## 12 3.631418 3.634270 0.9992152
+## 
+## Inertia &amp; coinertia Y (bet2):
+##     inertia      max     ratio
+## 1  2.492066 2.901579 0.8588654
+## 12 4.587047 5.166382 0.8878645
+## 
+## RV:
+##  0.522622
+</code></pre>
+
+<pre><code class="language-r">s.class(pcgen10$l1,dfdap10)
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-28-4.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">s.class(pcenv10$l1,dfdap10)
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-28-5.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">rv10=RV.rtest(coi10$lX,coi10$lY,nrepet=9999)$obs
 rv10pval=RV.rtest(coi10$lX,coi10$lY,nrepet=9999)$pvalue
 </code></pre>
 

@@ -144,9 +144,9 @@ plot(lchp,breaks=seq(0,100,length.out=11),col=cols)
 
 <p><em>landsim</em> package: simulating <strong>selected</strong> SNPs based on the <em>landscapeR</em>-generated landscape.</p>
 
-<ul>
+<ol>
 <li>Landscape 1: Low Complexity, <strong>Low</strong> Permeability</li>
-</ul>
+</ol>
 
 <pre><code class="language-r">library(landsim)
 #consistency of results
@@ -208,9 +208,9 @@ for (i in 1:3){
 }
 </code></pre>
 
-<ul>
+<ol>
 <li>Landscape 2: Low Complexity, <strong>High</strong> Permeability</li>
-</ul>
+</ol>
 
 <pre><code class="language-r">library(landsim)
 #consistency of results
@@ -701,8 +701,8 @@ setwd(m0.1_lclp)
 #delete duplicate &quot;Loc1&quot; line
 writeLines(readLines(&quot;lclp.GENEPOP.gen1000&quot;)[-2],&quot;lclp.GENEPOP.gen&quot;)
 writeLines(readLines(&quot;lclp.GENEPOP.PopCoor.gen1000&quot;),&quot;lclp.GENEPOP.PopCoor.txt&quot;)
-lclp_file &lt;- read.genepop(paste0(lclp,&quot;lclp.GENEPOP.gen&quot;))
-lclp_file@other &lt;- read.table(paste0(lclp,&quot;lclp.GENEPOP.PopCoor.txt&quot;), sep=&quot; &quot;,header=F)
+lclp_file &lt;- read.genepop(&quot;lclp.GENEPOP.gen&quot;)
+lclp_file@other &lt;- read.table(&quot;lclp.GENEPOP.PopCoor.txt&quot;, sep=&quot; &quot;,header=F)
 colnames(lclp_file@other)=c(&quot;x&quot;,&quot;y&quot;)
 rand.subset.20pops.lclp &lt;- popsub(lclp_file, sublist=sample(popNames(lclp_file),20))
 rand.subset.20pops.lclp.neutrloc &lt;- df2genind(genind2df(rand.subset.20pops.lclp)[,52:551],pop=genind2df(rand.subset.20pops.lclp)[,1],ncode=2)
@@ -725,8 +725,8 @@ setwd(m0.1_lchp)
 #delete duplicate &quot;Loc1&quot; line
 writeLines(readLines(&quot;lchp.GENEPOP.gen1000&quot;)[-2],&quot;lchp.GENEPOP.gen&quot;)
 writeLines(readLines(&quot;lchp.GENEPOP.PopCoor.gen1000&quot;),&quot;lchp.GENEPOP.PopCoor.txt&quot;)
-lchp_file &lt;- read.genepop(paste0(lchp,&quot;lchp.GENEPOP.gen&quot;))
-lchp_file@other &lt;- read.table(paste0(lchp,&quot;lchp.GENEPOP.PopCoor.txt&quot;), sep=&quot; &quot;,header=F)
+lchp_file &lt;- read.genepop(&quot;lchp.GENEPOP.gen&quot;)
+lchp_file@other &lt;- read.table(&quot;lchp.GENEPOP.PopCoor.txt&quot;, sep=&quot; &quot;,header=F)
 colnames(lchp_file@other)=c(&quot;x&quot;,&quot;y&quot;)
 rand.subset.20pops.lchp &lt;- popsub(lchp_file, sublist=sample(popNames(lchp_file),20))
 rand.subset.20pops.lchp.neutrloc &lt;- df2genind(genind2df(rand.subset.20pops.lchp)[,52:551],pop=genind2df(rand.subset.20pops.lchp)[,1],ncode=2)
@@ -749,8 +749,8 @@ setwd(m0.1_hclp)
 #delete duplicate &quot;Loc1&quot; line
 writeLines(readLines(&quot;hclp.GENEPOP.gen1000&quot;)[-2],&quot;hclp.GENEPOP.gen&quot;)
 writeLines(readLines(&quot;hclp.GENEPOP.PopCoor.gen1000&quot;),&quot;hclp.GENEPOP.PopCoor.txt&quot;)
-hclp_file &lt;- read.genepop(paste0(hclp,&quot;pop3_complex_lowperm.GENEPOP.gen&quot;))
-hclp_file@other &lt;- read.table(paste0(hclp,&quot;pop3_complex_lowperm.GENEPOP.PopCoor.txt&quot;), sep=&quot; &quot;,header=F)
+hclp_file &lt;- read.genepop(&quot;hclp.GENEPOP.gen&quot;)
+hclp_file@other &lt;- read.table(&quot;hclp.GENEPOP.PopCoor.txt&quot;, sep=&quot; &quot;,header=F)
 colnames(hclp_file@other)=c(&quot;x&quot;,&quot;y&quot;)
 rand.subset.20pops.hclp &lt;- popsub(hclp_file, sublist=sample(popNames(hclp_file),20))
 rand.subset.20pops.hclp.neutrloc &lt;- df2genind(genind2df(rand.subset.20pops.hclp)[,52:551],pop=genind2df(rand.subset.20pops.hclp)[,1],ncode=2)
@@ -773,8 +773,8 @@ setwd(m0.1_hchp)
 #delete duplicate &quot;Loc1&quot; line
 writeLines(readLines(&quot;hchp.GENEPOP.gen1000&quot;)[-2],&quot;hchp.GENEPOP.gen&quot;)
 writeLines(readLines(&quot;hchp.GENEPOP.PopCoor.gen1000&quot;),&quot;hchp.GENEPOP.PopCoor.txt&quot;)
-hchp_file &lt;- read.genepop(paste0(hchp,&quot;pop3_complex_highperm.GENEPOP.gen&quot;))
-hchp_file@other &lt;- read.table(paste0(hchp,&quot;pop3_complex_highperm.GENEPOP.PopCoor.txt&quot;), sep=&quot; &quot;,header=F)
+hchp_file &lt;- read.genepop(&quot;hchp.GENEPOP.gen&quot;)
+hchp_file@other &lt;- read.table(&quot;hchp.GENEPOP.PopCoor.txt&quot;, sep=&quot; &quot;,header=F)
 colnames(hchp_file@other)=c(&quot;x&quot;,&quot;y&quot;)
 rand.subset.20pops.hchp &lt;- popsub(hchp_file, sublist=sample(popNames(hchp_file),20))
 rand.subset.20pops.hchp.neutrloc &lt;- df2genind(genind2df(rand.subset.20pops.hchp)[,52:551],pop=genind2df(rand.subset.20pops.hchp)[,1],ncode=2)
@@ -798,8 +798,8 @@ setwd(m0.5_lclp)
 #delete duplicate &quot;Loc1&quot; line
 writeLines(readLines(&quot;lclp.GENEPOP.gen1000&quot;)[-2],&quot;lclp.GENEPOP.gen&quot;)
 writeLines(readLines(&quot;lclp.GENEPOP.PopCoor.gen1000&quot;),&quot;lclp.GENEPOP.PopCoor.txt&quot;)
-lclp_file &lt;- read.genepop(paste0(lclp,&quot;lclp.GENEPOP.gen&quot;))
-lclp_file@other &lt;- read.table(paste0(lclp,&quot;lclp.GENEPOP.PopCoor.txt&quot;), sep=&quot; &quot;,header=F)
+lclp_file &lt;- read.genepop(&quot;lclp.GENEPOP.gen&quot;)
+lclp_file@other &lt;- read.table(&quot;lclp.GENEPOP.PopCoor.txt&quot;, sep=&quot; &quot;,header=F)
 colnames(lclp_file@other)=c(&quot;x&quot;,&quot;y&quot;)
 rand.subset.20pops.lclp &lt;- popsub(lclp_file, sublist=sample(popNames(lclp_file),20))
 rand.subset.20pops.lclp.neutrloc &lt;- df2genind(genind2df(rand.subset.20pops.lclp)[,52:551],pop=genind2df(rand.subset.20pops.lclp)[,1],ncode=2)
@@ -822,8 +822,8 @@ setwd(m0.5_lchp)
 #delete duplicate &quot;Loc1&quot; line
 writeLines(readLines(&quot;lchp.GENEPOP.gen1000&quot;)[-2],&quot;lchp.GENEPOP.gen&quot;)
 writeLines(readLines(&quot;lchp.GENEPOP.PopCoor.gen1000&quot;),&quot;lchp.GENEPOP.PopCoor.txt&quot;)
-lchp_file &lt;- read.genepop(paste0(lchp,&quot;lchp.GENEPOP.gen&quot;))
-lchp_file@other &lt;- read.table(paste0(lchp,&quot;lchp.GENEPOP.PopCoor.txt&quot;), sep=&quot; &quot;,header=F)
+lchp_file &lt;- read.genepop(&quot;lchp.GENEPOP.gen&quot;)
+lchp_file@other &lt;- read.table(&quot;lchp.GENEPOP.PopCoor.txt&quot;, sep=&quot; &quot;,header=F)
 colnames(lchp_file@other)=c(&quot;x&quot;,&quot;y&quot;)
 rand.subset.20pops.lchp &lt;- popsub(lchp_file, sublist=sample(popNames(lchp_file),20))
 rand.subset.20pops.lchp.neutrloc &lt;- df2genind(genind2df(rand.subset.20pops.lchp)[,52:551],pop=genind2df(rand.subset.20pops.lchp)[,1],ncode=2)
@@ -846,8 +846,8 @@ setwd(m0.5_hclp)
 #delete duplicate &quot;Loc1&quot; line
 writeLines(readLines(&quot;hclp.GENEPOP.gen1000&quot;)[-2],&quot;hclp.GENEPOP.gen&quot;)
 writeLines(readLines(&quot;hclp.GENEPOP.PopCoor.gen1000&quot;),&quot;hclp.GENEPOP.PopCoor.txt&quot;)
-hclp_file &lt;- read.genepop(paste0(hclp,&quot;pop3_complex_lowperm.GENEPOP.gen&quot;))
-hclp_file@other &lt;- read.table(paste0(hclp,&quot;pop3_complex_lowperm.GENEPOP.PopCoor.txt&quot;), sep=&quot; &quot;,header=F)
+hclp_file &lt;- read.genepop(&quot;hclp.GENEPOP.gen&quot;)
+hclp_file@other &lt;- read.table(&quot;hclp.GENEPOP.PopCoor.txt&quot;, sep=&quot; &quot;,header=F)
 colnames(hclp_file@other)=c(&quot;x&quot;,&quot;y&quot;)
 rand.subset.20pops.hclp &lt;- popsub(hclp_file, sublist=sample(popNames(hclp_file),20))
 rand.subset.20pops.hclp.neutrloc &lt;- df2genind(genind2df(rand.subset.20pops.hclp)[,52:551],pop=genind2df(rand.subset.20pops.hclp)[,1],ncode=2)
@@ -870,8 +870,8 @@ setwd(m0.5_hchp)
 #delete duplicate &quot;Loc1&quot; line
 writeLines(readLines(&quot;hchp.GENEPOP.gen1000&quot;)[-2],&quot;hchp.GENEPOP.gen&quot;)
 writeLines(readLines(&quot;hchp.GENEPOP.PopCoor.gen1000&quot;),&quot;hchp.GENEPOP.PopCoor.txt&quot;)
-hchp_file &lt;- read.genepop(paste0(hchp,&quot;pop3_complex_highperm.GENEPOP.gen&quot;))
-hchp_file@other &lt;- read.table(paste0(hchp,&quot;pop3_complex_highperm.GENEPOP.PopCoor.txt&quot;), sep=&quot; &quot;,header=F)
+hchp_file &lt;- read.genepop(&quot;hchp.GENEPOP.gen&quot;)
+hchp_file@other &lt;- read.table(&quot;hchp.GENEPOP.PopCoor.txt&quot;, sep=&quot; &quot;,header=F)
 colnames(hchp_file@other)=c(&quot;x&quot;,&quot;y&quot;)
 rand.subset.20pops.hchp &lt;- popsub(hchp_file, sublist=sample(popNames(hchp_file),20))
 rand.subset.20pops.hchp.neutrloc &lt;- df2genind(genind2df(rand.subset.20pops.hchp)[,52:551],pop=genind2df(rand.subset.20pops.hchp)[,1],ncode=2)
