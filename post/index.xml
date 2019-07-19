@@ -29,23 +29,5 @@
       <description>&lt;p&gt;To evaluate the NALgen method of modeling neutral and adaptive genetic variation across continuous landscapes, I first generated several landscapes, and then simulated genotypes based on the generated landscapes. In this post, I break down the simulation steps.&lt;/p&gt;</description>
     </item>
     
-    <item>
-      <title></title>
-      <link>/NALgen/post/multivariateanalysis_popstruct_simulateddata/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>/NALgen/post/multivariateanalysis_popstruct_simulateddata/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title></title>
-      <link>/NALgen/post/landgen-simulations/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>/NALgen/post/landgen-simulations/</guid>
-      <description></description>
-    </item>
-    
   </channel>
 </rss>
