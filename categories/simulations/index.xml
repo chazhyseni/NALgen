@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Simulations on NALgen</title>
+    <link>/NALgen/categories/simulations/</link>
+    <description>Recent content in Simulations on NALgen</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 17 Jul 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/NALgen/categories/simulations/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Landscape Genetic Simulations</title>
+      <link>/NALgen/post/landscape-genetic-simulations/</link>
+      <pubDate>Wed, 17 Jul 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/NALgen/post/landscape-genetic-simulations/</guid>
+      <description>&lt;p&gt;The main purpose of this article is to break down the simulation steps: landscape generation and simulation of genotypes based on the generated landscapes.&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

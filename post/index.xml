@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>NALgen</title>
-    <link>/NALgen/</link>
-    <description>Recent content on NALgen</description>
+    <title>Posts on NALgen</title>
+    <link>/NALgen/post/</link>
+    <description>Recent content in Posts on NALgen</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Fri, 19 Jul 2019 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="/NALgen/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="/NALgen/post/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
@@ -27,33 +27,6 @@
       
       <guid>/NALgen/post/landscape-genetic-simulations/</guid>
       <description>&lt;p&gt;The main purpose of this article is to break down the simulation steps: landscape generation and simulation of genotypes based on the generated landscapes.&lt;/p&gt;</description>
-    </item>
-    
-    <item>
-      <title>About</title>
-      <link>/NALgen/about/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>/NALgen/about/</guid>
-      <description>NALgen (Neutral and Adaptive Landscape Genetics) is a method for modeling the process of gene flow and predicting the resulting pattern of (neutral and adaptive) genetic variation across (continuous) landscapes.</description>
-    </item>
-    
-    <item>
-      <title>Tutorials</title>
-      <link>/NALgen/tutorials/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>/NALgen/tutorials/</guid>
-      <description>Tutorials for the NALgen method are posted here.</description>
-    </item>
-    
-    <item>
-      <title>Vignettes</title>
-      <link>/NALgen/vignettes/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>/NALgen/vignettes/</guid>
-      <description>Vignettes for the NALgen method are posted here.</description>
     </item>
     
   </channel>

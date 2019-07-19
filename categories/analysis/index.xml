@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>NALgen</title>
-    <link>/NALgen/</link>
-    <description>Recent content on NALgen</description>
+    <title>Analysis on NALgen</title>
+    <link>/NALgen/categories/analysis/</link>
+    <description>Recent content in Analysis on NALgen</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Fri, 19 Jul 2019 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="/NALgen/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="/NALgen/categories/analysis/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
@@ -18,42 +18,6 @@
       
       <guid>/NALgen/post/multivariateanalysis_popstruct_simulateddata/</guid>
       <description>Color palette library(ggsci) futr &amp;lt;- pal_futurama() futr.cols &amp;lt;- colorRampPalette(futr(12)[c(12,11,3,7,8,6,1,2)]) cols &amp;lt;- futr.cols(12) library(scales) #show_col(futr(12)) show_col(cols)  Preliminary NALgen analysis pt.1: Multivariate ordinations Loading the environmental data library(raster)  ## Loading required package: sp  library(virtualspecies) #load bioclim files setwd(&amp;quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Phylogeography/Geo_Analysis/Data/EnvData/bioclim/east coast/current&amp;quot;) fn &amp;lt;- list.files(pattern=&amp;quot;.asc&amp;quot;) bio_stk &amp;lt;- stack() for(i in 1:length(fn)) bio_stk &amp;lt;- addLayer(bio_stk,raster(fn[i])) #modify variable names nampres &amp;lt;- sub(pattern=&amp;quot;Ecoast&amp;quot;,replacement=&amp;quot;&amp;quot;,names(bio_stk)) nampres &amp;lt;- sub(pattern=&amp;quot;_&amp;quot;,replacement=&amp;quot;&amp;quot;,nampres) nampres &amp;lt;- sub(pattern=&amp;quot;_&amp;quot;,replacement=&amp;quot;&amp;quot;,nampres) names(bio_stk) &amp;lt;- nampres ##remove highly correlated variables #rc_bio &amp;lt;- removeCollinearity(bio_stk, select.</description>
-    </item>
-    
-    <item>
-      <title>Landscape Genetic Simulations</title>
-      <link>/NALgen/post/landscape-genetic-simulations/</link>
-      <pubDate>Wed, 17 Jul 2019 00:00:00 +0000</pubDate>
-      
-      <guid>/NALgen/post/landscape-genetic-simulations/</guid>
-      <description>&lt;p&gt;The main purpose of this article is to break down the simulation steps: landscape generation and simulation of genotypes based on the generated landscapes.&lt;/p&gt;</description>
-    </item>
-    
-    <item>
-      <title>About</title>
-      <link>/NALgen/about/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>/NALgen/about/</guid>
-      <description>NALgen (Neutral and Adaptive Landscape Genetics) is a method for modeling the process of gene flow and predicting the resulting pattern of (neutral and adaptive) genetic variation across (continuous) landscapes.</description>
-    </item>
-    
-    <item>
-      <title>Tutorials</title>
-      <link>/NALgen/tutorials/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>/NALgen/tutorials/</guid>
-      <description>Tutorials for the NALgen method are posted here.</description>
-    </item>
-    
-    <item>
-      <title>Vignettes</title>
-      <link>/NALgen/vignettes/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>/NALgen/vignettes/</guid>
-      <description>Vignettes for the NALgen method are posted here.</description>
     </item>
     
   </channel>

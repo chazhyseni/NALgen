@@ -3,22 +3,101 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
-    <loc>/NALgen/about/</loc>
+    <loc>/NALgen/categories/analysis/</loc>
+    <lastmod>2019-07-19T00:00:00+00:00</lastmod>
+    <priority>0</priority>
   </url>
   
   <url>
     <loc>/NALgen/categories/</loc>
+    <lastmod>2019-07-19T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/NALgen/tags/co-inertia-analysis/</loc>
+    <lastmod>2019-07-19T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/NALgen/tags/discriminant-analysis-of-principal-components/</loc>
+    <lastmod>2019-07-19T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/NALgen/tags/genetic-environmental-covariance/</loc>
+    <lastmod>2019-07-19T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/NALgen/tags/multivariate-ordination/</loc>
+    <lastmod>2019-07-19T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>/NALgen/</loc>
+    <lastmod>2019-07-19T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/NALgen/post/multivariateanalysis_popstruct_simulateddata/</loc>
+    <lastmod>2019-07-19T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/NALgen/tags/population-structure/</loc>
+    <lastmod>2019-07-19T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/NALgen/post/</loc>
+    <lastmod>2019-07-19T00:00:00+00:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>/NALgen/tags/</loc>
+    <lastmod>2019-07-19T00:00:00+00:00</lastmod>
     <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/NALgen/tags/genotype-simulations/</loc>
+    <lastmod>2019-07-17T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/NALgen/post/landscape-genetic-simulations/</loc>
+    <lastmod>2019-07-17T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/NALgen/tags/landscape-genetics/</loc>
+    <lastmod>2019-07-17T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/NALgen/tags/landscape-simulations/</loc>
+    <lastmod>2019-07-17T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/NALgen/categories/simulations/</loc>
+    <lastmod>2019-07-17T00:00:00+00:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/NALgen/about/</loc>
   </url>
   
   <url>
