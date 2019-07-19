@@ -26,7 +26,7 @@
       <pubDate>Wed, 17 Jul 2019 00:00:00 +0000</pubDate>
       
       <guid>/NALgen/post/landscape-genetic-simulations/</guid>
-      <description>&lt;p&gt;The main purpose of this article is to break down the simulation steps: landscape generation and simulation of genotypes based on the generated landscapes.&lt;/p&gt;</description>
+      <description>&lt;p&gt;To evaluate the NALgen method of modeling neutral and adaptive genetic variation across continuous landscapes, I first generated several landscapes, and then simulated genotypes based on the generated landscapes. In this post, I break down the simulation steps.&lt;/p&gt;</description>
     </item>
     
     <item>

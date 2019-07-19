@@ -8,7 +8,7 @@
 	<script>(function(d,e){d[e]=d[e].replace("no-js","js");})(document.documentElement,"className");</script>
 	<meta name="description" content="">
 	<meta property="og:title" content="Landscape Genetic Simulations" />
-<meta property="og:description" content="The main purpose of this article is to break down the simulation steps: landscape generation and simulation of genotypes based on the generated landscapes." />
+<meta property="og:description" content="To evaluate the NALgen method of modeling neutral and adaptive genetic variation across continuous landscapes, I first generated several landscapes, and then simulated genotypes based on the generated landscapes. In this post, I break down the simulation steps." />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="/NALgen/post/landscape-genetic-simulations/" />
 <meta property="article:published_time" content="2019-07-17T00:00:00&#43;00:00"/>
@@ -83,13 +83,13 @@ if (!doNotTrack) {
 </div>
 </div>
 		</header><div class="content post__content clearfix">
-			<p>The main purpose of this article is to break down the simulation steps: landscape generation and simulation of genotypes based on the generated landscapes.</p>
+			<p>To evaluate the NALgen method of modeling neutral and adaptive genetic variation across continuous landscapes, I first generated several landscapes, and then simulated genotypes based on the generated landscapes. In this post, I break down the simulation steps.</p>
 
-<p><a href="https://github.com/chazhyseni/NALgen/blob/master/data" target="_blank">Simulated Genotypes (50 selected and 500 neutral biallelic loci (SNPs), separately and combined): two migration coefficients (m=0.1 and 0.5) x two levels of landscape complexity (low and high) x two levels of landscape permeability (low and high)</a></p>
+<p><a href="https://github.com/chazhyseni/NALgen/blob/master/data" target="_blank">Simulated genotypes (50 selected and 500 neutral biallelic loci (SNPs), separately and combined): two migration coefficients (m=0.1 and 0.5) x two levels of landscape complexity (low and high) x two levels of landscape permeability (low and high)</a></p>
 
 <h2 id="color-palette">Color palette</h2>
 
-<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-1-1.png" alt="" /><!-- --></p>
+<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-1-1.png" alt="" /><!--Color palette--></p>
 
 <h1 id="phase-i-test-single-locus-genotypes">Phase I (Test): Single-locus genotypes</h1>
 
@@ -97,40 +97,9 @@ if (!doNotTrack) {
 
 <p><em>landscapeR</em> package: simulating simple landscapes (barrier and two different values of carrying capacity/habitat suitability): landscape 1 has low permeability cells (carrying capacity = 5) between habitable patches (carrying capacity = 100), while landscape 2 has high permeability cells (carrying capacity = 25), in addition to barriers (carrying capacity = 0).</p>
 
-<pre><code>## Loading required package: sp
-</code></pre>
+<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-2-1.png" alt="" /><!--Low-complexity low-permeability landscape--></p>
 
-<pre><code>## Warning in makePatch(context = mtx, spt = pts[np], size = size[np], bgr =
-## bgr, : Patch size reached from seed point 60 was 9 . No further background
-## cells available for the patch.
-</code></pre>
-
-<pre><code>## Warning in makePatch(context = mtx, spt = pts[np], size = size[np], bgr =
-## bgr, : Patch size reached from seed point 305 was 5 . No further background
-## cells available for the patch.
-</code></pre>
-
-<pre><code>## Warning in makePatch(context = mtx, spt = pts[np], size = size[np],
-## bgr = bgr, : Patch size reached from seed point 203 was 12 . No further
-## background cells available for the patch.
-</code></pre>
-
-<pre><code>## Warning in makePatch(context = mtx, spt = pts[np], size = size[np], bgr =
-## bgr, : Patch size reached from seed point 819 was 9 . No further background
-## cells available for the patch.
-</code></pre>
-
-<pre><code>## Warning in makePatch(context = mtx, spt = pts[np], size = size[np], bgr =
-## bgr, : Patch size reached from seed point 62 was 1 . No further background
-## cells available for the patch.
-</code></pre>
-
-<pre><code>## Warning in makePatch(context = mtx, spt = pts[np], size = size[np], bgr =
-## bgr, : Patch size reached from seed point 360 was 3 . No further background
-## cells available for the patch.
-</code></pre>
-
-<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-2-1.png" alt="" /><!-- --><img src="landgen-simulations_files/figure-html/unnamed-chunk-2-2.png" alt="" /><!-- --></p>
+<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-2-2.png" alt="" /><!--Low-complexity high-permeability landscape--></p>
 
 <h2 id="simulation-of-genotypes-based-on-simple-landscapes">Simulation of genotypes based on simple landscapes</h2>
 
@@ -270,37 +239,9 @@ for (i in 1:3){
 
 <p><em>landscapeR</em> package: simulating simple landscapes (barrier and two different values of carrying capacity/habitat suitability): landscape 1 has low permeability cells (carrying capacity = 5) between habitable patches (carrying capacity = 100), while landscape 2 has high permeability cells (carrying capacity = 25), in addition to barriers (carrying capacity = 0).</p>
 
-<pre><code>## Warning in makePatch(context = mtx, spt = pts[np], size = size[np], bgr =
-## bgr, : Patch size reached from seed point 60 was 9 . No further background
-## cells available for the patch.
-</code></pre>
+<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-5-1.png" alt="" /><!--Low-complexity low-permeability landscape--></p>
 
-<pre><code>## Warning in makePatch(context = mtx, spt = pts[np], size = size[np], bgr =
-## bgr, : Patch size reached from seed point 305 was 5 . No further background
-## cells available for the patch.
-</code></pre>
-
-<pre><code>## Warning in makePatch(context = mtx, spt = pts[np], size = size[np],
-## bgr = bgr, : Patch size reached from seed point 203 was 12 . No further
-## background cells available for the patch.
-</code></pre>
-
-<pre><code>## Warning in makePatch(context = mtx, spt = pts[np], size = size[np], bgr =
-## bgr, : Patch size reached from seed point 819 was 9 . No further background
-## cells available for the patch.
-</code></pre>
-
-<pre><code>## Warning in makePatch(context = mtx, spt = pts[np], size = size[np], bgr =
-## bgr, : Patch size reached from seed point 62 was 1 . No further background
-## cells available for the patch.
-</code></pre>
-
-<pre><code>## Warning in makePatch(context = mtx, spt = pts[np], size = size[np], bgr =
-## bgr, : Patch size reached from seed point 360 was 3 . No further background
-## cells available for the patch.
-</code></pre>
-
-<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-5-1.png" alt="" /><!-- --><img src="landgen-simulations_files/figure-html/unnamed-chunk-5-2.png" alt="" /><!-- --></p>
+<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-5-2.png" alt="" /><!--Low-complexity high-permeability landscape--></p>
 
 <h2 id="simulation-of-genotypes-based-on-simple-landscapes-1">Simulation of genotypes based on simple landscapes</h2>
 
@@ -418,177 +359,25 @@ writeRaster(lchp, &quot;lchp.asc&quot;, overwrite=TRUE)
    To generate distributions:<br />
      1. collinearity removed from climatic variables,<br />
      2. PCA of remaining variables performed,<br />
-     3. ranges of PCA values specified (for three populations).</p>
+     3. ranges of PCA values specified (for three metapopulations).</p>
 
-<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-7-1.png" alt="" /><!-- --></p>
+<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-7-1.png" alt="" /><!--Selecting non-collinear bioclimatic variables--></p>
 
-<pre><code>##  - Perfoming the pca
-</code></pre>
+<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-7-2.png" alt="" /><!--Occurrence probability of metapopulation 1 (out of 3)--></p>
 
-<pre><code>##  - Defining the response of the species along PCA axes
-</code></pre>
+<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-7-3.png" alt="" /><!--Occurrence probability of metapopulation 2 (out of 3)--></p>
 
-<pre><code>##     - You have provided standard deviations, so argument niche.breadth will be ignored.
-</code></pre>
+<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-7-4.png" alt="" /><!--Occurrence probability of metapopulation 3 (out of 3)--></p>
 
-<pre><code>##  - Calculating suitability values
-</code></pre>
+<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-7-5.png" alt="" /><!--Putting the three metapopulations together: High-complexity low-permeability landscape--></p>
 
-<pre><code>##    The final environmental suitability was rescaled between 0 and 1.
-##                   To disable, set argument rescale = FALSE
-</code></pre>
+<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-7-6.png" alt="" /><!--Occurrence probability of metapopulation 1 (out of 3)--></p>
 
-<pre><code>##  - Perfoming the pca
-</code></pre>
+<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-7-7.png" alt="" /><!--Occurrence probability of metapopulation 2 (out of 3)--></p>
 
-<pre><code>##  - Defining the response of the species along PCA axes
-</code></pre>
+<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-7-8.png" alt="" /><!--Occurrence probability of metapopulation 3 (out of 3)--></p>
 
-<pre><code>##     - You have provided standard deviations, so argument niche.breadth will be ignored.
-</code></pre>
-
-<pre><code>##  - Calculating suitability values
-</code></pre>
-
-<pre><code>##    The final environmental suitability was rescaled between 0 and 1.
-##                   To disable, set argument rescale = FALSE
-</code></pre>
-
-<pre><code>##  - Perfoming the pca
-</code></pre>
-
-<pre><code>##  - Defining the response of the species along PCA axes
-</code></pre>
-
-<pre><code>##     - You have provided standard deviations, so argument niche.breadth will be ignored.
-</code></pre>
-
-<pre><code>##  - Calculating suitability values
-</code></pre>
-
-<pre><code>##    The final environmental suitability was rescaled between 0 and 1.
-##                   To disable, set argument rescale = FALSE
-</code></pre>
-
-<pre><code>##    --- Determing species.prevalence automatically according to alpha and beta
-</code></pre>
-
-<pre><code>##    Logistic conversion finished:
-##               
-## - beta = 0.2
-## - alpha = -0.002
-## - species prevalence =0.0347432024169184
-</code></pre>
-
-<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-7-2.png" alt="" /><!-- --></p>
-
-<pre><code>##    --- Determing species.prevalence automatically according to alpha and beta
-</code></pre>
-
-<pre><code>##    Logistic conversion finished:
-##               
-## - beta = 0.2
-## - alpha = -0.002
-## - species prevalence =0.114803625377644
-</code></pre>
-
-<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-7-3.png" alt="" /><!-- --></p>
-
-<pre><code>##    --- Determing species.prevalence automatically according to alpha and beta
-</code></pre>
-
-<pre><code>##    Logistic conversion finished:
-##               
-## - beta = 0.2
-## - alpha = -0.002
-## - species prevalence =0.108761329305136
-</code></pre>
-
-<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-7-4.png" alt="" /><!-- --><img src="landgen-simulations_files/figure-html/unnamed-chunk-7-5.png" alt="" /><!-- --></p>
-
-<pre><code>##  - Perfoming the pca
-</code></pre>
-
-<pre><code>##  - Defining the response of the species along PCA axes
-</code></pre>
-
-<pre><code>##     - You have provided standard deviations, so argument niche.breadth will be ignored.
-</code></pre>
-
-<pre><code>##  - Calculating suitability values
-</code></pre>
-
-<pre><code>##    The final environmental suitability was rescaled between 0 and 1.
-##                   To disable, set argument rescale = FALSE
-</code></pre>
-
-<pre><code>##  - Perfoming the pca
-</code></pre>
-
-<pre><code>##  - Defining the response of the species along PCA axes
-</code></pre>
-
-<pre><code>##     - You have provided standard deviations, so argument niche.breadth will be ignored.
-</code></pre>
-
-<pre><code>##  - Calculating suitability values
-</code></pre>
-
-<pre><code>##    The final environmental suitability was rescaled between 0 and 1.
-##                   To disable, set argument rescale = FALSE
-</code></pre>
-
-<pre><code>##  - Perfoming the pca
-</code></pre>
-
-<pre><code>##  - Defining the response of the species along PCA axes
-</code></pre>
-
-<pre><code>##     - You have provided standard deviations, so argument niche.breadth will be ignored.
-</code></pre>
-
-<pre><code>##  - Calculating suitability values
-</code></pre>
-
-<pre><code>##    The final environmental suitability was rescaled between 0 and 1.
-##                   To disable, set argument rescale = FALSE
-</code></pre>
-
-<pre><code>##    --- Determing species.prevalence automatically according to alpha and beta
-</code></pre>
-
-<pre><code>##    Logistic conversion finished:
-##               
-## - beta = 0.4
-## - alpha = -0.004
-## - species prevalence =0.191842900302115
-</code></pre>
-
-<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-7-6.png" alt="" /><!-- --></p>
-
-<pre><code>##    --- Determing species.prevalence automatically according to alpha and beta
-</code></pre>
-
-<pre><code>##    Logistic conversion finished:
-##               
-## - beta = 0.4
-## - alpha = -0.004
-## - species prevalence =0.31570996978852
-</code></pre>
-
-<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-7-7.png" alt="" /><!-- --></p>
-
-<pre><code>##    --- Determing species.prevalence automatically according to alpha and beta
-</code></pre>
-
-<pre><code>##    Logistic conversion finished:
-##               
-## - beta = 0.4
-## - alpha = -0.004
-## - species prevalence =0.107250755287009
-</code></pre>
-
-<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-7-8.png" alt="" /><!-- --><img src="landgen-simulations_files/figure-html/unnamed-chunk-7-9.png" alt="" /><!-- --></p>
+<p><img src="landgen-simulations_files/figure-html/unnamed-chunk-7-9.png" alt="" /><!--Putting the three metapopulations together: High-complexity high-permeability landscape--></p>
 
 <p><em>popRange</em> package: simulating 50 <em>selected</em> and 500 <strong>neutral</strong> SNPs based on the <em>virtualspecies</em>-generated landscape.</p>
 
@@ -888,7 +677,7 @@ writeGenPop(rand.subset.20pops.hchp.selloc,&quot;hchp_only-sel_20pops.gen&quot;,
 write.table(cbind(rand.subset.20pops.hchp@other$x,rand.subset.20pops.hchp@other$y),&quot;hchp_20pops_coords.txt&quot;, row.names=FALSE, col.names=FALSE)
 </code></pre>
 
-<p><a href="https://github.com/chazhyseni/NALgen/blob/master/data" target="_blank">Simulated Genotypes (50 selected and 500 neutral biallelic loci (SNPs), separately and combined): two migration coefficients (m=0.1 and 0.5) x two levels of landscape complexity (low and high) x two levels of landscape permeability (low and high)</a></p>
+<p><a href="https://github.com/chazhyseni/NALgen/blob/master/data" target="_blank">Simulated genotypes (50 selected and 500 neutral biallelic loci (SNPs), separately and combined): two migration coefficients (m=0.1 and 0.5) x two levels of landscape complexity (low and high) x two levels of landscape permeability (low and high)</a></p>
 		</div>
 		
 <div class="post__tags tags clearfix">
