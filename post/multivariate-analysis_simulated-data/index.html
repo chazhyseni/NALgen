@@ -99,8 +99,6 @@ show_col(cols)
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-1-1.png" alt="" /><!-- --></p>
 
-<h1 id="preliminary-nalgen-analysis-pt-1-multivariate-ordinations">Preliminary NALgen analysis pt.1: Multivariate ordinations</h1>
-
 <h2 id="loading-the-environmental-data">Loading the environmental data</h2>
 
 <pre><code class="language-r">library(raster)
@@ -292,6 +290,8 @@ m0.5_hclp_n.s$other &lt;- read.table(paste0(m0.5_n.s,&quot;hclp_20pops_coords.tx
 colnames(m0.5_hclp_n.s$other)=c(&quot;x&quot;,&quot;y&quot;)
 m0.5_hclp_n.s$other &lt;- xyFromRC(m0.5_hclp_n.s, fa_stk)
 </code></pre>
+
+<h2 id="inferring-population-structure-with-discriminant-analysis-of-principal-components-dapc">Inferring population structure with Discriminant Analysis of Principal Components (DAPC)</h2>
 
 <pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.1_lclp_n,center=T,scale=F,n.pca=500,n.da=2)
 temp &lt;- optim.a.score(temp.dapc.obj)
@@ -580,6 +580,8 @@ scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.5,
 par(xpd=TRUE)
 points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
 </code></pre>
+
+<h2 id="inferring-genetic-environmental-covariance-with-co-inertia-analysis">Inferring genetic-environmental covariance with Co-inertia Analysis</h2>
 
 <pre><code class="language-r">#plot parameters
 par(mfrow=c(1,1),fg=&quot;gray50&quot;,pty='m',bty='o',mar=c(4,4,4,4),cex.main=1.3,cex.axis=1.1,cex.lab=1.2)
