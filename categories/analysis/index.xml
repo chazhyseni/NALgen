@@ -6,7 +6,7 @@
     <description>Recent content in Analysis on NALgen</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 19 Jul 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 20 Jul 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/NALgen/categories/analysis/index.xml" rel="self" type="application/rss+xml" />
     
@@ -14,7 +14,7 @@
     <item>
       <title>NALgen Analysis Pt.1</title>
       <link>/NALgen/post/multivariate-analysis_simulated-data/</link>
-      <pubDate>Fri, 19 Jul 2019 00:00:00 +0000</pubDate>
+      <pubDate>Sat, 20 Jul 2019 00:00:00 +0000</pubDate>
       
       <guid>/NALgen/post/multivariate-analysis_simulated-data/</guid>
       <description>&lt;p&gt;Here, I present the prequel to the NALgen method: using multivariate analyses to infer population structure in the simulated data as well as to find covariance between genetic and environmental data. In upcoming posts about modeling neutral and adaptive genetic variation across continuous landscapes, information about population structure will be used in creating the response variable, while transformed environmental data (based on genetic-environmental covariance) will be used as predictors.&lt;/p&gt;</description>

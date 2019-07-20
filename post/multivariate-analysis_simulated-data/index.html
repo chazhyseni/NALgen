@@ -11,8 +11,8 @@
 <meta property="og:description" content="Multivariate analyses: Inferring population structure in simulated data" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="/NALgen/post/multivariate-analysis_simulated-data/" />
-<meta property="article:published_time" content="2019-07-19T00:00:00&#43;00:00"/>
-<meta property="article:modified_time" content="2019-07-19T00:00:00&#43;00:00"/>
+<meta property="article:published_time" content="2019-07-20T00:00:00&#43;00:00"/>
+<meta property="article:modified_time" content="2019-07-20T00:00:00&#43;00:00"/>
 
 	
 	<link rel="dns-prefetch" href="//fonts.googleapis.com">
@@ -74,7 +74,7 @@ if (!doNotTrack) {
 			<div class="post__meta meta">
 <div class="meta__item-datetime meta__item">
 	<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg>
-	<time class="meta__text" datetime="2019-07-19T00:00:00">July 19, 2019</time>
+	<time class="meta__text" datetime="2019-07-20T00:00:00">July 20, 2019</time>
 </div>
 
 <div class="meta__item-categories meta__item">
@@ -82,19 +82,27 @@ if (!doNotTrack) {
 	<span class="meta__text"><a class="meta__link" href="/NALgen/categories/analysis" rel="category">Analysis</a></span>
 </div>
 </div>
-		</header><div class="content post__content clearfix">
+		</header>
+		<figure class="post__thumbnail">
+			<img src="/NALgen/img/logo-small.png" alt="NALgen Analysis Pt.1">
+		</figure><div class="content post__content clearfix">
 			<p>Here, I present the prequel to the NALgen method: using multivariate analyses to infer population structure in the simulated data as well as to find covariance between genetic and environmental data. In upcoming posts about modeling neutral and adaptive genetic variation across continuous landscapes, information about population structure will be used in creating the response variable, while transformed environmental data (based on genetic-environmental covariance) will be used as predictors.</p>
 
 <h2 id="color-palette">Color palette</h2>
 
 <pre><code class="language-r">library(ggsci)
-futr &lt;- pal_futurama()
-futr.cols &lt;- colorRampPalette(futr(12)[c(12,11,3,7,8,6,1,2)])
-cols &lt;- futr.cols(12)
-
 library(scales)
-#show_col(futr(12))
-show_col(cols)
+
+futr &lt;- pal_futurama()
+schwifty &lt;- pal_rickandmorty()
+futr.cols &lt;- colorRampPalette(futr(12)[c(12,11,3,7,8,6,1,2)])
+schwifty.cols &lt;- colorRampPalette(schwifty(12)[c(3,12,4,6,1,9,8,2)])
+futrschwift.cols &lt;- colorRampPalette(c(&quot;gray15&quot;, schwifty(12)[3], futr(12)[11], schwifty(12)[c(1,9)], futr(12)[c(8,6,2)]))
+cols &lt;- futrschwift.cols(12)
+
+#show_col(futr.cols(20))
+#show_col(schwifty.cols(20))
+show_col(futrschwift.cols(20))
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-1-1.png" alt="" /><!-- --></p>
@@ -169,901 +177,793 @@ m0.5_s &lt;- &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Sim
 
 setwd(&quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/NALgen_Analysis/Multivariate/&quot;)
 
-#define function
+#below I define the xyFromRC function: includes a scenario when genind and rastr don't have the same dimensions
+#currently (for my purposes here it's fine) only spits out error when aspect ratio is not the same, but proceeds the same anyway
+#need to fix to apply to other situations
+
 xyFromRC &lt;- function(genind, rastr){
-   coord &lt;- genind$other
-   row.no &lt;- coord[,1]+1
-   col.no &lt;- coord[,2]+1
-   cell.no &lt;- cellFromRowCol(rastr,row=row.no,col=col.no)
-   coord &lt;- xyFromCell(rastr, cell.no)
-   as.data.frame(coord)
-}
+             coord &lt;- genind$other
+             row.no &lt;- coord[,1]+1
+             col.no &lt;- coord[,2]+1
+             dim.genind.row &lt;- 26 #dim of simulated landscape
+             dim.genind.col &lt;- 34 #dim of simulated landscape
+             dim.rast.row &lt;- dim(rastr)[1]
+             dim.rast.col &lt;- dim(rastr)[2]
+             if(dim.rast.col/dim.genind.col == dim.rast.row/dim.genind.row){
+                print(&quot;raster and genind are the same aspect ratio. proceed.&quot;)
+             }
+             else{
+                print(&quot;error! raster and genind are NOT the same aspect ratio. proceed ANYWAY.&quot;)
+             }
+             rastr &lt;- aggregate(rastr, dim.rast.col/dim.genind.col)
+             cell.no &lt;- cellFromRowCol(rastr, row=row.no, col=col.no)
+             coord &lt;- xyFromCell(rastr, cell.no)
+             as.data.frame(coord)
+         }
 
-
+#use already aggregated fa_stk to make this go faster
+fa_stk.agg &lt;- aggregate(fa_stk, dim(fa_stk)[1]/26)
 
 ###m0.1###
+
 ##neutral ONLY##
 m0.1_lclp_n &lt;- read.genepop(paste0(m0.1_n,&quot;lclp_only-neutr_20pops.gen&quot;))
-</code></pre>
-
-<pre><code>## 
-##  Converting data from a Genepop .gen file to a genind object... 
-## 
-## 
-## File description:  Low Complexity Low Permeability - Only Neutral Loci - 20 pops - Simulated Genotypes  
-## 
-## ...done.
-</code></pre>
-
-<pre><code class="language-r">m0.1_lclp_n$other &lt;- read.table(paste0(m0.1_n,&quot;lclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+m0.1_lclp_n$other &lt;- read.table(paste0(m0.1_n,&quot;lclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
 colnames(m0.1_lclp_n$other)=c(&quot;x&quot;,&quot;y&quot;)
-m0.1_lclp_n$other &lt;- xyFromRC(m0.1_lclp_n, fa_stk)
+m0.1_lclp_n$other &lt;- xyFromRC(m0.1_lclp_n, fa_stk.agg)
 m0.1_lchp_n &lt;- read.genepop(paste0(m0.1_n,&quot;lchp_only-neutr_20pops.gen&quot;))
-</code></pre>
-
-<pre><code>## 
-##  Converting data from a Genepop .gen file to a genind object... 
-## 
-## 
-## File description:  Low Complexity High Permeability - Only Neutral Loci - 20 pops - Simulated Genotypes  
-## 
-## ...done.
-</code></pre>
-
-<pre><code class="language-r">m0.1_lchp_n$other &lt;- read.table(paste0(m0.1_n,&quot;lchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+m0.1_lchp_n$other &lt;- read.table(paste0(m0.1_n,&quot;lchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
 colnames(m0.1_lchp_n$other)=c(&quot;x&quot;,&quot;y&quot;)
-m0.1_lchp_n$other &lt;- xyFromRC(m0.1_lchp_n, fa_stk)
+m0.1_lchp_n$other &lt;- xyFromRC(m0.1_lchp_n, fa_stk.agg)
 m0.1_hchp_n &lt;- read.genepop(paste0(m0.1_n,&quot;hchp_only-neutr_20pops.gen&quot;))
-</code></pre>
-
-<pre><code>## 
-##  Converting data from a Genepop .gen file to a genind object... 
-## 
-## 
-## File description:  High Complexity High Permeability - Only Neutral Loci - 20 pops - Simulated Genotypes  
-## 
-## ...done.
-</code></pre>
-
-<pre><code class="language-r">m0.1_hchp_n$other &lt;- read.table(paste0(m0.1_n,&quot;hchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+m0.1_hchp_n$other &lt;- read.table(paste0(m0.1_n,&quot;hchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
 colnames(m0.1_hchp_n$other)=c(&quot;x&quot;,&quot;y&quot;)
-m0.1_hchp_n$other &lt;- xyFromRC(m0.1_hchp_n, fa_stk)
+m0.1_hchp_n$other &lt;- xyFromRC(m0.1_hchp_n, fa_stk.agg)
 m0.1_hclp_n &lt;- read.genepop(paste0(m0.1_n,&quot;hclp_only-neutr_20pops.gen&quot;))
-</code></pre>
-
-<pre><code>## 
-##  Converting data from a Genepop .gen file to a genind object... 
-## 
-## 
-## File description:  High Complexity Low Permeability - Only Neutral Loci - 20 pops - Simulated Genotypes  
-## 
-## ...done.
-</code></pre>
-
-<pre><code class="language-r">m0.1_hclp_n$other &lt;- read.table(paste0(m0.1_n,&quot;hclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+m0.1_hclp_n$other &lt;- read.table(paste0(m0.1_n,&quot;hclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
 colnames(m0.1_hclp_n$other)=c(&quot;x&quot;,&quot;y&quot;)
-m0.1_hclp_n$other &lt;- xyFromRC(m0.1_hclp_n, fa_stk)
+m0.1_hclp_n$other &lt;- xyFromRC(m0.1_hclp_n, fa_stk.agg)
 
 ##selected ONLY##
 m0.1_lclp_s &lt;- read.genepop(paste0(m0.1_s,&quot;lclp_only-sel_20pops.gen&quot;))
-</code></pre>
-
-<pre><code>## 
-##  Converting data from a Genepop .gen file to a genind object... 
-## 
-## 
-## File description:  Low Complexity Low Permeability - Only Selected Loci - 20 pops - Simulated Genotypes  
-## 
-## ...done.
-</code></pre>
-
-<pre><code class="language-r">m0.1_lclp_s$other &lt;- read.table(paste0(m0.1_s,&quot;lclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+m0.1_lclp_s$other &lt;- read.table(paste0(m0.1_s,&quot;lclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
 colnames(m0.1_lclp_s$other)=c(&quot;x&quot;,&quot;y&quot;)
-m0.1_lclp_s$other &lt;- xyFromRC(m0.1_lclp_s, fa_stk)
+m0.1_lclp_s$other &lt;- xyFromRC(m0.1_lclp_s, fa_stk.agg)
 m0.1_lchp_s &lt;- read.genepop(paste0(m0.1_s,&quot;lchp_only-sel_20pops.gen&quot;))
-</code></pre>
-
-<pre><code>## 
-##  Converting data from a Genepop .gen file to a genind object... 
-## 
-## 
-## File description:  Low Complexity High Permeability - Only Selected Loci - 20 pops - Simulated Genotypes  
-## 
-## ...done.
-</code></pre>
-
-<pre><code class="language-r">m0.1_lchp_s$other &lt;- read.table(paste0(m0.1_s,&quot;lchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+m0.1_lchp_s$other &lt;- read.table(paste0(m0.1_s,&quot;lchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
 colnames(m0.1_lchp_s$other)=c(&quot;x&quot;,&quot;y&quot;)
-m0.1_lchp_s$other &lt;- xyFromRC(m0.1_lchp_s, fa_stk)
+m0.1_lchp_s$other &lt;- xyFromRC(m0.1_lchp_s, fa_stk.agg)
 m0.1_hchp_s &lt;- read.genepop(paste0(m0.1_s,&quot;hchp_only-sel_20pops.gen&quot;))
-</code></pre>
-
-<pre><code>## 
-##  Converting data from a Genepop .gen file to a genind object... 
-## 
-## 
-## File description:  High Complexity High Permeability - Only Selected Loci - 20 pops - Simulated Genotypes  
-## 
-## ...done.
-</code></pre>
-
-<pre><code class="language-r">m0.1_hchp_s$other &lt;- read.table(paste0(m0.1_s,&quot;hchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+m0.1_hchp_s$other &lt;- read.table(paste0(m0.1_s,&quot;hchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
 colnames(m0.1_hchp_s$other)=c(&quot;x&quot;,&quot;y&quot;)
-m0.1_hchp_s$other &lt;- xyFromRC(m0.1_hchp_s, fa_stk)
+m0.1_hchp_s$other &lt;- xyFromRC(m0.1_hchp_s, fa_stk.agg)
 m0.1_hclp_s &lt;- read.genepop(paste0(m0.1_s,&quot;hclp_only-sel_20pops.gen&quot;))
-</code></pre>
-
-<pre><code>## 
-##  Converting data from a Genepop .gen file to a genind object... 
-## 
-## 
-## File description:  High Complexity Low Permeability - Only Selected Loci - 20 pops - Simulated Genotypes  
-## 
-## ...done.
-</code></pre>
-
-<pre><code class="language-r">m0.1_hclp_s$other &lt;- read.table(paste0(m0.1_s,&quot;hclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+m0.1_hclp_s$other &lt;- read.table(paste0(m0.1_s,&quot;hclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
 colnames(m0.1_hclp_s$other)=c(&quot;x&quot;,&quot;y&quot;)
-m0.1_hclp_s$other &lt;- xyFromRC(m0.1_hclp_s, fa_stk)
+m0.1_hclp_s$other &lt;- xyFromRC(m0.1_hclp_s, fa_stk.agg)
 
 ##neutral AND selected##
 m0.1_lclp_n.s &lt;- read.genepop(paste0(m0.1_n.s,&quot;lclp_20pops.gen&quot;))
-</code></pre>
-
-<pre><code>## 
-##  Converting data from a Genepop .gen file to a genind object... 
-## 
-## 
-## File description:  Low Complexity Low Permeability - 20 pops - Simulated Genotypes  
-## 
-## ...done.
-</code></pre>
-
-<pre><code class="language-r">m0.1_lclp_n.s$other &lt;- read.table(paste0(m0.1_n.s,&quot;lclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+m0.1_lclp_n.s$other &lt;- read.table(paste0(m0.1_n.s,&quot;lclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
 colnames(m0.1_lclp_n.s$other)=c(&quot;x&quot;,&quot;y&quot;)
-m0.1_lclp_n.s$other &lt;- xyFromRC(m0.1_lclp_n.s, fa_stk)
+m0.1_lclp_n.s$other &lt;- xyFromRC(m0.1_lclp_n.s, fa_stk.agg)
 m0.1_lchp_n.s &lt;- read.genepop(paste0(m0.1_n.s,&quot;lchp_20pops.gen&quot;))
-</code></pre>
-
-<pre><code>## 
-##  Converting data from a Genepop .gen file to a genind object... 
-## 
-## 
-## File description:  Low Complexity High Permeability - 20 pops - Simulated Genotypes  
-## 
-## ...done.
-</code></pre>
-
-<pre><code class="language-r">m0.1_lchp_n.s$other &lt;- read.table(paste0(m0.1_n.s,&quot;lchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+m0.1_lchp_n.s$other &lt;- read.table(paste0(m0.1_n.s,&quot;lchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
 colnames(m0.1_lchp_n.s$other)=c(&quot;x&quot;,&quot;y&quot;)
-m0.1_lchp_n.s$other &lt;- xyFromRC(m0.1_lchp_n.s, fa_stk)
+m0.1_lchp_n.s$other &lt;- xyFromRC(m0.1_lchp_n.s, fa_stk.agg)
 m0.1_hchp_n.s &lt;- read.genepop(paste0(m0.1_n.s,&quot;hchp_20pops.gen&quot;))
-</code></pre>
-
-<pre><code>## 
-##  Converting data from a Genepop .gen file to a genind object... 
-## 
-## 
-## File description:  High Complexity High Permeability - 20 pops - Simulated Genotypes  
-## 
-## ...done.
-</code></pre>
-
-<pre><code class="language-r">m0.1_hchp_n.s$other &lt;- read.table(paste0(m0.1_n.s,&quot;hchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+m0.1_hchp_n.s$other &lt;- read.table(paste0(m0.1_n.s,&quot;hchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
 colnames(m0.1_hchp_n.s$other)=c(&quot;x&quot;,&quot;y&quot;)
-m0.1_hchp_n.s$other &lt;- xyFromRC(m0.1_hchp_n.s, fa_stk)
+m0.1_hchp_n.s$other &lt;- xyFromRC(m0.1_hchp_n.s, fa_stk.agg)
 m0.1_hclp_n.s &lt;- read.genepop(paste0(m0.1_n.s,&quot;hclp_20pops.gen&quot;))
-</code></pre>
-
-<pre><code>## 
-##  Converting data from a Genepop .gen file to a genind object... 
-## 
-## 
-## File description:  High Complexity Low Permeability - 20 pops - Simulated Genotypes  
-## 
-## ...done.
-</code></pre>
-
-<pre><code class="language-r">m0.1_hclp_n.s$other &lt;- read.table(paste0(m0.1_n.s,&quot;hclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+m0.1_hclp_n.s$other &lt;- read.table(paste0(m0.1_n.s,&quot;hclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
 colnames(m0.1_hclp_n.s$other)=c(&quot;x&quot;,&quot;y&quot;)
-m0.1_hclp_n.s$other &lt;- xyFromRC(m0.1_hclp_n.s, fa_stk)
+m0.1_hclp_n.s$other &lt;- xyFromRC(m0.1_hclp_n.s, fa_stk.agg)
 
 
 ###m0.5###
+
 ##neutral ONLY##
 m0.5_lclp_n &lt;- read.genepop(paste0(m0.5_n,&quot;lclp_only-neutr_20pops.gen&quot;))
-</code></pre>
-
-<pre><code>## 
-##  Converting data from a Genepop .gen file to a genind object... 
-## 
-## 
-## File description:  Low Complexity Low Permeability - Only Neutral Loci - 20 pops - Simulated Genotypes  
-## 
-## ...done.
-</code></pre>
-
-<pre><code class="language-r">m0.5_lclp_n$other &lt;- read.table(paste0(m0.5_n,&quot;lclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+m0.5_lclp_n$other &lt;- read.table(paste0(m0.5_n,&quot;lclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
 colnames(m0.5_lclp_n$other)=c(&quot;x&quot;,&quot;y&quot;)
-m0.5_lclp_n$other &lt;- xyFromRC(m0.5_lclp_n, fa_stk)
-m0.5_lchp_n &lt;- read.genepop(paste0(m0.5_n,&quot;lchp_only-neutr_20pops.gen&quot;))
-</code></pre>
-
-<pre><code>## 
-##  Converting data from a Genepop .gen file to a genind object... 
-## 
-## 
-## File description:  Low Complexity High Permeability - Only Neutral Loci - 20 pops - Simulated Genotypes  
-## 
-## ...done.
-</code></pre>
-
-<pre><code class="language-r">m0.5_lchp_n$other &lt;- read.table(paste0(m0.5_n,&quot;lchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+m0.5_lclp_n$other &lt;- xyFromRC(m0.5_lclp_n, fa_stk.agg)
+m0.5_lchp_n$other &lt;- read.table(paste0(m0.5_n,&quot;lchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
 colnames(m0.5_lchp_n$other)=c(&quot;x&quot;,&quot;y&quot;)
-m0.5_lchp_n$other &lt;- xyFromRC(m0.5_lchp_n, fa_stk)
+m0.5_lchp_n$other &lt;- xyFromRC(m0.5_lchp_n, fa_stk.agg)
 m0.5_hchp_n &lt;- read.genepop(paste0(m0.5_n,&quot;hchp_only-neutr_20pops.gen&quot;))
-</code></pre>
-
-<pre><code>## 
-##  Converting data from a Genepop .gen file to a genind object... 
-## 
-## 
-## File description:  High Complexity High Permeability - Only Neutral Loci - 20 pops - Simulated Genotypes  
-## 
-## ...done.
-</code></pre>
-
-<pre><code class="language-r">m0.5_hchp_n$other &lt;- read.table(paste0(m0.5_n,&quot;hchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+m0.5_hchp_n$other &lt;- read.table(paste0(m0.5_n,&quot;hchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
 colnames(m0.5_hchp_n$other)=c(&quot;x&quot;,&quot;y&quot;)
-m0.5_hchp_n$other &lt;- xyFromRC(m0.5_hchp_n, fa_stk)
+m0.5_hchp_n$other &lt;- xyFromRC(m0.5_hchp_n, fa_stk.agg)
 m0.5_hclp_n &lt;- read.genepop(paste0(m0.5_n,&quot;hclp_only-neutr_20pops.gen&quot;))
-</code></pre>
-
-<pre><code>## 
-##  Converting data from a Genepop .gen file to a genind object... 
-## 
-## 
-## File description:  High Complexity Low Permeability - Only Neutral Loci - 20 pops - Simulated Genotypes  
-## 
-## ...done.
-</code></pre>
-
-<pre><code class="language-r">m0.5_hclp_n$other &lt;- read.table(paste0(m0.5_n,&quot;hclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+m0.5_hclp_n$other &lt;- read.table(paste0(m0.5_n,&quot;hclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
 colnames(m0.5_hclp_n$other)=c(&quot;x&quot;,&quot;y&quot;)
-m0.5_hclp_n$other &lt;- xyFromRC(m0.5_hclp_n, fa_stk)
+m0.5_hclp_n$other &lt;- xyFromRC(m0.5_hclp_n, fa_stk.agg)
 
 ##selected ONLY##
 m0.5_lclp_s &lt;- read.genepop(paste0(m0.5_s,&quot;lclp_only-sel_20pops.gen&quot;))
-</code></pre>
-
-<pre><code>## 
-##  Converting data from a Genepop .gen file to a genind object... 
-## 
-## 
-## File description:  Low Complexity Low Permeability - Only Selected Loci - 20 pops - Simulated Genotypes  
-## 
-## ...done.
-</code></pre>
-
-<pre><code class="language-r">m0.5_lclp_s$other &lt;- read.table(paste0(m0.5_s,&quot;lclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+m0.5_lclp_s$other &lt;- read.table(paste0(m0.5_s,&quot;lclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
 colnames(m0.5_lclp_s$other)=c(&quot;x&quot;,&quot;y&quot;)
-m0.5_lclp_s$other &lt;- xyFromRC(m0.5_lclp_s, fa_stk)
+m0.5_lclp_s$other &lt;- xyFromRC(m0.5_lclp_s, fa_stk.agg)
 m0.5_lchp_s &lt;- read.genepop(paste0(m0.5_s,&quot;lchp_only-sel_20pops.gen&quot;))
-</code></pre>
-
-<pre><code>## 
-##  Converting data from a Genepop .gen file to a genind object... 
-## 
-## 
-## File description:  Low Complexity High Permeability - Only Selected Loci - 20 pops - Simulated Genotypes  
-## 
-## ...done.
-</code></pre>
-
-<pre><code class="language-r">m0.5_lchp_s$other &lt;- read.table(paste0(m0.5_s,&quot;lchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+m0.5_lchp_s$other &lt;- read.table(paste0(m0.5_s,&quot;lchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
 colnames(m0.5_lchp_s$other)=c(&quot;x&quot;,&quot;y&quot;)
-m0.5_lchp_s$other &lt;- xyFromRC(m0.5_lchp_s, fa_stk)
+m0.5_lchp_s$other &lt;- xyFromRC(m0.5_lchp_s, fa_stk.agg)
 m0.5_hchp_s &lt;- read.genepop(paste0(m0.5_s,&quot;hchp_only-sel_20pops.gen&quot;))
-</code></pre>
-
-<pre><code>## 
-##  Converting data from a Genepop .gen file to a genind object... 
-## 
-## 
-## File description:  High Complexity High Permeability - Only Selected Loci - 20 pops - Simulated Genotypes  
-## 
-## ...done.
-</code></pre>
-
-<pre><code class="language-r">m0.5_hchp_s$other &lt;- read.table(paste0(m0.5_s,&quot;hchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+m0.5_hchp_s$other &lt;- read.table(paste0(m0.5_s,&quot;hchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
 colnames(m0.5_hchp_s$other)=c(&quot;x&quot;,&quot;y&quot;)
-m0.5_hchp_s$other &lt;- xyFromRC(m0.5_hchp_s, fa_stk)
+m0.5_hchp_s$other &lt;- xyFromRC(m0.5_hchp_s, fa_stk.agg)
 m0.5_hclp_s &lt;- read.genepop(paste0(m0.5_s,&quot;hclp_only-sel_20pops.gen&quot;))
-</code></pre>
-
-<pre><code>## 
-##  Converting data from a Genepop .gen file to a genind object... 
-## 
-## 
-## File description:  High Complexity Low Permeability - Only Selected Loci - 20 pops - Simulated Genotypes  
-## 
-## ...done.
-</code></pre>
-
-<pre><code class="language-r">m0.5_hclp_s$other &lt;- read.table(paste0(m0.5_s,&quot;hclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+m0.5_hclp_s$other &lt;- read.table(paste0(m0.5_s,&quot;hclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
 colnames(m0.5_hclp_s$other)=c(&quot;x&quot;,&quot;y&quot;)
-m0.5_hclp_s$other &lt;- xyFromRC(m0.5_hclp_s, fa_stk)
+m0.5_hclp_s$other &lt;- xyFromRC(m0.5_hclp_s, fa_stk.agg)
 
 ##neutral AND selected##
 m0.5_lclp_n.s &lt;- read.genepop(paste0(m0.5_n.s,&quot;lclp_20pops.gen&quot;))
-</code></pre>
-
-<pre><code>## 
-##  Converting data from a Genepop .gen file to a genind object... 
-## 
-## 
-## File description:  Low Complexity Low Permeability - 20 pops - Simulated Genotypes  
-## 
-## ...done.
-</code></pre>
-
-<pre><code class="language-r">m0.5_lclp_n.s$other &lt;- read.table(paste0(m0.5_n.s,&quot;lclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+m0.5_lclp_n.s$other &lt;- read.table(paste0(m0.5_n.s,&quot;lclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
 colnames(m0.5_lclp_n.s$other)=c(&quot;x&quot;,&quot;y&quot;)
-m0.5_lclp_n.s$other &lt;- xyFromRC(m0.5_lclp_n.s, fa_stk)
+m0.5_lclp_n.s$other &lt;- xyFromRC(m0.5_lclp_n.s, fa_stk.agg)
 m0.5_lchp_n.s &lt;- read.genepop(paste0(m0.5_n.s,&quot;lchp_20pops.gen&quot;))
-</code></pre>
-
-<pre><code>## 
-##  Converting data from a Genepop .gen file to a genind object... 
-## 
-## 
-## File description:  Low Complexity High Permeability - 20 pops - Simulated Genotypes  
-## 
-## ...done.
-</code></pre>
-
-<pre><code class="language-r">m0.5_lchp_n.s$other &lt;- read.table(paste0(m0.5_n.s,&quot;lchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+m0.5_lchp_n.s$other &lt;- read.table(paste0(m0.5_n.s,&quot;lchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
 colnames(m0.5_lchp_n.s$other)=c(&quot;x&quot;,&quot;y&quot;)
-m0.5_lchp_n.s$other &lt;- xyFromRC(m0.5_lchp_n.s, fa_stk)
+m0.5_lchp_n.s$other &lt;- xyFromRC(m0.5_lchp_n.s, fa_stk.agg)
 m0.5_hchp_n.s &lt;- read.genepop(paste0(m0.5_n.s,&quot;hchp_20pops.gen&quot;))
-</code></pre>
-
-<pre><code>## 
-##  Converting data from a Genepop .gen file to a genind object... 
-## 
-## 
-## File description:  High Complexity High Permeability - 20 pops - Simulated Genotypes  
-## 
-## ...done.
-</code></pre>
-
-<pre><code class="language-r">m0.5_hchp_n.s$other &lt;- read.table(paste0(m0.5_n.s,&quot;hchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+m0.5_hchp_n.s$other &lt;- read.table(paste0(m0.5_n.s,&quot;hchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
 colnames(m0.5_hchp_n.s$other)=c(&quot;x&quot;,&quot;y&quot;)
-m0.5_hchp_n.s$other &lt;- xyFromRC(m0.5_hchp_n.s, fa_stk)
+m0.5_hchp_n.s$other &lt;- xyFromRC(m0.5_hchp_n.s, fa_stk.agg)
 m0.5_hclp_n.s &lt;- read.genepop(paste0(m0.5_n.s,&quot;hclp_20pops.gen&quot;))
-</code></pre>
-
-<pre><code>## 
-##  Converting data from a Genepop .gen file to a genind object... 
-## 
-## 
-## File description:  High Complexity Low Permeability - 20 pops - Simulated Genotypes  
-## 
-## ...done.
-</code></pre>
-
-<pre><code class="language-r">m0.5_hclp_n.s$other &lt;- read.table(paste0(m0.5_n.s,&quot;hclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+m0.5_hclp_n.s$other &lt;- read.table(paste0(m0.5_n.s,&quot;hclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
 colnames(m0.5_hclp_n.s$other)=c(&quot;x&quot;,&quot;y&quot;)
-m0.5_hclp_n.s$other &lt;- xyFromRC(m0.5_hclp_n.s, fa_stk)
+m0.5_hclp_n.s$other &lt;- xyFromRC(m0.5_hclp_n.s, fa_stk.agg)
 </code></pre>
 
 <h2 id="inferring-population-structure-with-discriminant-analysis-of-principal-components-dapc">Inferring population structure with Discriminant Analysis of Principal Components (DAPC)</h2>
 
-<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.1_lclp_n,center=T,scale=F,n.pca=500,n.da=2)
-temp &lt;- optim.a.score(temp.dapc.obj)
+<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.1_lclp_n, center=T, scale=F, n.pca=100, n.da=2)
+temp &lt;- optim.a.score(temp.dapc.obj, n=15, n.sim=30)
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-4-1.png" alt="" /><!-- --></p>
 
 <pre><code class="language-r">best.n.pca &lt;- temp$best
-dapc.obj &lt;- dapc(m0.1_lclp_n,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+dapc.obj &lt;- dapc(m0.1_lclp_n, center=T, scale=F, n.pca=best.n.pca, n.da=2)
 
-scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.1, low complexity, low permeability, neutral loci only&quot;,
-    pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,
-    mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(m0.1_lclp_n))
+#plot parameters
+par(mfrow=c(1,1), fg=&quot;gray50&quot;, pty='m', bty='o', mar=c(4,4,4,4), cex.main=1.3, cex.axis=1.1, cex.lab=1.2)
+scatter(dapc.obj, col=futrschwift.cols(20), ratio.pca=0.3, bg=&quot;white&quot;, main=&quot;m = 0.1, low complexity, low permeability, neutral loci only&quot;,
+    pch=c(16,15,18,17), cell=0, cstar=0, solid=0.9, cex=1.8, clab=0,
+    mstree=TRUE, lwd=3, scree.da=FALSE, leg=TRUE, txt.leg=popNames(m0.1_lclp_n))
 par(xpd=TRUE)
-points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
+points(dapc.obj$grp.coord[,1], dapc.obj$grp.coord[,2], pch=21:24, cex=2, lwd=3, col=&quot;black&quot;, bg=futrschwift.cols(20))
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-4-2.png" alt="" /><!-- --></p>
 
-<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.1_lclp_s,center=T,scale=F,n.pca=500,n.da=2)
-temp &lt;- optim.a.score(temp.dapc.obj)
+<pre><code class="language-r">compoplot(dapc.obj, lab=&quot;&quot;, col=futrschwift.cols(20))
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-4-3.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.1_lclp_s, center=T, scale=F, n.pca=length(m0.1_lclp_s@tab[1,]), n.da=2)
+temp &lt;- optim.a.score(temp.dapc.obj, n=15, n.sim=30)
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-5-1.png" alt="" /><!-- --></p>
 
 <pre><code class="language-r">best.n.pca &lt;- temp$best
-dapc.obj &lt;- dapc(m0.1_lclp_s,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+dapc.obj &lt;- dapc(m0.1_lclp_s, center=T, scale=F, n.pca=best.n.pca, n.da=2)
 
-scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.1, low complexity, low permeability, selected loci only&quot;,
-    pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,
-    mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(m0.1_lclp_n))
+#plot parameters
+par(mfrow=c(1,1), fg=&quot;gray50&quot;, pty='m', bty='o', mar=c(4,4,4,4), cex.main=1.3, cex.axis=1.1, cex.lab=1.2)
+scatter(dapc.obj, col=futrschwift.cols(20), ratio.pca=0.3, bg=&quot;white&quot;, main=&quot;m = 0.1, low complexity, low permeability, selected loci only&quot;,
+    pch=c(16,15,18,17), cell=0, cstar=0, solid=0.9, cex=1.8, clab=0,
+    mstree=TRUE, lwd=3, scree.da=FALSE, leg=TRUE, txt.leg=popNames(m0.1_lclp_s))
 par(xpd=TRUE)
-points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
+points(dapc.obj$grp.coord[,1], dapc.obj$grp.coord[,2], pch=21:24, cex=2, lwd=3, col=&quot;black&quot;, bg=futrschwift.cols(20))
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-5-2.png" alt="" /><!-- --></p>
 
-<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.1_lclp_n.s,center=T,scale=F,n.pca=500,n.da=2)
-temp &lt;- optim.a.score(temp.dapc.obj)
+<pre><code class="language-r">compoplot(dapc.obj, lab=&quot;&quot;, col=futrschwift.cols(20))
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-5-3.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.1_lclp_n.s, center=T, scale=F, n.pca=100, n.da=2)
+temp &lt;- optim.a.score(temp.dapc.obj, n=15, n.sim=30)
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-6-1.png" alt="" /><!-- --></p>
 
 <pre><code class="language-r">best.n.pca &lt;- temp$best
-dapc.obj &lt;- dapc(m0.1_lclp_n.s,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+dapc.obj &lt;- dapc(m0.1_lclp_n.s, center=T, scale=F, n.pca=best.n.pca, n.da=2)
 
-scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.1, low complexity, low permeability, neutral and selected loci&quot;,
-    pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,
-    mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(m0.1_lclp_n))
+#plot parameters
+par(mfrow=c(1,1), fg=&quot;gray50&quot;, pty='m', bty='o', mar=c(4,4,4,4), cex.main=1.3, cex.axis=1.1, cex.lab=1.2)
+scatter(dapc.obj, col=futrschwift.cols(20), ratio.pca=0.3, bg=&quot;white&quot;, main=&quot;m = 0.1, low complexity, low permeability, neutral and selected loci&quot;,
+    pch=c(16,15,18,17), cell=0, cstar=0, solid=0.9, cex=1.8, clab=0,
+    mstree=TRUE, lwd=3, scree.da=FALSE, leg=TRUE, txt.leg=popNames(m0.1_lclp_n.s))
 par(xpd=TRUE)
-points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
+points(dapc.obj$grp.coord[,1], dapc.obj$grp.coord[,2], pch=21:24, cex=2, lwd=3, col=&quot;black&quot;, bg=futrschwift.cols(20))
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-6-2.png" alt="" /><!-- --></p>
 
-<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.5_lclp_n,center=T,scale=F,n.pca=500,n.da=2)
-temp &lt;- optim.a.score(temp.dapc.obj)
+<pre><code class="language-r">compoplot(dapc.obj, lab=&quot;&quot;, col=futrschwift.cols(20))
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-6-3.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.5_lclp_n, center=T, scale=F, n.pca=100, n.da=2)
+temp &lt;- optim.a.score(temp.dapc.obj, n=15, n.sim=30)
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-7-1.png" alt="" /><!-- --></p>
 
 <pre><code class="language-r">best.n.pca &lt;- temp$best
-dapc.obj &lt;- dapc(m0.5_lclp_n,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+dapc.obj &lt;- dapc(m0.5_lclp_n, center=T, scale=F, n.pca=best.n.pca, n.da=2)
 
-scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.5, low complexity, low permeability, neutral loci only&quot;,
-    pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,
-    mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(m0.5_lclp_n))
+#plot parameters
+par(mfrow=c(1,1), fg=&quot;gray50&quot;, pty='m', bty='o', mar=c(4,4,4,4), cex.main=1.3, cex.axis=1.1, cex.lab=1.2)
+scatter(dapc.obj, col=futrschwift.cols(20), ratio.pca=0.3, bg=&quot;white&quot;, main=&quot;m = 0.5, low complexity, low permeability, neutral loci only&quot;,
+    pch=c(16,15,18,17), cell=0, cstar=0, solid=0.9, cex=1.8, clab=0,
+    mstree=TRUE, lwd=3, scree.da=FALSE, leg=TRUE, txt.leg=popNames(m0.5_lclp_n))
 par(xpd=TRUE)
-points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
+points(dapc.obj$grp.coord[,1], dapc.obj$grp.coord[,2], pch=21:24, cex=2, lwd=3, col=&quot;black&quot;, bg=futrschwift.cols(20))
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-7-2.png" alt="" /><!-- --></p>
 
-<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.5_lclp_s,center=T,scale=F,n.pca=500,n.da=2)
-temp &lt;- optim.a.score(temp.dapc.obj)
+<pre><code class="language-r">compoplot(dapc.obj, lab=&quot;&quot;, col=futrschwift.cols(20))
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-7-3.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.5_lclp_s, center=T, scale=F, n.pca=length(m0.5_lclp_s@tab[1,]), n.da=2)
+temp &lt;- optim.a.score(temp.dapc.obj, n=15, n.sim=30)
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-8-1.png" alt="" /><!-- --></p>
 
 <pre><code class="language-r">best.n.pca &lt;- temp$best
-dapc.obj &lt;- dapc(m0.5_lclp_s,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+dapc.obj &lt;- dapc(m0.5_lclp_s, center=T, scale=F, n.pca=best.n.pca, n.da=2)
 
-scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.5, low complexity, low permeability, selected loci only&quot;,
-    pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,
-    mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(m0.5_lclp_n))
+#plot parameters
+par(mfrow=c(1,1), fg=&quot;gray50&quot;, pty='m', bty='o', mar=c(4,4,4,4), cex.main=1.3, cex.axis=1.1, cex.lab=1.2)
+scatter(dapc.obj, col=futrschwift.cols(20), ratio.pca=0.3, bg=&quot;white&quot;, main=&quot;m = 0.5, low complexity, low permeability, selected loci only&quot;,
+    pch=c(16,15,18,17), cell=0, cstar=0, solid=0.9, cex=1.8, clab=0,
+    mstree=TRUE, lwd=3, scree.da=FALSE, leg=TRUE, txt.leg=popNames(m0.5_lclp_s))
 par(xpd=TRUE)
-points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
+points(dapc.obj$grp.coord[,1], dapc.obj$grp.coord[,2], pch=21:24, cex=2, lwd=3, col=&quot;black&quot;, bg=futrschwift.cols(20))
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-8-2.png" alt="" /><!-- --></p>
 
-<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.5_lclp_n.s,center=T,scale=F,n.pca=500,n.da=2)
-temp &lt;- optim.a.score(temp.dapc.obj)
+<pre><code class="language-r">compoplot(dapc.obj, lab=&quot;&quot;, col=futrschwift.cols(20))
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-8-3.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.5_lclp_n.s, center=T, scale=F, n.pca=100, n.da=2)
+temp &lt;- optim.a.score(temp.dapc.obj, n=15, n.sim=30)
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-9-1.png" alt="" /><!-- --></p>
 
 <pre><code class="language-r">best.n.pca &lt;- temp$best
-dapc.obj &lt;- dapc(m0.5_lclp_n.s,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+dapc.obj &lt;- dapc(m0.5_lclp_n.s, center=T, scale=F, n.pca=best.n.pca, n.da=2)
 
-scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.5, low complexity, low permeability, neutral and selected loci&quot;,
-    pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,
-    mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(m0.5_lclp_n))
+#plot parameters
+par(mfrow=c(1,1), fg=&quot;gray50&quot;, pty='m', bty='o', mar=c(4,4,4,4), cex.main=1.3, cex.axis=1.1, cex.lab=1.2)
+scatter(dapc.obj, col=futrschwift.cols(20), ratio.pca=0.3, bg=&quot;white&quot;, main=&quot;m = 0.5, low complexity, low permeability, neutral and selected loci&quot;,
+    pch=c(16,15,18,17), cell=0, cstar=0, solid=0.9, cex=1.8, clab=0,
+    mstree=TRUE, lwd=3, scree.da=FALSE, leg=TRUE, txt.leg=popNames(m0.5_lclp_n.s))
 par(xpd=TRUE)
-points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
+points(dapc.obj$grp.coord[,1], dapc.obj$grp.coord[,2], pch=21:24, cex=2, lwd=3, col=&quot;black&quot;, bg=futrschwift.cols(20))
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-9-2.png" alt="" /><!-- --></p>
 
-<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.1_lchp_n,center=T,scale=F,n.pca=500,n.da=2)
-temp &lt;- optim.a.score(temp.dapc.obj)
+<pre><code class="language-r">compoplot(dapc.obj, lab=&quot;&quot;, col=futrschwift.cols(20))
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-9-3.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.1_lchp_n, center=T, scale=F, n.pca=100, n.da=2)
+temp &lt;- optim.a.score(temp.dapc.obj, n=15, n.sim=30)
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-10-1.png" alt="" /><!-- --></p>
 
 <pre><code class="language-r">best.n.pca &lt;- temp$best
-dapc.obj &lt;- dapc(m0.1_lchp_n,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+dapc.obj &lt;- dapc(m0.1_lchp_n, center=T, scale=F, n.pca=best.n.pca, n.da=2)
 
-scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.1, low complexity, high permeability, neutral loci only&quot;,
-    pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,
-    mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(m0.1_lchp_n))
+#plot parameters
+par(mfrow=c(1,1), fg=&quot;gray50&quot;, pty='m', bty='o', mar=c(4,4,4,4), cex.main=1.3, cex.axis=1.1, cex.lab=1.2)
+scatter(dapc.obj, col=futrschwift.cols(20), ratio.pca=0.3, bg=&quot;white&quot;, main=&quot;m = 0.1, low complexity, high permeability, neutral loci only&quot;,
+    pch=c(16,15,18,17), cell=0, cstar=0, solid=0.9, cex=1.8, clab=0,
+    mstree=TRUE, lwd=3, scree.da=FALSE, leg=TRUE, txt.leg=popNames(m0.1_lchp_n))
 par(xpd=TRUE)
-points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
+points(dapc.obj$grp.coord[,1], dapc.obj$grp.coord[,2], pch=21:24, cex=2, lwd=3, col=&quot;black&quot;, bg=futrschwift.cols(20))
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-10-2.png" alt="" /><!-- --></p>
 
-<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.1_lchp_s,center=T,scale=F,n.pca=500,n.da=2)
-temp &lt;- optim.a.score(temp.dapc.obj)
+<pre><code class="language-r">compoplot(dapc.obj, lab=&quot;&quot;, col=futrschwift.cols(20))
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-10-3.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.1_lchp_s, center=T, scale=F, n.pca=length(m0.1_lchp_s@tab[1,]), n.da=2)
+temp &lt;- optim.a.score(temp.dapc.obj, n=15, n.sim=30)
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-11-1.png" alt="" /><!-- --></p>
 
 <pre><code class="language-r">best.n.pca &lt;- temp$best
-dapc.obj &lt;- dapc(m0.1_lchp_s,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+dapc.obj &lt;- dapc(m0.1_lchp_s, center=T, scale=F, n.pca=best.n.pca, n.da=2)
 
-scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.1, low complexity, high permeability, selected loci only&quot;,
-    pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,
-    mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(m0.1_lchp_n))
+#plot parameters
+par(mfrow=c(1,1), fg=&quot;gray50&quot;, pty='m', bty='o', mar=c(4,4,4,4), cex.main=1.3, cex.axis=1.1, cex.lab=1.2)
+scatter(dapc.obj, col=futrschwift.cols(20), ratio.pca=0.3, bg=&quot;white&quot;, main=&quot;m = 0.1, low complexity, high permeability, selected loci only&quot;,
+    pch=c(16,15,18,17), cell=0, cstar=0, solid=0.9, cex=1.8, clab=0,
+    mstree=TRUE, lwd=3, scree.da=FALSE, leg=TRUE, txt.leg=popNames(m0.1_lchp_s))
 par(xpd=TRUE)
-points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
+points(dapc.obj$grp.coord[,1], dapc.obj$grp.coord[,2], pch=21:24, cex=2, lwd=3, col=&quot;black&quot;, bg=futrschwift.cols(20))
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-11-2.png" alt="" /><!-- --></p>
 
-<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.1_lchp_n.s,center=T,scale=F,n.pca=500,n.da=2)
-temp &lt;- optim.a.score(temp.dapc.obj)
+<pre><code class="language-r">compoplot(dapc.obj, lab=&quot;&quot;, col=futrschwift.cols(20))
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-11-3.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.1_lchp_n.s, center=T, scale=F, n.pca=100, n.da=2)
+temp &lt;- optim.a.score(temp.dapc.obj, n=15, n.sim=30)
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-12-1.png" alt="" /><!-- --></p>
 
 <pre><code class="language-r">best.n.pca &lt;- temp$best
-dapc.obj &lt;- dapc(m0.1_lchp_n.s,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+dapc.obj &lt;- dapc(m0.1_lchp_n.s, center=T, scale=F, n.pca=best.n.pca, n.da=2)
 
-scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.1, low complexity, high permeability, neutral and selected loci&quot;,
-    pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,
-    mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(m0.1_lchp_n))
+#plot parameters
+par(mfrow=c(1,1), fg=&quot;gray50&quot;, pty='m', bty='o', mar=c(4,4,4,4), cex.main=1.3, cex.axis=1.1, cex.lab=1.2)
+scatter(dapc.obj, col=futrschwift.cols(20), ratio.pca=0.3, bg=&quot;white&quot;, main=&quot;m = 0.1, low complexity, high permeability, neutral and selected loci&quot;,
+    pch=c(16,15,18,17), cell=0, cstar=0, solid=0.9, cex=1.8, clab=0,
+    mstree=TRUE, lwd=3, scree.da=FALSE, leg=TRUE, txt.leg=popNames(m0.1_lchp_n.s))
 par(xpd=TRUE)
-points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
+points(dapc.obj$grp.coord[,1], dapc.obj$grp.coord[,2], pch=21:24, cex=2, lwd=3, col=&quot;black&quot;, bg=futrschwift.cols(20))
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-12-2.png" alt="" /><!-- --></p>
 
-<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.5_lchp_n,center=T,scale=F,n.pca=500,n.da=2)
-temp &lt;- optim.a.score(temp.dapc.obj)
+<pre><code class="language-r">compoplot(dapc.obj, lab=&quot;&quot;, col=futrschwift.cols(20))
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-12-3.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.5_lchp_n, center=T, scale=F, n.pca=100, n.da=2)
+temp &lt;- optim.a.score(temp.dapc.obj, n=15, n.sim=30)
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-13-1.png" alt="" /><!-- --></p>
 
 <pre><code class="language-r">best.n.pca &lt;- temp$best
-dapc.obj &lt;- dapc(m0.5_lchp_n,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+dapc.obj &lt;- dapc(m0.5_lchp_n, center=T, scale=F, n.pca=best.n.pca, n.da=2)
 
-scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.5, low complexity, high permeability, neutral loci only&quot;,
-    pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,
-    mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(m0.5_lchp_n))
+#plot parameters
+par(mfrow=c(1,1), fg=&quot;gray50&quot;, pty='m', bty='o', mar=c(4,4,4,4), cex.main=1.3, cex.axis=1.1, cex.lab=1.2)
+scatter(dapc.obj, col=futrschwift.cols(20), ratio.pca=0.3, bg=&quot;white&quot;, main=&quot;m = 0.5, low complexity, high permeability, neutral loci only&quot;,
+    pch=c(16,15,18,17), cell=0, cstar=0, solid=0.9, cex=1.8, clab=0,
+    mstree=TRUE, lwd=3, scree.da=FALSE, leg=TRUE, txt.leg=popNames(m0.5_lchp_n))
 par(xpd=TRUE)
-points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
+points(dapc.obj$grp.coord[,1], dapc.obj$grp.coord[,2], pch=21:24, cex=2, lwd=3, col=&quot;black&quot;, bg=futrschwift.cols(20))
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-13-2.png" alt="" /><!-- --></p>
 
-<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.5_lchp_s,center=T,scale=F,n.pca=500,n.da=2)
-temp &lt;- optim.a.score(temp.dapc.obj)
+<pre><code class="language-r">compoplot(dapc.obj, lab=&quot;&quot;, col=futrschwift.cols(20))
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-13-3.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.5_lchp_s, center=T, scale=F, n.pca=length(m0.5_lchp_s@tab[1,]), n.da=2)
+temp &lt;- optim.a.score(temp.dapc.obj, n=15, n.sim=30)
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-14-1.png" alt="" /><!-- --></p>
 
 <pre><code class="language-r">best.n.pca &lt;- temp$best
-dapc.obj &lt;- dapc(m0.5_lchp_s,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+dapc.obj &lt;- dapc(m0.5_lchp_s, center=T, scale=F, n.pca=best.n.pca, n.da=2)
 
-scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.5, low complexity, high permeability, selected loci only&quot;,
-    pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,
-    mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(m0.5_lchp_n))
+#plot parameters
+par(mfrow=c(1,1), fg=&quot;gray50&quot;, pty='m', bty='o', mar=c(4,4,4,4), cex.main=1.3, cex.axis=1.1, cex.lab=1.2)
+scatter(dapc.obj, col=futrschwift.cols(20), ratio.pca=0.3, bg=&quot;white&quot;, main=&quot;m = 0.5, low complexity, high permeability, selected loci only&quot;,
+    pch=c(16,15,18,17), cell=0, cstar=0, solid=0.9, cex=1.8, clab=0,
+    mstree=TRUE, lwd=3, scree.da=FALSE, leg=TRUE, txt.leg=popNames(m0.5_lchp_s))
 par(xpd=TRUE)
-points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
+points(dapc.obj$grp.coord[,1], dapc.obj$grp.coord[,2], pch=21:24, cex=2, lwd=3, col=&quot;black&quot;, bg=futrschwift.cols(20))
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-14-2.png" alt="" /><!-- --></p>
 
-<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.5_lchp_n.s,center=T,scale=F,n.pca=500,n.da=2)
-temp &lt;- optim.a.score(temp.dapc.obj)
+<pre><code class="language-r">compoplot(dapc.obj, lab=&quot;&quot;, col=futrschwift.cols(20))
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-14-3.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.5_lchp_n.s, center=T, scale=F, n.pca=100, n.da=2)
+temp &lt;- optim.a.score(temp.dapc.obj, n=15, n.sim=30)
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-15-1.png" alt="" /><!-- --></p>
 
 <pre><code class="language-r">best.n.pca &lt;- temp$best
-dapc.obj &lt;- dapc(m0.5_lchp_n.s,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+dapc.obj &lt;- dapc(m0.5_lchp_n.s, center=T, scale=F, n.pca=best.n.pca, n.da=2)
 
-scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.5, low complexity, high permeability, neutral and selected loci&quot;,
-    pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,
-    mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(m0.5_lchp_n))
+#plot parameters
+par(mfrow=c(1,1), fg=&quot;gray50&quot;, pty='m', bty='o', mar=c(4,4,4,4), cex.main=1.3, cex.axis=1.1, cex.lab=1.2)
+scatter(dapc.obj, col=futrschwift.cols(20), ratio.pca=0.3, bg=&quot;white&quot;, main=&quot;m = 0.5, low complexity, high permeability, neutral and selected loci&quot;,
+    pch=c(16,15,18,17), cell=0, cstar=0, solid=0.9, cex=1.8, clab=0,
+    mstree=TRUE, lwd=3, scree.da=FALSE, leg=TRUE, txt.leg=popNames(m0.5_lchp_n.s))
 par(xpd=TRUE)
-points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
+points(dapc.obj$grp.coord[,1], dapc.obj$grp.coord[,2], pch=21:24, cex=2, lwd=3, col=&quot;black&quot;, bg=futrschwift.cols(20))
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-15-2.png" alt="" /><!-- --></p>
 
-<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.1_hclp_n,center=T,scale=F,n.pca=500,n.da=2)
-temp &lt;- optim.a.score(temp.dapc.obj)
+<pre><code class="language-r">compoplot(dapc.obj, lab=&quot;&quot;, col=futrschwift.cols(20))
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-15-3.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.1_hclp_n, center=T, scale=F, n.pca=100, n.da=2)
+temp &lt;- optim.a.score(temp.dapc.obj, n=15, n.sim=30)
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-16-1.png" alt="" /><!-- --></p>
 
 <pre><code class="language-r">best.n.pca &lt;- temp$best
-dapc.obj &lt;- dapc(m0.1_hclp_n,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+dapc.obj &lt;- dapc(m0.1_hclp_n, center=T, scale=F, n.pca=best.n.pca, n.da=2)
 
-scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.1, high complexity, low permeability, neutral loci only&quot;,
-    pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,
-    mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(m0.1_hclp_n))
+#plot parameters
+par(mfrow=c(1,1), fg=&quot;gray50&quot;, pty='m', bty='o', mar=c(4,4,4,4), cex.main=1.3, cex.axis=1.1, cex.lab=1.2)
+scatter(dapc.obj, col=futrschwift.cols(20), ratio.pca=0.3, bg=&quot;white&quot;, main=&quot;m = 0.1, high complexity, low permeability, neutral loci only&quot;,
+    pch=c(16,15,18,17), cell=0, cstar=0, solid=0.9, cex=1.8, clab=0,
+    mstree=TRUE, lwd=3, scree.da=FALSE, leg=TRUE, txt.leg=popNames(m0.1_hclp_n))
 par(xpd=TRUE)
-points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
+points(dapc.obj$grp.coord[,1], dapc.obj$grp.coord[,2], pch=21:24, cex=2, lwd=3, col=&quot;black&quot;, bg=futrschwift.cols(20))
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-16-2.png" alt="" /><!-- --></p>
 
-<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.1_hclp_s,center=T,scale=F,n.pca=500,n.da=2)
-temp &lt;- optim.a.score(temp.dapc.obj)
+<pre><code class="language-r">compoplot(dapc.obj, lab=&quot;&quot;, col=futrschwift.cols(20))
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-16-3.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.1_hclp_s, center=T, scale=F, n.pca=length(m0.1_hclp_s@tab[1,]), n.da=2)
+temp &lt;- optim.a.score(temp.dapc.obj, n=15, n.sim=30)
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-17-1.png" alt="" /><!-- --></p>
 
 <pre><code class="language-r">best.n.pca &lt;- temp$best
-dapc.obj &lt;- dapc(m0.1_hclp_s,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+dapc.obj &lt;- dapc(m0.1_hclp_s, center=T, scale=F, n.pca=best.n.pca, n.da=2)
 
-scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.1, high complexity, low permeability, selected loci only&quot;,
-    pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,
-    mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(m0.1_hclp_n))
+#plot parameters
+par(mfrow=c(1,1), fg=&quot;gray50&quot;, pty='m', bty='o', mar=c(4,4,4,4), cex.main=1.3, cex.axis=1.1, cex.lab=1.2)
+scatter(dapc.obj, col=futrschwift.cols(20), ratio.pca=0.3, bg=&quot;white&quot;, main=&quot;m = 0.1, high complexity, low permeability, selected loci only&quot;,
+    pch=c(16,15,18,17), cell=0, cstar=0, solid=0.9, cex=1.8, clab=0,
+    mstree=TRUE, lwd=3, scree.da=FALSE, leg=TRUE, txt.leg=popNames(m0.1_hclp_s))
 par(xpd=TRUE)
-points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
+points(dapc.obj$grp.coord[,1], dapc.obj$grp.coord[,2], pch=21:24, cex=2, lwd=3, col=&quot;black&quot;, bg=futrschwift.cols(20))
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-17-2.png" alt="" /><!-- --></p>
 
-<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.1_hclp_n.s,center=T,scale=F,n.pca=500,n.da=2)
-temp &lt;- optim.a.score(temp.dapc.obj)
+<pre><code class="language-r">compoplot(dapc.obj, lab=&quot;&quot;, col=futrschwift.cols(20))
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-17-3.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.1_hclp_n.s, center=T, scale=F, n.pca=100, n.da=2)
+temp &lt;- optim.a.score(temp.dapc.obj, n=15, n.sim=30)
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-18-1.png" alt="" /><!-- --></p>
 
 <pre><code class="language-r">best.n.pca &lt;- temp$best
-dapc.obj &lt;- dapc(m0.1_hclp_n.s,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+dapc.obj &lt;- dapc(m0.1_hclp_n.s, center=T, scale=F, n.pca=best.n.pca, n.da=2)
 
-scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.1, high complexity, low permeability, neutral and selected loci&quot;,
-    pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,
-    mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(m0.1_hclp_n))
+#plot parameters
+par(mfrow=c(1,1), fg=&quot;gray50&quot;, pty='m', bty='o', mar=c(4,4,4,4), cex.main=1.3, cex.axis=1.1, cex.lab=1.2)
+scatter(dapc.obj, col=futrschwift.cols(20), ratio.pca=0.3, bg=&quot;white&quot;, main=&quot;m = 0.1, high complexity, low permeability, neutral and selected loci&quot;,
+    pch=c(16,15,18,17), cell=0, cstar=0, solid=0.9, cex=1.8, clab=0,
+    mstree=TRUE, lwd=3, scree.da=FALSE, leg=TRUE, txt.leg=popNames(m0.1_hclp_n.s))
 par(xpd=TRUE)
-points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
+points(dapc.obj$grp.coord[,1], dapc.obj$grp.coord[,2], pch=21:24, cex=2, lwd=3, col=&quot;black&quot;, bg=futrschwift.cols(20))
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-18-2.png" alt="" /><!-- --></p>
 
-<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.5_hclp_n,center=T,scale=F,n.pca=500,n.da=2)
-temp &lt;- optim.a.score(temp.dapc.obj)
+<pre><code class="language-r">compoplot(dapc.obj, lab=&quot;&quot;, col=futrschwift.cols(20))
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-18-3.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.5_hclp_n, center=T, scale=F, n.pca=100, n.da=2)
+temp &lt;- optim.a.score(temp.dapc.obj, n=15, n.sim=30)
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-19-1.png" alt="" /><!-- --></p>
 
 <pre><code class="language-r">best.n.pca &lt;- temp$best
-dapc.obj &lt;- dapc(m0.5_hclp_n,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+dapc.obj &lt;- dapc(m0.5_hclp_n, center=T, scale=F, n.pca=best.n.pca, n.da=2)
 
-scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.5, high complexity, low permeability, neutral loci only&quot;,
-    pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,
-    mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(m0.5_hclp_n))
+#plot parameters
+par(mfrow=c(1,1), fg=&quot;gray50&quot;, pty='m', bty='o', mar=c(4,4,4,4), cex.main=1.3, cex.axis=1.1, cex.lab=1.2)
+scatter(dapc.obj, col=futrschwift.cols(20), ratio.pca=0.3, bg=&quot;white&quot;, main=&quot;m = 0.5, high complexity, low permeability, neutral loci only&quot;,
+    pch=c(16,15,18,17), cell=0, cstar=0, solid=0.9, cex=1.8, clab=0,
+    mstree=TRUE, lwd=3, scree.da=FALSE, leg=TRUE, txt.leg=popNames(m0.5_hclp_n))
 par(xpd=TRUE)
-points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
+points(dapc.obj$grp.coord[,1], dapc.obj$grp.coord[,2], pch=21:24, cex=2, lwd=3, col=&quot;black&quot;, bg=futrschwift.cols(20))
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-19-2.png" alt="" /><!-- --></p>
 
-<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.5_hclp_s,center=T,scale=F,n.pca=500,n.da=2)
-temp &lt;- optim.a.score(temp.dapc.obj)
+<pre><code class="language-r">compoplot(dapc.obj, lab=&quot;&quot;, col=futrschwift.cols(20))
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-19-3.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.5_hclp_s, center=T, scale=F, n.pca=length(m0.5_hclp_s@tab[1,]), n.da=2)
+temp &lt;- optim.a.score(temp.dapc.obj, n=15, n.sim=30)
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-20-1.png" alt="" /><!-- --></p>
 
 <pre><code class="language-r">best.n.pca &lt;- temp$best
-dapc.obj &lt;- dapc(m0.5_hclp_s,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+dapc.obj &lt;- dapc(m0.5_hclp_s, center=T, scale=F, n.pca=best.n.pca, n.da=2)
 
-scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.5, high complexity, low permeability, selected loci only&quot;,
-    pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,
-    mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(m0.5_hclp_n))
+#plot parameters
+par(mfrow=c(1,1), fg=&quot;gray50&quot;, pty='m', bty='o', mar=c(4,4,4,4), cex.main=1.3, cex.axis=1.1, cex.lab=1.2)
+scatter(dapc.obj, col=futrschwift.cols(20), ratio.pca=0.3, bg=&quot;white&quot;, main=&quot;m = 0.5, high complexity, low permeability, selected loci only&quot;,
+    pch=c(16,15,18,17), cell=0, cstar=0, solid=0.9, cex=1.8, clab=0,
+    mstree=TRUE, lwd=3, scree.da=FALSE, leg=TRUE, txt.leg=popNames(m0.5_hclp_s))
 par(xpd=TRUE)
-points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
+points(dapc.obj$grp.coord[,1], dapc.obj$grp.coord[,2], pch=21:24, cex=2, lwd=3, col=&quot;black&quot;, bg=futrschwift.cols(20))
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-20-2.png" alt="" /><!-- --></p>
 
-<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.5_hclp_n.s,center=T,scale=F,n.pca=500,n.da=2)
-temp &lt;- optim.a.score(temp.dapc.obj)
+<pre><code class="language-r">compoplot(dapc.obj, lab=&quot;&quot;, col=futrschwift.cols(20))
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-20-3.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.5_hclp_n.s, center=T, scale=F, n.pca=100, n.da=2)
+temp &lt;- optim.a.score(temp.dapc.obj, n=15, n.sim=30)
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-21-1.png" alt="" /><!-- --></p>
 
 <pre><code class="language-r">best.n.pca &lt;- temp$best
-dapc.obj &lt;- dapc(m0.5_hclp_n.s,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+dapc.obj &lt;- dapc(m0.5_hclp_n.s, center=T, scale=F, n.pca=best.n.pca, n.da=2)
 
-scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.5, high complexity, low permeability, neutral and selected loci&quot;,
-    pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,
-    mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(m0.5_hclp_n))
+#plot parameters
+par(mfrow=c(1,1), fg=&quot;gray50&quot;, pty='m', bty='o', mar=c(4,4,4,4), cex.main=1.3, cex.axis=1.1, cex.lab=1.2)
+scatter(dapc.obj, col=futrschwift.cols(20), ratio.pca=0.3, bg=&quot;white&quot;, main=&quot;m = 0.5, high complexity, low permeability, neutral and selected loci&quot;,
+    pch=c(16,15,18,17), cell=0, cstar=0, solid=0.9, cex=1.8, clab=0,
+    mstree=TRUE, lwd=3, scree.da=FALSE, leg=TRUE, txt.leg=popNames(m0.5_hclp_n.s))
 par(xpd=TRUE)
-points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
+points(dapc.obj$grp.coord[,1], dapc.obj$grp.coord[,2], pch=21:24, cex=2, lwd=3, col=&quot;black&quot;, bg=futrschwift.cols(20))
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-21-2.png" alt="" /><!-- --></p>
 
-<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.1_hchp_n,center=T,scale=F,n.pca=500,n.da=2)
-temp &lt;- optim.a.score(temp.dapc.obj)
+<pre><code class="language-r">compoplot(dapc.obj, lab=&quot;&quot;, col=futrschwift.cols(20))
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-21-3.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.1_hchp_n, center=T, scale=F, n.pca=100, n.da=2)
+temp &lt;- optim.a.score(temp.dapc.obj, n=15, n.sim=30)
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-22-1.png" alt="" /><!-- --></p>
 
 <pre><code class="language-r">best.n.pca &lt;- temp$best
-dapc.obj &lt;- dapc(m0.1_hchp_n,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+dapc.obj &lt;- dapc(m0.1_hchp_n, center=T, scale=F, n.pca=best.n.pca, n.da=2)
 
-scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.1, high complexity, high permeability, neutral loci only&quot;,
-    pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,
-    mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(m0.1_hchp_n))
+#plot parameters
+par(mfrow=c(1,1), fg=&quot;gray50&quot;, pty='m', bty='o', mar=c(4,4,4,4), cex.main=1.3, cex.axis=1.1, cex.lab=1.2)
+scatter(dapc.obj, col=futrschwift.cols(20), ratio.pca=0.3, bg=&quot;white&quot;, main=&quot;m = 0.1, high complexity, high permeability, neutral loci only&quot;,
+    pch=c(16,15,18,17), cell=0, cstar=0, solid=0.9, cex=1.8, clab=0,
+    mstree=TRUE, lwd=3, scree.da=FALSE, leg=TRUE, txt.leg=popNames(m0.1_hchp_n))
 par(xpd=TRUE)
-points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
+points(dapc.obj$grp.coord[,1], dapc.obj$grp.coord[,2], pch=21:24, cex=2, lwd=3, col=&quot;black&quot;, bg=futrschwift.cols(20))
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-22-2.png" alt="" /><!-- --></p>
 
-<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.1_hchp_s,center=T,scale=F,n.pca=500,n.da=2)
-temp &lt;- optim.a.score(temp.dapc.obj)
+<pre><code class="language-r">compoplot(dapc.obj, lab=&quot;&quot;, col=futrschwift.cols(20))
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-22-3.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.1_hchp_s, center=T, scale=F, n.pca=length(m0.1_hchp_s@tab[1,]), n.da=2)
+temp &lt;- optim.a.score(temp.dapc.obj, n=15, n.sim=30)
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-23-1.png" alt="" /><!-- --></p>
 
 <pre><code class="language-r">best.n.pca &lt;- temp$best
-dapc.obj &lt;- dapc(m0.1_hchp_s,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+dapc.obj &lt;- dapc(m0.1_hchp_s, center=T, scale=F, n.pca=best.n.pca, n.da=2)
 
-scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.1, high complexity, high permeability, selected loci only&quot;,
-    pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,
-    mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(m0.1_hchp_n))
+#plot parameters
+par(mfrow=c(1,1), fg=&quot;gray50&quot;, pty='m', bty='o', mar=c(4,4,4,4), cex.main=1.3, cex.axis=1.1, cex.lab=1.2)
+scatter(dapc.obj, col=futrschwift.cols(20), ratio.pca=0.3, bg=&quot;white&quot;, main=&quot;m = 0.1, high complexity, high permeability, selected loci only&quot;,
+    pch=c(16,15,18,17), cell=0, cstar=0, solid=0.9, cex=1.8, clab=0,
+    mstree=TRUE, lwd=3, scree.da=FALSE, leg=TRUE, txt.leg=popNames(m0.1_hchp_s))
 par(xpd=TRUE)
-points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
+points(dapc.obj$grp.coord[,1], dapc.obj$grp.coord[,2], pch=21:24, cex=2, lwd=3, col=&quot;black&quot;, bg=futrschwift.cols(20))
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-23-2.png" alt="" /><!-- --></p>
 
-<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.1_hchp_n.s,center=T,scale=F,n.pca=500,n.da=2)
-temp &lt;- optim.a.score(temp.dapc.obj)
+<pre><code class="language-r">compoplot(dapc.obj, lab=&quot;&quot;, col=futrschwift.cols(20))
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-23-3.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.1_hchp_n.s, center=T, scale=F, n.pca=100, n.da=2)
+temp &lt;- optim.a.score(temp.dapc.obj, n=15, n.sim=30)
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-24-1.png" alt="" /><!-- --></p>
 
 <pre><code class="language-r">best.n.pca &lt;- temp$best
-dapc.obj &lt;- dapc(m0.1_hchp_n.s,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+dapc.obj &lt;- dapc(m0.1_hchp_n.s, center=T, scale=F, n.pca=best.n.pca, n.da=2)
 
-scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.1, high complexity, high permeability, neutral and selected loci&quot;,
-    pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,
-    mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(m0.1_hchp_n))
+#plot parameters
+par(mfrow=c(1,1), fg=&quot;gray50&quot;, pty='m', bty='o', mar=c(4,4,4,4), cex.main=1.3, cex.axis=1.1, cex.lab=1.2)
+scatter(dapc.obj, col=futrschwift.cols(20), ratio.pca=0.3, bg=&quot;white&quot;, main=&quot;m = 0.1, high complexity, high permeability, neutral and selected loci&quot;,
+    pch=c(16,15,18,17), cell=0, cstar=0, solid=0.9, cex=1.8, clab=0,
+    mstree=TRUE, lwd=3, scree.da=FALSE, leg=TRUE, txt.leg=popNames(m0.1_hchp_n.s))
 par(xpd=TRUE)
-points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
+points(dapc.obj$grp.coord[,1], dapc.obj$grp.coord[,2], pch=21:24, cex=2, lwd=3, col=&quot;black&quot;, bg=futrschwift.cols(20))
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-24-2.png" alt="" /><!-- --></p>
 
-<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.5_hchp_n,center=T,scale=F,n.pca=500,n.da=2)
-temp &lt;- optim.a.score(temp.dapc.obj)
+<pre><code class="language-r">compoplot(dapc.obj, lab=&quot;&quot;, col=futrschwift.cols(20))
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-24-3.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.5_hchp_n, center=T, scale=F, n.pca=100, n.da=2)
+temp &lt;- optim.a.score(temp.dapc.obj, n=15, n.sim=30)
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-25-1.png" alt="" /><!-- --></p>
 
 <pre><code class="language-r">best.n.pca &lt;- temp$best
-dapc.obj &lt;- dapc(m0.5_hchp_n,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+dapc.obj &lt;- dapc(m0.5_hchp_n, center=T, scale=F, n.pca=best.n.pca, n.da=2)
 
-scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.5, high complexity, high permeability, neutral loci only&quot;,
-    pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,
-    mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(m0.5_hchp_n))
+#plot parameters
+par(mfrow=c(1,1), fg=&quot;gray50&quot;, pty='m', bty='o', mar=c(4,4,4,4), cex.main=1.3, cex.axis=1.1, cex.lab=1.2)
+scatter(dapc.obj, col=futrschwift.cols(20), ratio.pca=0.3, bg=&quot;white&quot;, main=&quot;m = 0.5, high complexity, high permeability, neutral loci only&quot;,
+    pch=c(16,15,18,17), cell=0, cstar=0, solid=0.9, cex=1.8, clab=0,
+    mstree=TRUE, lwd=3, scree.da=FALSE, leg=TRUE, txt.leg=popNames(m0.5_hchp_n))
 par(xpd=TRUE)
-points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
+points(dapc.obj$grp.coord[,1], dapc.obj$grp.coord[,2], pch=21:24, cex=2, lwd=3, col=&quot;black&quot;, bg=futrschwift.cols(20))
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-25-2.png" alt="" /><!-- --></p>
 
-<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.5_hchp_s,center=T,scale=F,n.pca=500,n.da=2)
-temp &lt;- optim.a.score(temp.dapc.obj)
+<pre><code class="language-r">compoplot(dapc.obj, lab=&quot;&quot;, col=futrschwift.cols(20))
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-25-3.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.5_hchp_s, center=T, scale=F, n.pca=length(m0.5_hchp_s@tab[1,]), n.da=2)
+temp &lt;- optim.a.score(temp.dapc.obj, n=15, n.sim=30)
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-26-1.png" alt="" /><!-- --></p>
 
 <pre><code class="language-r">best.n.pca &lt;- temp$best
-dapc.obj &lt;- dapc(m0.5_hchp_s,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+dapc.obj &lt;- dapc(m0.5_hchp_s, center=T, scale=F, n.pca=best.n.pca, n.da=2)
 
-scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.5, high complexity, high permeability, selected loci only&quot;,
-    pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,
-    mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(m0.5_hchp_n))
+#plot parameters
+par(mfrow=c(1,1), fg=&quot;gray50&quot;, pty='m', bty='o', mar=c(4,4,4,4), cex.main=1.3, cex.axis=1.1, cex.lab=1.2)
+scatter(dapc.obj, col=futrschwift.cols(20), ratio.pca=0.3, bg=&quot;white&quot;, main=&quot;m = 0.5, high complexity, high permeability, selected loci only&quot;,
+    pch=c(16,15,18,17), cell=0, cstar=0, solid=0.9, cex=1.8, clab=0,
+    mstree=TRUE, lwd=3, scree.da=FALSE, leg=TRUE, txt.leg=popNames(m0.5_hchp_s))
 par(xpd=TRUE)
-points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
+points(dapc.obj$grp.coord[,1], dapc.obj$grp.coord[,2], pch=21:24, cex=2, lwd=3, col=&quot;black&quot;, bg=futrschwift.cols(20))
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-26-2.png" alt="" /><!-- --></p>
 
-<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.5_hchp_n.s,center=T,scale=F,n.pca=500,n.da=2)
-temp &lt;- optim.a.score(temp.dapc.obj)
+<pre><code class="language-r">compoplot(dapc.obj, lab=&quot;&quot;, col=futrschwift.cols(20))
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-26-3.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.5_hchp_n.s, center=T, scale=F, n.pca=100, n.da=2)
+temp &lt;- optim.a.score(temp.dapc.obj, n=15, n.sim=30)
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-27-1.png" alt="" /><!-- --></p>
 
 <pre><code class="language-r">best.n.pca &lt;- temp$best
-dapc.obj &lt;- dapc(m0.5_hchp_n.s,center=T,scale=F,n.pca=best.n.pca,n.da=2)
+dapc.obj &lt;- dapc(m0.5_hchp_n.s, center=T, scale=F, n.pca=best.n.pca, n.da=2)
 
-scatter(dapc.obj,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,main=&quot;m = 0.5, high complexity, high permeability, neutral and selected loci&quot;,
-    pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,
-    mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(m0.5_hchp_n))
+#plot parameters
+par(mfrow=c(1,1), fg=&quot;gray50&quot;, pty='m', bty='o', mar=c(4,4,4,4), cex.main=1.3, cex.axis=1.1, cex.lab=1.2)
+scatter(dapc.obj, col=futrschwift.cols(20), ratio.pca=0.3, bg=&quot;white&quot;, main=&quot;m = 0.5, high complexity, high permeability, neutral and selected loci&quot;,
+    pch=c(16,15,18,17), cell=0, cstar=0, solid=0.9, cex=1.8, clab=0,
+    mstree=TRUE, lwd=3, scree.da=FALSE, leg=TRUE, txt.leg=popNames(m0.5_hchp_n.s))
 par(xpd=TRUE)
-points(dapc.obj$grp.coord[,1],dapc.obj$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
+points(dapc.obj$grp.coord[,1], dapc.obj$grp.coord[,2], pch=21:24, cex=2, lwd=3, col=&quot;black&quot;, bg=futrschwift.cols(20))
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-27-2.png" alt="" /><!-- --></p>
 
+<pre><code class="language-r">compoplot(dapc.obj, lab=&quot;&quot;, col=futrschwift.cols(20))
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-27-3.png" alt="" /><!-- --></p>
+
 <h2 id="inferring-genetic-environmental-covariance-with-co-inertia-analysis">Inferring genetic-environmental covariance with Co-inertia Analysis</h2>
 
 <pre><code class="language-r">#plot parameters
-par(mfrow=c(1,1),fg=&quot;gray50&quot;,pty='m',bty='o',mar=c(4,4,4,4),cex.main=1.3,cex.axis=1.1,cex.lab=1.2)
+par(mfrow=c(1,1), fg=&quot;gray50&quot;, pty='m', bty='o', mar=c(4,4,4,4), cex.main=1.3, cex.axis=1.1, cex.lab=1.2)
 
 ##Gen and Env data frames
 ##make this iterative for all simulated datasets: currently only one of them shown here
-gen &lt;- m0.1_lchp_n.s
-dfenv &lt;- extract(fa_stk,gen$other)
+gen &lt;- m0.5_hclp_n.s
+
+temp.dapc.obj &lt;- dapc(gen, center=T, scale=F, n.pca=100, n.da=2)
+temp &lt;- optim.a.score(temp.dapc.obj, n=15, n.sim=30)
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-28-1.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">best.n.pca &lt;- temp$best
+dapc.obj &lt;- dapc(gen, center=T, scale=F, n.pca=best.n.pca, n.da=2)
+
+dfenv &lt;- extract(fa_stk, gen$other)
 dfenv.obj &lt;- dfenv
 dfgen.obj &lt;- gen$tab
-dfgenenv &lt;- cbind(gen$tab,dfenv)
+dfgenenv &lt;- cbind(dfgen.obj, dfenv.obj)
 dfgenenv &lt;- na.omit(dfgenenv)
-dfgen &lt;- dfgenenv[,1:180]
-dfenv &lt;- dfgenenv[,181:185]
+n.alleles &lt;- length(dfgen.obj[1,])
+n.env &lt;- length(dfenv.obj[1,])
+env.var &lt;- seq(n.alleles + 1, n.alleles + n.env)
+dfgen &lt;- dfgenenv[,1:n.alleles]
+dfenv &lt;- dfgenenv[,env.var]
 
 ###Co-inertia###by individual###
 
-pcenv &lt;- dudi.pca(dfenv, cent=T,scale=T,scannf=F,nf=2)
+pcenv &lt;- dudi.pca(dfenv, cent=T, scale=T, scannf=F, nf=2)
 pcgen &lt;- dudi.pca(dfgen, cent=T, scale=F, scannf=F, nf=2)
-coi &lt;- coinertia(pcenv,pcgen,scan=F,nf=2)
-#plot(coi)
-summary(coi)
-</code></pre>
+coi &lt;- coinertia(pcenv, pcgen, scan=F, nf=2)
+#plot(coi, col=&quot;gray30&quot;)
+#summary(coi)
 
-<pre><code>## Coinertia analysis
-## 
-## Class: coinertia dudi
-## Call: coinertia(dudiX = pcenv, dudiY = pcgen, scannf = F, nf = 2)
-## 
-## Total inertia: 2.588
-## 
-## Eigenvalues:
-##     Ax1     Ax2     Ax3 
-##  1.7596  0.4729  0.3553 
-## 
-## Projected inertia (%):
-##     Ax1     Ax2     Ax3 
-##   68.00   18.27   13.73 
-## 
-## Cumulative projected inertia (%):
-##     Ax1   Ax1:2   Ax1:3 
-##   68.00   86.27  100.00 
-## 
-## Eigenvalues decomposition:
-##        eig     covar      sdX      sdY      corr
-## 1 1.759581 1.3264922 1.559164 1.452113 0.5858851
-## 2 0.472895 0.6876736 1.109017 1.405719 0.4411086
-## 
-## Inertia &amp; coinertia X (pcenv):
-##     inertia      max     ratio
-## 1  2.430994 2.442048 0.9954734
-## 12 3.660913 4.005326 0.9140113
-## 
-## Inertia &amp; coinertia Y (pcgen):
-##     inertia      max     ratio
-## 1  2.108631 3.852952 0.5472768
-## 12 4.084677 7.176375 0.5691839
-## 
-## RV:
-##  0.08915289
-</code></pre>
-
-<pre><code class="language-r">#rvind=RV.rtest(pcenv$l1,pcgen$l1,nrepet=9999)$obs
-#rvindpval=RV.rtest(pcenv$l1,pcgen$l1,nrepet=9999)$pvalue
-rvind=RV.rtest(coi$lX,coi$lY,nrepet=9999)$obs
-rvindpval=RV.rtest(coi$lX,coi$lY,nrepet=9999)$pvalue
+#rvind &lt;- RV.rtest(coi$lX, coi$lY, nrepet=9999)$obs
+#rvindpval &lt;- RV.rtest(coi$lX, coi$lY, nrepet=9999)$pvalue
 
 
 ###Co-inertia###by site/pop###
 
 dap20 &lt;- dapc.obj$grp
-dfdap20 &lt;- cbind(dap20,dfenv.obj)
+dfdap20 &lt;- cbind(dap20, dfenv.obj)
 dfdap20 &lt;- na.omit(dfdap20)
 dfdap20 &lt;- dfdap20[,1]
 dfdap20 &lt;- as.factor(as.numeric(dfdap20))
@@ -1072,11 +972,11 @@ pcenv &lt;- dudi.pca(dfenv, cent=T, scale=T, scannf=F, nf=2)
 bet1 &lt;- bca(pcenv, dfdap20, scannf=F, nf=2)
 pcgen &lt;- dudi.pca(dfgen, cent=T, scale=F, scannf=F, nf=2)
 bet2 &lt;- bca(pcgen, dfdap20, scannf=F, nf=2)
-coi20 &lt;- coinertia(bet1,bet2,scan=F,nf=2)
-plot(coi20)
+coi20 &lt;- coinertia(bet1, bet2, scan=F, nf=2)
+plot(coi20, col=&quot;gray30&quot;)
 </code></pre>
 
-<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-28-1.png" alt="" /><!-- --></p>
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-28-2.png" alt="" /><!-- --></p>
 
 <pre><code class="language-r">summary(coi20)
 </code></pre>
@@ -1086,82 +986,82 @@ plot(coi20)
 ## Class: coinertia dudi
 ## Call: coinertia(dudiX = bet1, dudiY = bet2, scannf = F, nf = 2)
 ## 
-## Total inertia: 1.49
+## Total inertia: 31.18
 ## 
 ## Eigenvalues:
-##     Ax1     Ax2     Ax3 
-##  1.0104  0.3458  0.1335 
+##     Ax1     Ax2     Ax3     Ax4 
+##  22.396   6.310   1.754   0.716 
 ## 
 ## Projected inertia (%):
-##     Ax1     Ax2     Ax3 
-##   67.83   23.21    8.96 
+##     Ax1     Ax2     Ax3     Ax4 
+##  71.837  20.240   5.627   2.297 
 ## 
 ## Cumulative projected inertia (%):
-##     Ax1   Ax1:2   Ax1:3 
-##   67.83   91.04  100.00 
+##     Ax1   Ax1:2   Ax1:3   Ax1:4 
+##   71.84   92.08   97.70  100.00 
 ## 
 ## Eigenvalues decomposition:
-##         eig     covar       sdX      sdY      corr
-## 1 1.0103701 1.0051717 0.9779356 1.353076 0.7596399
-## 2 0.3457998 0.5880474 0.6109938 1.078438 0.8924427
+##         eig    covar      sdX      sdY      corr
+## 1 22.395764 4.732416 1.600793 3.020340 0.9787955
+## 2  6.309858 2.511943 1.025729 2.508428 0.9762824
 ## 
 ## Inertia &amp; coinertia X (bet1):
-##     inertia       max     ratio
-## 1  0.956358 0.9679242 0.9880506
-## 12 1.329671 1.3451082 0.9885238
+##     inertia      max     ratio
+## 1  2.562539 2.578374 0.9938584
+## 12 3.614658 3.617196 0.9992984
 ## 
 ## Inertia &amp; coinertia Y (bet2):
-##     inertia      max     ratio
-## 1  1.830815 2.939445 0.6228437
-## 12 2.993843 4.995198 0.5993443
+##      inertia       max     ratio
+## 1   9.122452  9.622948 0.9479893
+## 12 15.414665 18.386972 0.8383471
 ## 
 ## RV:
-##  0.2991802
+##  0.5371572
 </code></pre>
 
-<pre><code class="language-r">rv20 &lt;- RV.rtest(coi20$lX,coi20$lY,nrepet=9999)$obs
-rv20pval &lt;- RV.rtest(coi20$lX,coi20$lY,nrepet=9999)$pvalue
+<pre><code class="language-r">rv20 &lt;- RV.rtest(coi20$lX, coi20$lY, nrepet=9999)$obs
+rv20pval &lt;- RV.rtest(coi20$lX, coi20$lY, nrepet=9999)$pvalue
 
 
 ###Co-inertia###by cluster###
 
 ##Clusters##
-clust &lt;- find.clusters(gen,cent=T,scale=F,n.pca=best.n.pca,method=&quot;kmeans&quot;,n.iter=1e7,n.clust=10,stat=&quot;BIC&quot;)
+clust &lt;- find.clusters(gen, cent=T, scale=F, n.pca=best.n.pca, method=&quot;kmeans&quot;, n.iter=1e7, n.clust=10, stat=&quot;BIC&quot;)
 cl &lt;- as.factor(as.vector(clust$grp))
 gen$pop &lt;- cl
 sq &lt;- as.character(seq(1,10))
 popNames(gen) &lt;- sq
-dapc10 &lt;- dapc(gen,center=T,scale=F,n.pca=best.n.pca,n.da=2)
-scatter(dapc10,col=cols,ratio.pca=0.3,bg=&quot;white&quot;,pch=15:17,cell=0,cstar=0,solid=0.9,cex=1.8,clab=0,mstree=TRUE,lwd=3,scree.da=FALSE,leg=TRUE,txt.leg=popNames(gen))
+dapc10 &lt;- dapc(gen, center=T, scale=F, n.pca=best.n.pca, n.da=2)
+scatter(dapc10, col=futrschwift.cols(10), ratio.pca=0.3, bg=&quot;white&quot;, pch=c(16,15,18,17), cell=0, cstar=0, solid=0.9, cex=1.8, clab=0, mstree=TRUE, lwd=3, scree.da=FALSE, leg=TRUE, txt.leg=popNames(gen))
 par(xpd=TRUE)
-points(dapc10$grp.coord[,1],dapc10$grp.coord[,2],pch=c(22,21,24),cex=2,lwd=3,col=&quot;black&quot;,bg=cols)
+points(dapc10$grp.coord[,1], dapc10$grp.coord[,2], pch=21:24, cex=2, lwd=3, col=&quot;black&quot;, bg=futrschwift.cols(10))
 </code></pre>
 
-<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-28-2.png" alt="" /><!-- --></p>
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-28-3.png" alt="" /><!-- --></p>
 
 <pre><code class="language-r">dap10 &lt;- as.data.frame(dapc10$assign)
 
-dfdap10 &lt;- cbind(dap10,dfenv.obj)
+dfdap10 &lt;- cbind(dap10, dfenv.obj)
 dfdap10 &lt;- na.omit(dfdap10)
 dfenv10 &lt;- dfdap10[,2:length(dfdap10[1,])]
 dfdap10 &lt;- dfdap10[,1]
 
-dfgenenv10 &lt;- cbind(dap10,gen$tab,dfenv.obj)
+dfgenenv10 &lt;- cbind(dap10, gen$tab, dfenv.obj)
 dfgenenv10 &lt;- na.omit(dfgenenv10)
 dfdap10 &lt;- dfgenenv10[,1]
-dfgenenv10.gen &lt;- dfgenenv10[,2:181]
-dfgenenv10.env &lt;- dfgenenv10[,182:186]
+dfgenenv10.gen &lt;- dfgenenv10[,2:n.alleles+1]
+dfgenenv10.env &lt;- dfgenenv10[,env.var+1]
 
 
 pcenv10 &lt;- dudi.pca(dfenv10, cent=T, scale=T, scannf=F, nf=2)
 bet1 &lt;- bca(pcenv10, dfdap10, scannf=F, nf=2)
 pcgen10 &lt;- dudi.pca(dfgen, cent=T, scale=F, scannf=F, nf=2)
 bet2 &lt;- bca(pcgen10, dfdap10, scannf=F, nf=2)
-coi10 &lt;- coinertia(bet1,bet2,scan=F,nf=2)
-plot(coi10)
+coi10 &lt;- coinertia(bet1, bet2, scan=F, nf=2)
+plot(coi10, col=&quot;gray30&quot;)
 </code></pre>
 
-<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-28-3.png" alt="" /><!-- --></p>
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-28-4.png" alt="" /><!-- --></p>
 
 <pre><code class="language-r">summary(coi10)
 </code></pre>
@@ -1171,51 +1071,44 @@ plot(coi10)
 ## Class: coinertia dudi
 ## Call: coinertia(dudiX = bet1, dudiY = bet2, scannf = F, nf = 2)
 ## 
-## Total inertia: 7.614
+## Total inertia: 20.27
 ## 
 ## Eigenvalues:
 ##      Ax1      Ax2      Ax3      Ax4 
-## 6.958085 0.600614 0.050348 0.004932 
+## 19.07630  0.94346  0.18766  0.05781 
 ## 
 ## Projected inertia (%):
-##      Ax1      Ax2      Ax3      Ax4 
-## 91.38566  7.88831  0.66126  0.06478 
+##     Ax1     Ax2     Ax3     Ax4 
+## 94.1332  4.6555  0.9260  0.2853 
 ## 
 ## Cumulative projected inertia (%):
 ##     Ax1   Ax1:2   Ax1:3   Ax1:4 
-##   91.39   99.27   99.94  100.00 
+##   94.13   98.79   99.71  100.00 
 ## 
 ## Eigenvalues decomposition:
-##         eig     covar       sdX      sdY      corr
-## 1 6.9580851 2.6378182 1.8160708 1.578628 0.9200942
-## 2 0.6006139 0.7749928 0.5773254 1.447405 0.9274425
+##          eig     covar       sdX      sdY      corr
+## 1 19.0762965 4.3676420 1.4294467 3.084553 0.9905738
+## 2  0.9434554 0.9713163 0.3679976 2.731910 0.9661604
 ## 
 ## Inertia &amp; coinertia X (bet1):
 ##     inertia      max     ratio
-## 1  3.298113 3.312019 0.9958013
-## 12 3.631418 3.634270 0.9992152
+## 1  2.043318 2.043883 0.9997236
+## 12 2.178740 2.180329 0.9992714
 ## 
 ## Inertia &amp; coinertia Y (bet2):
-##     inertia      max     ratio
-## 1  2.492066 2.901579 0.8588654
-## 12 4.587047 5.166382 0.8878645
+##      inertia       max     ratio
+## 1   9.514466  9.611211 0.9899341
+## 12 16.977801 17.519425 0.9690844
 ## 
 ## RV:
-##  0.522622
+##  0.6896561
 </code></pre>
 
-<pre><code class="language-r">s.class(pcgen10$l1,dfdap10)
-</code></pre>
+<pre><code class="language-r">#s.class(pcgen10$l1, dfdap10, col=futrschwift.cols(10))
+#s.class(pcenv10$l1, dfdap10, col=futrschwift.cols(10))
 
-<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-28-4.png" alt="" /><!-- --></p>
-
-<pre><code class="language-r">s.class(pcenv10$l1,dfdap10)
-</code></pre>
-
-<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-28-5.png" alt="" /><!-- --></p>
-
-<pre><code class="language-r">rv10=RV.rtest(coi10$lX,coi10$lY,nrepet=9999)$obs
-rv10pval=RV.rtest(coi10$lX,coi10$lY,nrepet=9999)$pvalue
+rv10 &lt;- RV.rtest(coi10$lX, coi10$lY, nrepet=9999)$obs
+rv10pval &lt;- RV.rtest(coi10$lX, coi10$lY, nrepet=9999)$pvalue
 </code></pre>
 
 <h2 id="comparison-to-dapc-inferring-population-structure-with-lea-package">Comparison to DAPC: Inferring population structure with <em>LEA</em> package</h2>
@@ -1225,18 +1118,41 @@ library(mapplots)
 library(maps)
 library(raster)
 library(adegenet)
+library(ggsci)
+
+futr &lt;- pal_futurama()
+schwifty &lt;- pal_rickandmorty()
+futrschwift.cols &lt;- colorRampPalette(c(&quot;gray15&quot;, schwifty(12)[3], futr(12)[11], schwifty(12)[c(1,9)], futr(12)[c(8,6,2)]))
 
 #plot parameters
 par(mfrow=c(1,1),fg=&quot;gray50&quot;,pty='m',bty='o',mar=c(4,4,4,4),cex.main=1.3,cex.axis=1.1,cex.lab=1.2)
 
-simsubset.dir &lt;- c(
-        &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_1/Simulated_Genotypes/20pop_subsets/neutral+selected/&quot;,
-        &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_5/Simulated_Genotypes/20pop_subsets/neutral+selected/&quot;
-        )
+geninds &lt;- list(m0.1_lclp_n.s, 
+         m0.1_lchp_n.s, 
+         m0.1_hclp_n.s, 
+         m0.1_hchp_n.s, 
+         m0.5_lclp_n.s, 
+         m0.5_lchp_n.s, 
+         m0.5_hclp_n.s, 
+         m0.5_hchp_n.s)
 
-sims &lt;- c(&quot;lclp&quot;, &quot;lchp&quot;, &quot;hclp&quot;, &quot;hchp&quot;)
+genind_names &lt;- c(&quot;m0.1_lclp_n.s&quot;, 
+         &quot;m0.1_lchp_n.s&quot;, 
+         &quot;m0.1_hclp_n.s&quot;, 
+         &quot;m0.1_hchp_n.s&quot;, 
+         &quot;m0.5_lclp_n.s&quot;, 
+         &quot;m0.5_lchp_n.s&quot;, 
+         &quot;m0.5_hclp_n.s&quot;, 
+         &quot;m0.5_hchp_n.s&quot;)
 
-ls_names &lt;- c(&quot;LCLP landscape&quot;, &quot;LCHP landscape&quot;, &quot;HCLP landscape&quot;, &quot;HCHP landscape&quot;)
+ls_names &lt;- c(&quot;LCLP landscape (m = 0.1)&quot;, 
+          &quot;LCHP landscape (m = 0.1)&quot;, 
+          &quot;HCLP landscape (m = 0.1)&quot;, 
+          &quot;HCHP landscape (m = 0.1)&quot;, 
+          &quot;LCLP landscape (m = 0.5)&quot;, 
+          &quot;LCHP landscape (m = 0.5)&quot;, 
+          &quot;HCLP landscape (m = 0.5)&quot;, 
+          &quot;HCHP landscape (m = 0.5)&quot;)
 
 lea.dir &lt;- c(
        &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_1/Simulated_Landscapes/500neutral+50selectedSNPs/Low_Complexity_Landscapes/landscapeR/Low_Permeability/&quot;,
@@ -1248,152 +1164,183 @@ lea.dir &lt;- c(
        &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_5/Simulated_Landscapes/500neutral+50selectedSNPs/High_Complexity_Landscapes/virtualspecies/Low_Permeability/&quot;,
        &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_5/Simulated_Landscapes/500neutral+50selectedSNPs/High_Complexity_Landscapes/virtualspecies/High_Permeability/&quot;
            )
-for (j in 1:2){
-   for (i in 1:4){
-      genind.obj &lt;- read.genepop(paste0(simsubset.dir[j], sims[i], &quot;_20pops.gen&quot;))
-      genind.obj$other &lt;- read.table(paste0(simsubset.dir[j], sims[i], &quot;_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
-      colnames(genind.obj$other)=c(&quot;x&quot;,&quot;y&quot;)
-      genind.obj$other &lt;- xyFromRC(genind.obj, fa_stk)
-      genotypes &lt;- genind.obj@tab
-      coordinates &lt;- genind.obj$other
-      
-      ji &lt;- (j - 1) * 4 + i           
-      setwd(lea.dir[ji])
-      write.table(t(as.matrix(genotypes)), sep=&quot;&quot;, row.names=F, col.names=F, paste0(sims[i], &quot;.geno&quot;))
-      geno &lt;- read.geno(paste0(sims[i],&quot;.geno&quot;))
-      coord &lt;- coordinates
-      setwd(paste0(lea.dir[ji],&quot;LEA&quot;))
-      source(&quot;POPSutilities.r&quot;)
-      setwd(lea.dir[ji])
 
-      reps &lt;- 5
-      maxK &lt;- 10
+for (i in 1:8){
+     genind.obj &lt;- geninds[[i]]
+     genotypes &lt;- genind.obj$tab
+     coords &lt;- genind.obj$other
+      
+     setwd(lea.dir[i])
+     write.table(t(as.matrix(genotypes)), sep=&quot;&quot;, row.names=F, col.names=F, paste0(genind_names[i], &quot;.geno&quot;))
+     geno &lt;- read.geno(paste0(genind_names[i],&quot;.geno&quot;))
+     setwd(paste0(lea.dir[i],&quot;LEA&quot;))
+     source(&quot;POPSutilities.r&quot;)
+     setwd(lea.dir[i])
 
-      #running pop structure inference
-      snmf.obj &lt;- snmf(paste0(sims[i],&quot;.geno&quot;), K=1:maxK, repetitions=reps, project=&quot;new&quot;, 
-              alpha=10, iterations=100000,
-                  entropy=TRUE,percentage=0.25)
-      plot(snmf.obj,cex=1.2,col=&quot;lightblue&quot;,pch=19)
+     reps &lt;- 5
+     maxK &lt;- 15
 
-      #determining best K and picking best replicate for best K
-      ce &lt;- list()
-      for(i in 1:maxK) ce[[i]] &lt;- cross.entropy(snmf.obj, K=i)
-      best &lt;- which.min(unlist(ce))
-      best.K &lt;- ceiling(best/reps)
-      best.run &lt;- which.min(ce[[best.K]])
-      
-      my.colors &lt;- futr(best.K)
-      
-      barchart(snmf.obj, K=best.K, run=best.run,
-           border=NA, space=0, col=my.colors,
-           xlab=&quot;Individuals&quot;, ylab=&quot;Ancestry proportions&quot;,
-           main=paste(&quot;Ancestry bar chart for&quot;, ls_names[i]))
-      
-      qmatrix &lt;- Q(snmf.obj,K=best.K,run=best.run)
-      
-      grid &lt;- createGrid(min(coord[,1]),max(coord[,1]),
-                min(coord[,2]),max(coord[,2]),500,500)
-      constraints &lt;- NULL
-      
-      futr.gradient=colorRampPalette(futr(best.K))
-      grad.cols=futr.gradient(best.K*10)
-      
-      ColorGradients_bestK &lt;- list()
-    for(i in 1:best.K){ 
-      k.start &lt;- i*10-9
-      k.fin &lt;- i*10
-      ColorGradients_bestK[[i]] &lt;- c(&quot;gray95&quot;, grad.cols[k.start:k.fin])
-    }
+     #running pop structure inference
+     snmf.obj &lt;- snmf(paste0(genind_names[i],&quot;.geno&quot;), K=1:maxK, repetitions=reps, project=&quot;new&quot;, 
+                      alpha=10, iterations=100000,
+                      entropy=TRUE, percentage=0.25)
+     plot(snmf.obj, cex=1.2, col=&quot;lightblue&quot;, pch=19)
 
-       maps(matrix=qmatrix, cbind(coord[,1],coord[,2]), grid, constraints, method=&quot;max&quot;,
-         colorGradientsList=ColorGradients_bestK,
-         main=paste(&quot;Mapped ancestry coefficients for&quot;, ls_names[i]), 
-         xlab=&quot;Longitude&quot;, ylab=&quot;Latitude&quot;, cex=.5)
-       map(add=T,interior=F)
-   }
+     #determining best K and picking best replicate for best K
+     ce &lt;- list()
+     for(k in 1:maxK) ce[[k]] &lt;- cross.entropy(snmf.obj, K=k)
+     best &lt;- which.min(unlist(ce))
+     best.K &lt;- ceiling(best/reps)
+     best.run &lt;- which.min(ce[[best.K]])
+     
+     barchart(snmf.obj, K=best.K, run=best.run,
+              border=NA, space=0, col=futrschwift.cols(best.K),
+              xlab=&quot;Individuals&quot;, ylab=&quot;Ancestry proportions&quot;,
+              main=paste(&quot;Ancestry bar chart for&quot;, ls_names[i]))
+      
+     qmatrix &lt;- Q(snmf.obj, K=best.K, run=best.run)
+      
+     grid &lt;- createGrid(xmin(fa_stk), xmax(fa_stk),
+                        ymin(fa_stk), ymax(fa_stk), 260, 340)
+     constraints &lt;- NULL
+      
+     shades &lt;- 10
+     
+     futrschwift.gradient &lt;- colorRampPalette(futrschwift.cols(best.K))
+     grad.cols &lt;- futrschwift.gradient(shades*best.K)
+     
+     ColorGradients_bestK &lt;- list()
+     for(j in 1:best.K){ 
+           k.start &lt;- j*shades-shades+1
+           k.fin &lt;- j*shades
+           ColorGradients_bestK[[j]] &lt;- c(&quot;gray95&quot;, grad.cols[k.start:k.fin])
+     }
+
+     maps(qmatrix, coords, grid, constraints, method=&quot;max&quot;,
+          colorGradientsList=ColorGradients_bestK,
+       main=paste(&quot;Mapped ancestry coefficients for&quot;, ls_names[i]), 
+                  xlab=&quot;Longitude&quot;, ylab=&quot;Latitude&quot;, cex=.5)
+     map(add=T, interior=F)
 }
 </code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-29-1.png" alt="" /><!-- -->
+<img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-29-2.png" alt="" /><!-- -->
+<img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-29-3.png" alt="" /><!-- -->
+<img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-29-4.png" alt="" /><!-- -->
+<img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-29-5.png" alt="" /><!-- -->
+<img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-29-6.png" alt="" /><!-- -->
+<img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-29-7.png" alt="" /><!-- -->
+<img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-29-8.png" alt="" /><!-- -->
+<img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-29-9.png" alt="" /><!-- -->
+<img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-29-10.png" alt="" /><!-- -->
+<img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-29-11.png" alt="" /><!-- -->
+<img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-29-12.png" alt="" /><!-- -->
+<img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-29-13.png" alt="" /><!-- -->
+<img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-29-14.png" alt="" /><!-- -->
+<img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-29-15.png" alt="" /><!-- -->
+<img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-29-16.png" alt="" /><!-- -->
+<img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-29-17.png" alt="" /><!-- -->
+<img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-29-18.png" alt="" /><!-- -->
+<img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-29-19.png" alt="" /><!-- -->
+<img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-29-20.png" alt="" /><!-- -->
+<img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-29-21.png" alt="" /><!-- -->
+<img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-29-22.png" alt="" /><!-- -->
+<img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-29-23.png" alt="" /><!-- -->
+<img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-29-24.png" alt="" /><!-- --></p>
 
 <h2 id="comparison-to-dapc-inferring-population-structure-with-tess3r-package">Comparison to DAPC: Inferring population structure with <em>tess3r</em> package</h2>
 
 <pre><code class="language-r">library(tess3r)
 library(adegenet)
+library(raster)
+library(ggsci)
+
+futr &lt;- pal_futurama()
+schwifty &lt;- pal_rickandmorty()
+futrschwift.cols &lt;- colorRampPalette(c(&quot;gray15&quot;, schwifty(12)[3], futr(12)[11], schwifty(12)[c(1,9)], futr(12)[c(8,6,2)]))
+
 
 #plot parameters
 par(mfrow=c(1,1),fg=&quot;gray50&quot;,pty='m',bty='o',mar=c(4,4,4,4),cex.main=1.3,cex.axis=1.1,cex.lab=1.2)
 
-simsubset.dir &lt;- c(
-        &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_1/Simulated_Genotypes/20pop_subsets/neutral+selected/&quot;,
-        &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_5/Simulated_Genotypes/20pop_subsets/neutral+selected/&quot;
-        )
+geninds &lt;- list(m0.1_lclp_n.s, 
+         m0.1_lchp_n.s, 
+         m0.1_hclp_n.s, 
+         m0.1_hchp_n.s, 
+         m0.5_lclp_n.s, 
+         m0.5_lchp_n.s, 
+         m0.5_hclp_n.s, 
+         m0.5_hchp_n.s)
 
-sims &lt;- c(&quot;lclp&quot;, &quot;lchp&quot;, &quot;hclp&quot;, &quot;hchp&quot;)
+ls_names &lt;- c(&quot;LCLP landscape (m = 0.1)&quot;, 
+          &quot;LCHP landscape (m = 0.1)&quot;, 
+          &quot;HCLP landscape (m = 0.1)&quot;, 
+          &quot;HCHP landscape (m = 0.1)&quot;, 
+          &quot;LCLP landscape (m = 0.5)&quot;, 
+          &quot;LCHP landscape (m = 0.5)&quot;, 
+          &quot;HCLP landscape (m = 0.5)&quot;, 
+          &quot;HCHP landscape (m = 0.5)&quot;)
 
-ls_names &lt;- c(&quot;LCLP landscape&quot;, &quot;LCHP landscape&quot;, &quot;HCLP landscape&quot;, &quot;HCHP landscape&quot;)
 
-lea.dir &lt;- c(
-       &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_1/Simulated_Landscapes/500neutral+50selectedSNPs/Low_Complexity_Landscapes/landscapeR/Low_Permeability/&quot;,
-       &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_1/Simulated_Landscapes/500neutral+50selectedSNPs/Low_Complexity_Landscapes/landscapeR/High_Permeability/&quot;,
-       &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_1/Simulated_Landscapes/500neutral+50selectedSNPs/High_Complexity_Landscapes/virtualspecies/Low_Permeability/&quot;,
-           &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_1/Simulated_Landscapes/500neutral+50selectedSNPs/High_Complexity_Landscapes/virtualspecies/High_Permeability/&quot;,
-       &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_5/Simulated_Landscapes/500neutral+50selectedSNPs/Low_Complexity_Landscapes/landscapeR/Low_Permeability/&quot;,
-       &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_5/Simulated_Landscapes/500neutral+50selectedSNPs/Low_Complexity_Landscapes/landscapeR/High_Permeability/&quot;,
-       &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_5/Simulated_Landscapes/500neutral+50selectedSNPs/High_Complexity_Landscapes/virtualspecies/Low_Permeability/&quot;,
-       &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_5/Simulated_Landscapes/500neutral+50selectedSNPs/High_Complexity_Landscapes/virtualspecies/High_Permeability/&quot;
-           )
-           
-for (j in 1:2){
-   for (i in 1:4){
-      genind.obj &lt;- read.genepop(paste0(simsubset.dir[j], sims[i], &quot;_20pops.gen&quot;))
-      genind.obj$other &lt;- read.table(paste0(simsubset.dir[j], sims[i], &quot;_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
-      colnames(genind.obj$other)=c(&quot;x&quot;,&quot;y&quot;)
-      genind.obj$other &lt;- xyFromRC(genind.obj, fa_stk)
-      genotypes &lt;- genind.obj@tab
-      coords &lt;- genind.obj$other
+for (i in 1:8){
+     genind.obj &lt;- geninds[[i]]
+     genotypes &lt;- genind.obj$tab
+     coords &lt;- as.matrix(genind.obj$other)
       
-      ji &lt;- (j - 1) * 4 + i           
-      setwd(lea.dir[ji])
-      write.table(t(as.matrix(genotypes)), sep=&quot;&quot;, row.names=F, col.names=F, paste0(sims[i], &quot;.geno&quot;))
-      geno &lt;- read.geno(paste0(sims[i],&quot;.geno&quot;))
-      setwd(paste0(lea.dir[ji],&quot;LEA&quot;))
-      source(&quot;POPSutilities.r&quot;)
-      setwd(lea.dir[ji])
+     reps &lt;- 5
+     maxK &lt;- 15
 
-      reps &lt;- 5
-      maxK &lt;- 10
-
-      #running pop structure inference
-      tess3.obj &lt;- tess3(X=genotypes, coord=coordinates, K=1:maxK,
-                         method=&quot;projected.ls&quot;, rep=reps, 
-                         max.iteration=1000, tolerance=1e-06, 
-                         #max.iteration = 10000, tolerance = 1e-07, 
-                         mask=0.25,
-                         ploidy=2)
+     #running pop structure inference
+     tess3.obj &lt;- tess3(X=genotypes, coord=coords, K=1:maxK,
+                        method=&quot;projected.ls&quot;, rep=reps, 
+                        max.iteration=1000, tolerance=1e-06, 
+                        #max.iteration = 10000, tolerance = 1e-07, 
+                        mask=0.25,
+                        ploidy=2)
 
       #determining best K and picking best replicate for best K
       ce &lt;- list()
-      for(i in 1:maxK) ce[[i]] &lt;- tess3.obj[[i]]$crossvalid.crossentropy
+      for(k in 1:maxK) ce[[k]] &lt;- tess3.obj[[k]]$crossvalid.crossentropy
       best &lt;- which.min(unlist(ce))
       best.K &lt;- ceiling(best/reps)
       best.run &lt;- which.min(ce[[best.K]])
 
       q.matrix &lt;- qmatrix(tess3.obj, K=best.K)
 
-      futr.pal &lt;- CreatePalette(futr(best.K),10)
+      shades &lt;- 10
+      
+      futrschwift.pal &lt;- CreatePalette(futrschwift.cols(best.K), shades)
 
       barplot(q.matrix, border = NA, space = 0,
-          col.palette = futr.pal,
-          xlab = &quot;Individuals&quot;, ylab = &quot;Ancestry proportions&quot;,
-          main = paste(&quot;Ancestry bar chart for&quot;, ls_names[i]))
+                col.palette = futrschwift.pal,
+                xlab = &quot;Individuals&quot;, ylab = &quot;Ancestry proportions&quot;,
+                main = paste(&quot;Ancestry bar chart for&quot;, ls_names[i]))
   
-      plot(q.matrix, coordinates, method = &quot;map.max&quot;, interpol = FieldsKrigModel(10),
-       main = paste(&quot;Mapped ancestry coefficients for&quot;, ls_names[i]),
-       xlab = &quot;Longitude&quot;, ylab = &quot;Latitude&quot;,
-       resolution = c(500,500), cex = .8,
-       col.palette = futr.pal)
-   }
+      plot(q.matrix, coords, method = &quot;map.max&quot;, interpol = FieldsKrigModel(10),
+             main = paste(&quot;Mapped ancestry coefficients for&quot;, ls_names[i]),
+             xlab = &quot;Longitude&quot;, ylab = &quot;Latitude&quot;,
+             resolution = c(260,340), cex = .9,
+             col.palette = futrschwift.pal)
 }
 </code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-30-1.png" alt="" /><!-- -->
+<img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-30-2.png" alt="" /><!-- -->
+<img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-30-3.png" alt="" /><!-- -->
+<img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-30-4.png" alt="" /><!-- -->
+<img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-30-5.png" alt="" /><!-- -->
+<img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-30-6.png" alt="" /><!-- -->
+<img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-30-7.png" alt="" /><!-- -->
+<img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-30-8.png" alt="" /><!-- -->
+<img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-30-9.png" alt="" /><!-- -->
+<img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-30-10.png" alt="" /><!-- -->
+<img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-30-11.png" alt="" /><!-- -->
+<img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-30-12.png" alt="" /><!-- -->
+<img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-30-13.png" alt="" /><!-- -->
+<img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-30-14.png" alt="" /><!-- -->
+<img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-30-15.png" alt="" /><!-- -->
+<img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-30-16.png" alt="" /><!-- --></p>
 		</div>
 		
 <div class="post__tags tags clearfix">
