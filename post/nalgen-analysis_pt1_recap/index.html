@@ -126,7 +126,7 @@ cols &lt;- futrschwift.cols(12)
 #show_col(futrschwift.cols(20))
 </code></pre>
 
-<h1 id="multivariate-analyses-using-machine-learning-alogorithms-to-infer-population-structure">Multivariate analyses: Using machine learning alogorithms to infer population structure</h1>
+<h1 id="multivariate-analyses-using-machine-learning-algorithms-to-infer-population-structure">Multivariate analyses: Using machine learning algorithms to infer population structure</h1>
 
 <h2 id="loading-the-environmental-data">Loading the environmental data</h2>
 
@@ -199,66 +199,17 @@ colnames(m0.5_hclp_n.s$other)=c(&quot;x&quot;,&quot;y&quot;)
 m0.5_hclp_n.s$other &lt;- xyFromRC(m0.5_hclp_n.s, fa_stk.agg)
 </code></pre>
 
-<h2 id="inferring-population-structure-with-dapc">Inferring population structure with DAPC</h2>
+<h1 id="co-inertia-analysis-genetic-environmental-covariance">Co-Inertia Analysis: Genetic-environmental covariance</h1>
 
-<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.5_hclp_n.s, center=T, scale=F, n.pca=100, n.da=2)
-temp &lt;- optim.a.score(temp.dapc.obj, n=15, n.sim=30)
-</code></pre>
+<p>Co-Inertia Analysis is used to determine the maximum covariance between genetic and environmental data at the spatial scale at which populations differentiate (population structuring). To do so, population structure is first inferred (classification into genetic clusters) using unsupervised (and unsupervised-supervised) machine learning methods.</p>
 
-<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-21-1.png" alt="" /><!-- --></p>
+<h2 id="unsupervised-classification-inferring-genetic-clusters-using-non-negative-matrix-factorization-lea-package">Unsupervised classification: Inferring genetic clusters using non-negative matrix factorization (<em>LEA</em> package)</h2>
 
-<pre><code class="language-r">best.n.pca &lt;- temp$best
-dapc.obj &lt;- dapc(m0.5_hclp_n.s, center=T, scale=F, n.pca=best.n.pca, n.da=2)
-
-#plot parameters
-par(mfrow=c(1,1), fg=&quot;gray50&quot;, pty='m', bty='o', mar=c(4,4,4,4), cex.main=1.3, cex.axis=1.1, cex.lab=1.2)
-scatter(dapc.obj, col=futrschwift.cols(20), ratio.pca=0.3, bg=&quot;white&quot;, main=&quot;m = 0.5, high complexity, low permeability, neutral and selected loci&quot;,
-    pch=c(16,15,18,17), cell=0, cstar=0, solid=0.9, cex=1.8, clab=0,
-    mstree=TRUE, lwd=3, scree.da=FALSE, leg=TRUE, txt.leg=popNames(m0.5_hclp_n.s))
-par(xpd=TRUE)
-points(dapc.obj$grp.coord[,1], dapc.obj$grp.coord[,2], pch=21:24, cex=2, lwd=3, col=&quot;black&quot;, bg=futrschwift.cols(20))
-</code></pre>
-
-<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-21-2.png" alt="" /><!-- --></p>
-
-<pre><code class="language-r">compoplot(dapc.obj, lab=&quot;&quot;, col=futrschwift.cols(20))
-</code></pre>
-
-<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-21-3.png" alt="" /><!-- --></p>
-
-<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.5_hchp_n.s, center=T, scale=F, n.pca=100, n.da=2)
-temp &lt;- optim.a.score(temp.dapc.obj, n=15, n.sim=30)
-</code></pre>
-
-<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-27-1.png" alt="" /><!-- --></p>
-
-<pre><code class="language-r">best.n.pca &lt;- temp$best
-dapc.obj &lt;- dapc(m0.5_hchp_n.s, center=T, scale=F, n.pca=best.n.pca, n.da=2)
-
-#plot parameters
-par(mfrow=c(1,1), fg=&quot;gray50&quot;, pty='m', bty='o', mar=c(4,4,4,4), cex.main=1.3, cex.axis=1.1, cex.lab=1.2)
-scatter(dapc.obj, col=futrschwift.cols(20), ratio.pca=0.3, bg=&quot;white&quot;, main=&quot;m = 0.5, high complexity, high permeability, neutral and selected loci&quot;,
-    pch=c(16,15,18,17), cell=0, cstar=0, solid=0.9, cex=1.8, clab=0,
-    mstree=TRUE, lwd=3, scree.da=FALSE, leg=TRUE, txt.leg=popNames(m0.5_hchp_n.s))
-par(xpd=TRUE)
-points(dapc.obj$grp.coord[,1], dapc.obj$grp.coord[,2], pch=21:24, cex=2, lwd=3, col=&quot;black&quot;, bg=futrschwift.cols(20))
-</code></pre>
-
-<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-27-2.png" alt="" /><!-- --></p>
-
-<pre><code class="language-r">compoplot(dapc.obj, lab=&quot;&quot;, col=futrschwift.cols(20))
-</code></pre>
-
-<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-27-3.png" alt="" /><!-- --></p>
-
-<h2 id="inferring-population-structure-with-lea-package">Inferring population structure with <em>LEA</em> package</h2>
+<p>High-complexity landscapes (m = 0.5)</p>
 
 <pre><code class="language-r">library(LEA)
 library(mapplots)
 library(maps)
-library(raster)
-library(adegenet)
-library(ggsci)
 
 futr &lt;- pal_futurama()
 schwifty &lt;- pal_rickandmorty()
@@ -345,96 +296,17 @@ for (i in 1:2){
 <img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-29-23.png" alt="" /><!-- -->
 <img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-29-24.png" alt="" /><!-- --></p>
 
-<h2 id="inferring-population-structure-with-tess3r-package">Inferring population structure with <em>tess3r</em> package</h2>
+<h2 id="unsupervised-supervised-classification-inferring-genetic-clusters-using-dapc">Unsupervised-supervised classification: Inferring genetic clusters using DAPC</h2>
 
-<pre><code class="language-r">library(tess3r)
-library(adegenet)
-library(raster)
-library(ggsci)
+<p>High-complexity landscapes (m = 0.5): low permeability</p>
 
-futr &lt;- pal_futurama()
-schwifty &lt;- pal_rickandmorty()
-futrschwift.cols &lt;- colorRampPalette(c(&quot;gray15&quot;, schwifty(12)[3], futr(12)[11], schwifty(12)[c(1,9)], futr(12)[c(8,6,2)]))
-
-
-#plot parameters
-par(mfrow=c(1,1),fg=&quot;gray50&quot;,pty='m',bty='o',mar=c(4,4,4,4),cex.main=1.3,cex.axis=1.1,cex.lab=1.2)
-
-geninds &lt;- list(m0.5_hclp_n.s, 
-         m0.5_hchp_n.s)
-
-genind_names &lt;- c(&quot;m0.5_hclp_n.s&quot;, 
-         &quot;m0.5_hchp_n.s&quot;)
-
-ls_names &lt;- c(&quot;HCLP landscape (m = 0.5)&quot;, 
-          &quot;HCHP landscape (m = 0.5)&quot;)
-
-
-for (i in 1:2){
-     genind.obj &lt;- geninds[[i]]
-     genotypes &lt;- genind.obj$tab
-     coords &lt;- as.matrix(genind.obj$other)
-      
-     reps &lt;- 5
-     maxK &lt;- 15
-
-     #running pop structure inference
-     tess3.obj &lt;- tess3(X=genotypes, coord=coords, K=1:maxK,
-                        method=&quot;projected.ls&quot;, rep=reps, 
-                        max.iteration=1000, tolerance=1e-06, 
-                        #max.iteration = 10000, tolerance = 1e-07, 
-                        mask=0.25,
-                        ploidy=2)
-
-      #determining best K and picking best replicate for best K
-      ce &lt;- list()
-      for(k in 1:maxK) ce[[k]] &lt;- tess3.obj[[k]]$crossvalid.crossentropy
-      best &lt;- which.min(unlist(ce))
-      best.K &lt;- ceiling(best/reps)
-      best.run &lt;- which.min(ce[[best.K]])
-
-      q.matrix &lt;- qmatrix(tess3.obj, K=best.K)
-
-      shades &lt;- 10
-      
-      futrschwift.pal &lt;- CreatePalette(futrschwift.cols(best.K), shades)
-
-      barplot(q.matrix, border = NA, space = 0,
-                col.palette = futrschwift.pal,
-                xlab = &quot;Individuals&quot;, ylab = &quot;Ancestry proportions&quot;,
-                main = paste(&quot;Ancestry bar chart for&quot;, ls_names[i]))
-  
-      plot(q.matrix, coords, method = &quot;map.max&quot;, interpol = FieldsKrigModel(10),
-             main = paste(&quot;Mapped ancestry coefficients for&quot;, ls_names[i]),
-             xlab = &quot;Longitude&quot;, ylab = &quot;Latitude&quot;,
-             resolution = c(260,340), cex = .9,
-             col.palette = futrschwift.pal)
-}
-</code></pre>
-
-<h1 id="maximizing-genetic-environmental-covariance-with-population-structure-constraint-with-co-inertia-analysis">Maximizing genetic-environmental covariance (with population-structure constraint) with Co-inertia Analysis</h1>
-
-<h2 id="high-complexity-low-permeability-landscape">High-complexity low-permeability landscape</h2>
-
-<pre><code class="language-r">library(adegenet)
-
-#plot parameters
-par(mfrow=c(1,1), fg=&quot;gray50&quot;, pty='m', bty='o', mar=c(4,4,4,4), cex.main=1.3, cex.axis=1.1, cex.lab=1.2)
-futr3 &lt;- c(futr(12)[c(12,7,2)])
-
-#genetic data
+<pre><code class="language-r">#genetic data
 gen &lt;- m0.5_hclp_n.s
-
-temp.dapc.obj &lt;- dapc(gen, center=T, scale=F, n.pca=100, n.da=2)
-temp &lt;- optim.a.score(temp.dapc.obj, n=15, n.sim=30)
 </code></pre>
 
-<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-7-1.png" alt="" /><!-- --></p>
+<p>Setting up the data (genetic and environmental)</p>
 
-<pre><code class="language-r">best.n.pca &lt;- temp$best
-dapc.obj &lt;- dapc(gen, center=T, scale=F, n.pca=best.n.pca, n.da=2)
-
-dfenv &lt;- extract(fa_stk, gen$other)
+<pre><code class="language-r">dfenv &lt;- extract(fa_stk, gen$other)
 dfenv.obj &lt;- dfenv
 dfgen.obj &lt;- gen$tab
 dfgenenv &lt;- cbind(dfgen.obj, dfenv.obj)
@@ -444,8 +316,22 @@ n.env &lt;- length(dfenv.obj[1,])
 env.var &lt;- seq(n.alleles + 1, n.alleles + n.env)
 dfgen &lt;- dfgenenv[,1:n.alleles]
 dfenv &lt;- dfgenenv[,env.var]
+</code></pre>
 
-##Clusters##
+<p>Running DAPC</p>
+
+<pre><code class="language-r">#plot parameters
+par(mfrow=c(1,1), fg=&quot;gray50&quot;, pty='m', bty='o', mar=c(4,4,4,4), cex.main=1.3, cex.axis=1.1, cex.lab=1.2)
+cols3 &lt;- futrschwift.cols(12)[c(2,6,11)]
+
+temp.dapc.obj &lt;- dapc(gen, center=T, scale=F, n.pca=100, n.da=2)
+temp &lt;- optim.a.score(temp.dapc.obj, n=15, n.sim=30)
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-7-1.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">best.n.pca &lt;- temp$best
+dapc.obj &lt;- dapc(gen, center=T, scale=F, n.pca=best.n.pca, n.da=2)
 clust &lt;- find.clusters(gen, cent=T, scale=F, n.pca=best.n.pca, method=&quot;kmeans&quot;, n.iter=1e7, n.clust=3, stat=&quot;BIC&quot;)
 cl &lt;- as.factor(as.vector(clust$grp))
 gen$pop &lt;- cl
@@ -453,14 +339,19 @@ sq &lt;- as.character(seq(1,3))
 popNames(gen) &lt;- sq
 
 dapc3 &lt;- dapc(gen, center=T, scale=F, n.pca=best.n.pca, n.da=2)
-scatter(dapc3, col=futr3, ratio.pca=0.3, bg=&quot;white&quot;, 
+scatter(dapc3, col=cols3, ratio.pca=0.3, bg=&quot;white&quot;, 
     pch=c(16,15,18,17), cell=0, cstar=0, solid=0.9, cex=1.8, clab=0, 
     mstree=TRUE, lwd=3, scree.da=FALSE, leg=TRUE, txt.leg=popNames(gen))
 par(xpd=TRUE)
-points(dapc3$grp.coord[,1], dapc3$grp.coord[,2], pch=21:24, cex=2, lwd=3, col=&quot;black&quot;, bg=futr3)
+points(dapc3$grp.coord[,1], dapc3$grp.coord[,2], pch=21:24, cex=2, lwd=3, col=&quot;black&quot;, bg=cols3)
 </code></pre>
 
 <p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-7-2.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">compoplot(dapc3, lab=&quot;&quot;, col=cols3)
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-7-3.png" alt="" /><!-- --></p>
 
 <pre><code class="language-r">dap3 &lt;- as.data.frame(dapc3$assign)
 dfdap3 &lt;- cbind(dap3, dfenv.obj)
@@ -475,13 +366,27 @@ dfgenenv3.gen &lt;- dfgenenv3[,2:n.alleles+1]
 dfgenenv3.env &lt;- dfgenenv3[,env.var+1]
 </code></pre>
 
-<p>Accounting for population structure</p>
+<h2 id="co-inertia-analysis-maximizing-genetic-environmental-covariance-using-inferred-genetic-clusters-as-constraint">Co-Inertia Analysis: Maximizing genetic-environmental covariance (using inferred genetic clusters as constraint)</h2>
+
+<p>The DAPC classification (of locations/individuals into one of three inferred genetic clusters) is used as a constraint (constrained correspondence analysis) to determine the variance in genetic data explained by processes that have led to the inferred population structure, and Co-Inertia Analysis is then used to look at covariance with environmental data.</p>
 
 <pre><code class="language-r">pcenv3 &lt;- dudi.pca(dfenv3, cent=T, scale=T, scannf=F, nf=2)
+
+#dfdap3 = DAPC classification
+
+#constrained correspondence analysis of environmental data
 bet1 &lt;- bca(pcenv3, dfdap3, scannf=F, nf=2)
+
 pcgen3 &lt;- dudi.pca(dfgen, cent=T, scale=F, scannf=F, nf=2)
+
+#constrained correspondence analysis of genetic data
 bet2 &lt;- bca(pcgen3, dfdap3, scannf=F, nf=2)
+
+#maximizing genetic-environmental covariance (at the scale of three populations)
 coi3 &lt;- coinertia(bet1, bet2, scan=F, nf=2)
+
+par(mfrow=c(1,1), fg=&quot;gray50&quot;, pty='m', bty='o', mar=c(4,4,4,4), cex.main=1.3, cex.axis=1.1, cex.lab=1.2)
+
 plot(coi3, col=&quot;gray30&quot;)
 </code></pre>
 
@@ -528,27 +433,17 @@ plot(coi3, col=&quot;gray30&quot;)
 ##  0.8537908
 </code></pre>
 
-<h2 id="high-complexity-high-permeability-landscape">High-complexity high-permeability landscape</h2>
+<h2 id="another-iteration-with-a-different-landscape">Another iteration (with a different landscape)</h2>
 
-<pre><code class="language-r">library(adegenet)
+<p>High-complexity landscapes (m = 0.5): high permeability</p>
 
-#plot parameters
-par(mfrow=c(1,1), fg=&quot;gray50&quot;, pty='m', bty='o', mar=c(4,4,4,4), cex.main=1.3, cex.axis=1.1, cex.lab=1.2)
-futr3 &lt;- c(futr(12)[c(12,7,2)])
-
-#genetic data
+<pre><code class="language-r">#genetic data
 gen &lt;- m0.5_hchp_n.s
-
-temp.dapc.obj &lt;- dapc(gen, center=T, scale=F, n.pca=100, n.da=2)
-temp &lt;- optim.a.score(temp.dapc.obj, n=15, n.sim=30)
 </code></pre>
 
-<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-9-1.png" alt="" /><!-- --></p>
+<p>Setting up the data (genetic and environmental)</p>
 
-<pre><code class="language-r">best.n.pca &lt;- temp$best
-dapc.obj &lt;- dapc(gen, center=T, scale=F, n.pca=best.n.pca, n.da=2)
-
-dfenv &lt;- extract(fa_stk, gen$other)
+<pre><code class="language-r">dfenv &lt;- extract(fa_stk, gen$other)
 dfenv.obj &lt;- dfenv
 dfgen.obj &lt;- gen$tab
 dfgenenv &lt;- cbind(dfgen.obj, dfenv.obj)
@@ -558,8 +453,21 @@ n.env &lt;- length(dfenv.obj[1,])
 env.var &lt;- seq(n.alleles + 1, n.alleles + n.env)
 dfgen &lt;- dfgenenv[,1:n.alleles]
 dfenv &lt;- dfgenenv[,env.var]
+</code></pre>
 
-##Clusters##
+<p>Running DAPC</p>
+
+<pre><code class="language-r">#plot parameters
+par(mfrow=c(1,1), fg=&quot;gray50&quot;, pty='m', bty='o', mar=c(4,4,4,4), cex.main=1.3, cex.axis=1.1, cex.lab=1.2)
+
+temp.dapc.obj &lt;- dapc(gen, center=T, scale=F, n.pca=100, n.da=2)
+temp &lt;- optim.a.score(temp.dapc.obj, n=15, n.sim=30)
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-11-1.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">best.n.pca &lt;- temp$best
+dapc.obj &lt;- dapc(gen, center=T, scale=F, n.pca=best.n.pca, n.da=2)
 clust &lt;- find.clusters(gen, cent=T, scale=F, n.pca=best.n.pca, method=&quot;kmeans&quot;, n.iter=1e7, n.clust=3, stat=&quot;BIC&quot;)
 cl &lt;- as.factor(as.vector(clust$grp))
 gen$pop &lt;- cl
@@ -567,14 +475,19 @@ sq &lt;- as.character(seq(1,3))
 popNames(gen) &lt;- sq
 
 dapc3 &lt;- dapc(gen, center=T, scale=F, n.pca=best.n.pca, n.da=2)
-scatter(dapc3, col=futr3, ratio.pca=0.3, bg=&quot;white&quot;, 
+scatter(dapc3, col=cols3, ratio.pca=0.3, bg=&quot;white&quot;, 
     pch=c(16,15,18,17), cell=0, cstar=0, solid=0.9, cex=1.8, clab=0, 
     mstree=TRUE, lwd=3, scree.da=FALSE, leg=TRUE, txt.leg=popNames(gen))
 par(xpd=TRUE)
-points(dapc3$grp.coord[,1], dapc3$grp.coord[,2], pch=21:24, cex=2, lwd=3, col=&quot;black&quot;, bg=futr3)
+points(dapc3$grp.coord[,1], dapc3$grp.coord[,2], pch=21:24, cex=2, lwd=3, col=&quot;black&quot;, bg=cols3)
 </code></pre>
 
-<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-9-2.png" alt="" /><!-- --></p>
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-11-2.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">compoplot(dapc3, lab=&quot;&quot;, col=cols3)
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-11-3.png" alt="" /><!-- --></p>
 
 <pre><code class="language-r">dap3 &lt;- as.data.frame(dapc3$assign)
 dfdap3 &lt;- cbind(dap3, dfenv.obj)
@@ -589,17 +502,29 @@ dfgenenv3.gen &lt;- dfgenenv3[,2:n.alleles+1]
 dfgenenv3.env &lt;- dfgenenv3[,env.var+1]
 </code></pre>
 
-<p>Accounting for population structure</p>
+<p>Co-Inertia Analysis</p>
 
 <pre><code class="language-r">pcenv3 &lt;- dudi.pca(dfenv3, cent=T, scale=T, scannf=F, nf=2)
+
+#dfdap3 = DAPC classification
+
+#constrained correspondence analysis of environmental data
 bet1 &lt;- bca(pcenv3, dfdap3, scannf=F, nf=2)
+
 pcgen3 &lt;- dudi.pca(dfgen, cent=T, scale=F, scannf=F, nf=2)
+
+#constrained correspondence analysis of genetic data
 bet2 &lt;- bca(pcgen3, dfdap3, scannf=F, nf=2)
+
+#maximizing genetic-environmental covariance (at the scale of three populations)
 coi3 &lt;- coinertia(bet1, bet2, scan=F, nf=2)
+
+par(mfrow=c(1,1), fg=&quot;gray50&quot;, pty='m', bty='o', mar=c(4,4,4,4), cex.main=1.3, cex.axis=1.1, cex.lab=1.2)
+
 plot(coi3, col=&quot;gray30&quot;)
 </code></pre>
 
-<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-10-1.png" alt="" /><!-- --></p>
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-12-1.png" alt="" /><!-- --></p>
 
 <pre><code class="language-r">summary(coi3)
 </code></pre>
@@ -609,38 +534,42 @@ plot(coi3, col=&quot;gray30&quot;)
 ## Class: coinertia dudi
 ## Call: coinertia(dudiX = bet1, dudiY = bet2, scannf = F, nf = 2)
 ## 
-## Total inertia: 4.337
+## Total inertia: 5.563
 ## 
 ## Eigenvalues:
 ##     Ax1     Ax2 
-##   2.490   1.847 
+##   3.481   2.082 
 ## 
 ## Projected inertia (%):
 ##     Ax1     Ax2 
-##    57.4    42.6 
+##   62.57   37.43 
 ## 
 ## Cumulative projected inertia (%):
 ##     Ax1   Ax1:2 
-##    57.4   100.0 
+##   62.57  100.00 
 ## 
 ## Eigenvalues decomposition:
 ##        eig    covar       sdX      sdY      corr
-## 1 2.489521 1.577822 0.5476020 2.926720 0.9844908
-## 2 1.847450 1.359209 0.4952117 2.787942 0.9844908
+## 1 3.480530 1.865618 0.6102563 3.059683 0.9991576
+## 2 2.082317 1.443024 0.5640759 2.560365 0.9991576
 ## 
 ## Inertia &amp; coinertia X (bet1):
 ##      inertia       max     ratio
-## 1  0.2998679 0.3274106 0.9158774
-## 12 0.5451026 0.5451026 1.0000000
+## 1  0.3724128 0.3758718 0.9907973
+## 12 0.6905944 0.6905944 1.0000000
 ## 
 ## Inertia &amp; coinertia Y (bet2):
-##      inertia       max    ratio
-## 1   8.565692  9.654541 0.887219
-## 12 16.338314 16.338314 1.000000
+##      inertia       max     ratio
+## 1   9.361659  9.398018 0.9961313
+## 12 15.917129 15.917129 1.0000000
 ## 
 ## RV:
-##  0.9393858
+##  0.9920957
 </code></pre>
+
+<h2 id="final-note">Final note</h2>
+
+<p>To determine the maximum genetic-environmental covariance, the raw data is first transformed. It is these transformed environmental scores that form the predictors in NALgen modeling: the idea here is that these transformed environmental scores are more informative for modeling a genetic response than the raw environmental data. The response variables are measures of genetic variation (neutral and adaptive): these are newly-developed metrics that I will be introducing in upcoming posts.</p>
 		</div>
 		
 <div class="post__tags tags clearfix">
