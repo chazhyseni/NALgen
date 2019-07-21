@@ -17,7 +17,7 @@
       <pubDate>Sun, 21 Jul 2019 00:00:00 +0000</pubDate>
       
       <guid>/NALgen/post/nalgen-analysis_pt1_recap/</guid>
-      <description>&lt;p&gt;The output of multivariate analyses in the &lt;a href=&#34;https://github.com/chazhyseni/NALgen/tree/master/data&#34;&gt;NALgen Analysis Pt.1&lt;/a&gt; post was dense (935 lines of code, 121 figures). In this recap, I wanted to highlight some of the results. Furthermore, I wanted to mention that the population structure inference (i.e., classification) methods I compared were all &amp;ldquo;simple&amp;rdquo; machine learning algorithms.&lt;/p&gt;</description>
+      <description>&lt;p&gt;The output of multivariate analyses in the &lt;a href=&#34;https://github.com/chazhyseni/NALgen/tree/master/data&#34;&gt;NALgen Analysis Pt.1&lt;/a&gt; post was dense (935 lines of code, 121 figures). In this recap, I wanted to highlight some of the results. Furthermore, I wanted to mention that the population structure inference methods I compared were all machine learning (classification) algorithms.&lt;/p&gt;</description>
     </item>
     
     <item>
