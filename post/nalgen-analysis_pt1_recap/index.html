@@ -99,7 +99,7 @@ if (!doNotTrack) {
 <br /></li>
 </ul>
 
-<p>The NALgen method leverages the flexibility of the co-inertia method (N.B. other multivariated ordination techniques can be used) to incorporate genetic clustering information from any algorithm (see the co-inertia section below). The idea behind this is to account for population structure while maximizing covariance between genetic and environmental data.</p>
+<p>The NALgen method leverages the flexibility of the co-inertia method (N.B. other multivariate ordination techniques can be used) to incorporate genetic clustering (i.e., population structure) information from any algorithm (see the co-inertia section below). The idea behind this is to first determine the variance in genetic data explained by processes that have led to the inferred population structure, and then identifying covariance with environmental data. This information can then be used downstream in the NALgen method (modeling gene flow in continuous space).</p>
 
 <h2 id="color-palette">Color palette</h2>
 
@@ -193,7 +193,7 @@ m0.5_hclp_n.s$other &lt;- xyFromRC(m0.5_hclp_n.s, fa_stk.agg)
 
 <h1 id="co-inertia-analysis-genetic-environmental-covariance">Co-Inertia Analysis: Genetic-environmental covariance</h1>
 
-<p>Co-Inertia Analysis is used to determine the maximum covariance between genetic and environmental data at the spatial scale at which populations differentiate (population structuring). To do so, population structure is first inferred (classification into genetic clusters) using unsupervised (and unsupervised-supervised) machine learning methods.</p>
+<p>Co-Inertia Analysis is used to determine the maximum covariance between genetic and environmental data at the spatial scale at which populations become differentiated (population structuring). To do so, population structure is first inferred (classification into genetic clusters) using unsupervised (and unsupervised-supervised) machine learning methods.</p>
 
 <h2 id="unsupervised-classification-inferring-genetic-clusters-using-non-negative-matrix-factorization-lea-package">Unsupervised classification: Inferring genetic clusters using non-negative matrix factorization (<em>LEA</em> package)</h2>
 
