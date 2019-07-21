@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en-us">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>NALgen Analysis Pt.1 - Recap - NALgen</title>
+	<script>(function(d,e){d[e]=d[e].replace("no-js","js");})(document.documentElement,"className");</script>
+	<meta name="description" content="Multivariate analyses: Inferring population structure in simulated data">
+	<meta property="og:title" content="NALgen Analysis Pt.1 - Recap" />
+<meta property="og:description" content="Multivariate analyses: Inferring population structure in simulated data" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="/NALgen/post/nalgen-analysis_pt1_recap/" />
+<meta property="article:published_time" content="2019-07-21T00:00:00&#43;00:00"/>
+<meta property="article:modified_time" content="2019-07-21T00:00:00&#43;00:00"/>
+
+	
+	<link rel="dns-prefetch" href="//fonts.googleapis.com">
+	<link rel="dns-prefetch" href="//fonts.gstatic.com">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700">
+	<link rel="stylesheet" href="/NALgen/css/style.css">
+	
+	<link rel="shortcut icon" href="/NALgen/favicon.ico">
+		
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-139514839-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+</head>
+<body class="body">
+	<div class="container container--outer">
+		<header class="header">
+	<div class="container">
+		<div class="logo">
+			<a class="logo__link" href="/NALgen" title="NALgen" rel="home">
+				<div class="logo__title">NALgen</div>
+				<div class="logo__tagline">Neutral and Adaptive Landscape Genetics</div>
+			</a>
+		</div>
+		
+<nav class="menu">
+	<button class="menu__btn" aria-haspopup="true" aria-expanded="false" tabindex="0">
+		<span class="menu__btn-title" tabindex="-1">Menu</span>
+	</button>
+	<ul class="menu__list">
+		<li class="menu__item">
+			<a class="menu__link" href="/NALgen/about/">About</a>
+		</li>
+		<li class="menu__item">
+			<a class="menu__link" href="/NALgen/vignettes/">Vignettes</a>
+		</li>
+		<li class="menu__item">
+			<a class="menu__link" href="/NALgen/tutorials/">Tutorials</a>
+		</li>
+	</ul>
+</nav>
+
+	</div>
+</header>
+		<div class="wrapper flex">
+			<div class="primary">
+			
+<main class="main" role="main">
+	<article class="post">
+		<header class="post__header">
+			<h1 class="post__title">NALgen Analysis Pt.1 - Recap</h1>
+			<div class="post__meta meta">
+<div class="meta__item-datetime meta__item">
+	<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg>
+	<time class="meta__text" datetime="2019-07-21T00:00:00">July 21, 2019</time>
+</div>
+
+<div class="meta__item-categories meta__item">
+	<svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2l1 2h8v11h-16v-13z"/></svg>
+	<span class="meta__text"><a class="meta__link" href="/NALgen/categories/recap" rel="category">Recap</a></span>
+</div>
+</div>
+		</header>
+		<figure class="post__thumbnail">
+			<img src="/NALgen/img/logo.png" alt="NALgen Analysis Pt.1 - Recap">
+		</figure><div class="content post__content clearfix">
+			<p>The output of multivariate analyses in the <a href="https://github.com/chazhyseni/NALgen/tree/master/data">NALgen Analysis Pt.1</a> post was dense (935 lines of code, 121 figures). In this recap, I wanted to highlight some of the results. Furthermore, I wanted to mention that the population structure inference (i.e., classification) methods I compared were all &ldquo;simple&rdquo; machine learning algorithms.</p>
+
+<ol>
+<li><p>DAPC, an unsupervised-supervised learning algorithm (principal components analysis being unsupervised, and the supervised discriminant analysis step),</p>
+
+<ol>
+<li>Non-negative matrix factorization algorithms implemented in the <em>LEA</em> and <em>tess3r</em> packages (both cases of unsupervised machine learning), which use least-squares estimates of ancestry coefficients, which are geographically constrained in <em>tess3r</em> (i.e., spatial/geographic weights are used).<br />
+<br /></li>
+</ol></li>
+</ol>
+
+<p>All three methods are rather fast and produced similar results.</p>
+
+<ol>
+<li><p>DAPC went through 24 data sets in 17 mins,</p></li>
+
+<li><p><em>LEA</em> processed 8 in 38 mins (however, it should be noted that this included 5 replicates x 15 values of K = 75),</p></li>
+
+<li><p><em>tess3r</em> processed 8 in 122 mins (also 5 replicates x 15 values of K).</p></li>
+</ol>
+
+<p>The NALgen method leverages the flexibility of the co-inertia method (N.B. other multivariated ordination techniques can be used) to incorporate genetic clustering information from any algorithm (see the co-inertia section below). The idea behind this is to account for population structure while maximizing covariance between genetic and environmental data.</p>
+
+<h2 id="color-palette">Color palette</h2>
+
+<pre><code class="language-r">library(ggsci)
+library(scales)
+
+futr &lt;- pal_futurama()
+schwifty &lt;- pal_rickandmorty()
+futr.cols &lt;- colorRampPalette(futr(12)[c(12,11,3,7,8,6,1,2)])
+schwifty.cols &lt;- colorRampPalette(schwifty(12)[c(3,12,4,6,1,9,8,2)])
+futrschwift.cols &lt;- colorRampPalette(c(&quot;gray15&quot;, schwifty(12)[3], futr(12)[11], schwifty(12)[c(1,9)], futr(12)[c(8,6,2)]))
+cols &lt;- futrschwift.cols(12)
+
+#show_col(futr.cols(20))
+#show_col(schwifty.cols(20))
+#show_col(futrschwift.cols(20))
+</code></pre>
+
+<h1 id="multivariate-analyses-using-machine-learning-alogorithms-to-infer-population-structure">Multivariate analyses: Using machine learning alogorithms to infer population structure</h1>
+
+<h2 id="loading-the-environmental-data">Loading the environmental data</h2>
+
+<pre><code class="language-r">library(raster)
+library(virtualspecies)
+
+setwd(&quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Phylogeography/Geo_Analysis/Data/EnvData/bioclim_FA/east coast/Finalized/current&quot;)
+fn &lt;- list.files(pattern=&quot;.asc&quot;)
+fa_stk &lt;- stack()
+for(i in 1:length(fn)) fa_stk=addLayer(fa_stk,raster(fn[i]))
+
+#names for plot titles
+fa_stk_names &lt;- c(&quot;Annual Temperature Range&quot;, &quot;Dry-Season Precipitation&quot;, &quot;Summer Temperature&quot;, &quot;Wet-Season Precipitation&quot;)
+
+##plot Environmental Factors (https://datadryad.org/resource/doi:10.5061/dryad.5hr7f31)
+#for (i in 1:4){
+#   plot(fa_stk[[i]], main=fa_stk_names[i],
+#       breaks=seq(round(min(as.matrix(fa_stk[[i]]),na.rm=T),1),
+#                  round(max(as.matrix(fa_stk[[i]]),na.rm=T),1),length.out=11),
+#       col=cols)
+#}
+</code></pre>
+
+<h2 id="loading-the-genetic-data-only-2-vs-24-in-the-a-href-https-github-com-chazhyseni-nalgen-tree-master-data-nalgen-analysis-pt-1-a-post">Loading the genetic data (only 2, vs. 24 in the <a href="https://github.com/chazhyseni/NALgen/tree/master/data">NALgen Analysis Pt.1</a> post)</h2>
+
+<pre><code class="language-r">library(adegenet)
+
+
+m0.5_n.s &lt;- &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_5/Simulated_Genotypes/20pop_subsets/neutral+selected/&quot;
+
+
+setwd(&quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/NALgen_Analysis/Multivariate/&quot;)
+
+#below I define the xyFromRC function: includes a scenario when genind and rastr don't have the same dimensions
+#currently (for my purposes here it's fine) only spits out error when aspect ratio is not the same, but proceeds the same anyway
+#need to fix to apply to other situations
+
+xyFromRC &lt;- function(genind, rastr){
+             coord &lt;- genind$other
+             row.no &lt;- coord[,1]+1
+             col.no &lt;- coord[,2]+1
+             dim.genind.row &lt;- 26 #dim of simulated landscape
+             dim.genind.col &lt;- 34 #dim of simulated landscape
+             dim.rast.row &lt;- dim(rastr)[1]
+             dim.rast.col &lt;- dim(rastr)[2]
+             if(dim.rast.col/dim.genind.col == dim.rast.row/dim.genind.row){
+                print(&quot;raster and genind are the same aspect ratio. proceed.&quot;)
+             }
+             else{
+                print(&quot;error! raster and genind are NOT the same aspect ratio. proceed ANYWAY.&quot;)
+             }
+             rastr &lt;- aggregate(rastr, dim.rast.col/dim.genind.col)
+             cell.no &lt;- cellFromRowCol(rastr, row=row.no, col=col.no)
+             coord &lt;- xyFromCell(rastr, cell.no)
+             as.data.frame(coord)
+         }
+
+#use already aggregated fa_stk to make this go faster
+fa_stk.agg &lt;- aggregate(fa_stk, dim(fa_stk)[1]/26)
+
+###m0.5###
+##neutral AND selected##
+m0.5_hchp_n.s &lt;- read.genepop(paste0(m0.5_n.s,&quot;hchp_20pops.gen&quot;))
+m0.5_hchp_n.s$other &lt;- read.table(paste0(m0.5_n.s,&quot;hchp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+colnames(m0.5_hchp_n.s$other)=c(&quot;x&quot;,&quot;y&quot;)
+m0.5_hchp_n.s$other &lt;- xyFromRC(m0.5_hchp_n.s, fa_stk.agg)
+m0.5_hclp_n.s &lt;- read.genepop(paste0(m0.5_n.s,&quot;hclp_20pops.gen&quot;))
+m0.5_hclp_n.s$other &lt;- read.table(paste0(m0.5_n.s,&quot;hclp_20pops_coords.txt&quot;), sep=&quot; &quot;,header=F)
+colnames(m0.5_hclp_n.s$other)=c(&quot;x&quot;,&quot;y&quot;)
+m0.5_hclp_n.s$other &lt;- xyFromRC(m0.5_hclp_n.s, fa_stk.agg)
+</code></pre>
+
+<h2 id="inferring-population-structure-with-dapc">Inferring population structure with DAPC</h2>
+
+<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.5_hclp_n.s, center=T, scale=F, n.pca=100, n.da=2)
+temp &lt;- optim.a.score(temp.dapc.obj, n=15, n.sim=30)
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-21-1.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">best.n.pca &lt;- temp$best
+dapc.obj &lt;- dapc(m0.5_hclp_n.s, center=T, scale=F, n.pca=best.n.pca, n.da=2)
+
+#plot parameters
+par(mfrow=c(1,1), fg=&quot;gray50&quot;, pty='m', bty='o', mar=c(4,4,4,4), cex.main=1.3, cex.axis=1.1, cex.lab=1.2)
+scatter(dapc.obj, col=futrschwift.cols(20), ratio.pca=0.3, bg=&quot;white&quot;, main=&quot;m = 0.5, high complexity, low permeability, neutral and selected loci&quot;,
+    pch=c(16,15,18,17), cell=0, cstar=0, solid=0.9, cex=1.8, clab=0,
+    mstree=TRUE, lwd=3, scree.da=FALSE, leg=TRUE, txt.leg=popNames(m0.5_hclp_n.s))
+par(xpd=TRUE)
+points(dapc.obj$grp.coord[,1], dapc.obj$grp.coord[,2], pch=21:24, cex=2, lwd=3, col=&quot;black&quot;, bg=futrschwift.cols(20))
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-21-2.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">compoplot(dapc.obj, lab=&quot;&quot;, col=futrschwift.cols(20))
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-21-3.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">temp.dapc.obj &lt;- dapc(m0.5_hchp_n.s, center=T, scale=F, n.pca=100, n.da=2)
+temp &lt;- optim.a.score(temp.dapc.obj, n=15, n.sim=30)
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-27-1.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">best.n.pca &lt;- temp$best
+dapc.obj &lt;- dapc(m0.5_hchp_n.s, center=T, scale=F, n.pca=best.n.pca, n.da=2)
+
+#plot parameters
+par(mfrow=c(1,1), fg=&quot;gray50&quot;, pty='m', bty='o', mar=c(4,4,4,4), cex.main=1.3, cex.axis=1.1, cex.lab=1.2)
+scatter(dapc.obj, col=futrschwift.cols(20), ratio.pca=0.3, bg=&quot;white&quot;, main=&quot;m = 0.5, high complexity, high permeability, neutral and selected loci&quot;,
+    pch=c(16,15,18,17), cell=0, cstar=0, solid=0.9, cex=1.8, clab=0,
+    mstree=TRUE, lwd=3, scree.da=FALSE, leg=TRUE, txt.leg=popNames(m0.5_hchp_n.s))
+par(xpd=TRUE)
+points(dapc.obj$grp.coord[,1], dapc.obj$grp.coord[,2], pch=21:24, cex=2, lwd=3, col=&quot;black&quot;, bg=futrschwift.cols(20))
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-27-2.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">compoplot(dapc.obj, lab=&quot;&quot;, col=futrschwift.cols(20))
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-27-3.png" alt="" /><!-- --></p>
+
+<h2 id="inferring-population-structure-with-lea-package">Inferring population structure with <em>LEA</em> package</h2>
+
+<pre><code class="language-r">library(LEA)
+library(mapplots)
+library(maps)
+library(raster)
+library(adegenet)
+library(ggsci)
+
+futr &lt;- pal_futurama()
+schwifty &lt;- pal_rickandmorty()
+futrschwift.cols &lt;- colorRampPalette(c(&quot;gray15&quot;, schwifty(12)[3], futr(12)[11], schwifty(12)[c(1,9)], futr(12)[c(8,6,2)]))
+
+#plot parameters
+par(mfrow=c(1,1),fg=&quot;gray50&quot;,pty='m',bty='o',mar=c(4,4,4,4),cex.main=1.3,cex.axis=1.1,cex.lab=1.2)
+
+geninds &lt;- list(m0.5_hclp_n.s, 
+         m0.5_hchp_n.s)
+
+genind_names &lt;- c(&quot;m0.5_hclp_n.s&quot;, 
+         &quot;m0.5_hchp_n.s&quot;)
+
+ls_names &lt;- c(&quot;HCLP landscape (m = 0.5)&quot;, 
+          &quot;HCHP landscape (m = 0.5)&quot;)
+
+lea.dir &lt;- c(
+       &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_5/Simulated_Landscapes/500neutral+50selectedSNPs/High_Complexity_Landscapes/virtualspecies/Low_Permeability/&quot;,
+       &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_5/Simulated_Landscapes/500neutral+50selectedSNPs/High_Complexity_Landscapes/virtualspecies/High_Permeability/&quot;
+           )
+
+for (i in 1:2){
+     genind.obj &lt;- geninds[[i]]
+     genotypes &lt;- genind.obj$tab
+     coords &lt;- genind.obj$other
+      
+     setwd(lea.dir[i])
+     write.table(t(as.matrix(genotypes)), sep=&quot;&quot;, row.names=F, col.names=F, paste0(genind_names[i], &quot;.geno&quot;))
+     geno &lt;- read.geno(paste0(genind_names[i],&quot;.geno&quot;))
+     setwd(paste0(lea.dir[i],&quot;LEA&quot;))
+     source(&quot;POPSutilities.r&quot;)
+     setwd(lea.dir[i])
+
+     reps &lt;- 5
+     maxK &lt;- 15
+
+     #running pop structure inference
+     snmf.obj &lt;- snmf(paste0(genind_names[i],&quot;.geno&quot;), K=1:maxK, repetitions=reps, project=&quot;new&quot;, 
+                      alpha=10, iterations=100000,
+                      entropy=TRUE, percentage=0.25)
+     plot(snmf.obj, cex=1.2, col=&quot;lightblue&quot;, pch=19)
+
+     #determining best K and picking best replicate for best K
+     ce &lt;- list()
+     for(k in 1:maxK) ce[[k]] &lt;- cross.entropy(snmf.obj, K=k)
+     best &lt;- which.min(unlist(ce))
+     best.K &lt;- ceiling(best/reps)
+     best.run &lt;- which.min(ce[[best.K]])
+     
+     barchart(snmf.obj, K=best.K, run=best.run,
+              border=NA, space=0, col=futrschwift.cols(best.K),
+              xlab=&quot;Individuals&quot;, ylab=&quot;Ancestry proportions&quot;,
+              main=paste(&quot;Ancestry bar chart for&quot;, ls_names[i]))
+      
+     qmatrix &lt;- Q(snmf.obj, K=best.K, run=best.run)
+      
+     grid &lt;- createGrid(xmin(fa_stk), xmax(fa_stk),
+                        ymin(fa_stk), ymax(fa_stk), 260, 340)
+     constraints &lt;- NULL
+      
+     shades &lt;- 10
+     
+     futrschwift.gradient &lt;- colorRampPalette(futrschwift.cols(best.K))
+     grad.cols &lt;- futrschwift.gradient(shades*best.K)
+     
+     ColorGradients_bestK &lt;- list()
+     for(j in 1:best.K){ 
+           k.start &lt;- j*shades-shades+1
+           k.fin &lt;- j*shades
+           ColorGradients_bestK[[j]] &lt;- c(&quot;gray95&quot;, grad.cols[k.start:k.fin])
+     }
+
+     maps(qmatrix, coords, grid, constraints, method=&quot;max&quot;,
+          colorGradientsList=ColorGradients_bestK,
+       main=paste(&quot;Mapped ancestry coefficients for&quot;, ls_names[i]), 
+                  xlab=&quot;Longitude&quot;, ylab=&quot;Latitude&quot;, cex=.5)
+     map(add=T, interior=F)
+}
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-29-20.png" alt="" /><!-- -->
+<img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-29-21.png" alt="" /><!-- -->
+<img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-29-23.png" alt="" /><!-- -->
+<img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-29-24.png" alt="" /><!-- --></p>
+
+<h2 id="inferring-population-structure-with-tess3r-package">Inferring population structure with <em>tess3r</em> package</h2>
+
+<pre><code class="language-r">library(tess3r)
+library(adegenet)
+library(raster)
+library(ggsci)
+
+futr &lt;- pal_futurama()
+schwifty &lt;- pal_rickandmorty()
+futrschwift.cols &lt;- colorRampPalette(c(&quot;gray15&quot;, schwifty(12)[3], futr(12)[11], schwifty(12)[c(1,9)], futr(12)[c(8,6,2)]))
+
+
+#plot parameters
+par(mfrow=c(1,1),fg=&quot;gray50&quot;,pty='m',bty='o',mar=c(4,4,4,4),cex.main=1.3,cex.axis=1.1,cex.lab=1.2)
+
+geninds &lt;- list(m0.5_hclp_n.s, 
+         m0.5_hchp_n.s)
+
+genind_names &lt;- c(&quot;m0.5_hclp_n.s&quot;, 
+         &quot;m0.5_hchp_n.s&quot;)
+
+ls_names &lt;- c(&quot;HCLP landscape (m = 0.5)&quot;, 
+          &quot;HCHP landscape (m = 0.5)&quot;)
+
+
+for (i in 1:2){
+     genind.obj &lt;- geninds[[i]]
+     genotypes &lt;- genind.obj$tab
+     coords &lt;- as.matrix(genind.obj$other)
+      
+     reps &lt;- 5
+     maxK &lt;- 15
+
+     #running pop structure inference
+     tess3.obj &lt;- tess3(X=genotypes, coord=coords, K=1:maxK,
+                        method=&quot;projected.ls&quot;, rep=reps, 
+                        max.iteration=1000, tolerance=1e-06, 
+                        #max.iteration = 10000, tolerance = 1e-07, 
+                        mask=0.25,
+                        ploidy=2)
+
+      #determining best K and picking best replicate for best K
+      ce &lt;- list()
+      for(k in 1:maxK) ce[[k]] &lt;- tess3.obj[[k]]$crossvalid.crossentropy
+      best &lt;- which.min(unlist(ce))
+      best.K &lt;- ceiling(best/reps)
+      best.run &lt;- which.min(ce[[best.K]])
+
+      q.matrix &lt;- qmatrix(tess3.obj, K=best.K)
+
+      shades &lt;- 10
+      
+      futrschwift.pal &lt;- CreatePalette(futrschwift.cols(best.K), shades)
+
+      barplot(q.matrix, border = NA, space = 0,
+                col.palette = futrschwift.pal,
+                xlab = &quot;Individuals&quot;, ylab = &quot;Ancestry proportions&quot;,
+                main = paste(&quot;Ancestry bar chart for&quot;, ls_names[i]))
+  
+      plot(q.matrix, coords, method = &quot;map.max&quot;, interpol = FieldsKrigModel(10),
+             main = paste(&quot;Mapped ancestry coefficients for&quot;, ls_names[i]),
+             xlab = &quot;Longitude&quot;, ylab = &quot;Latitude&quot;,
+             resolution = c(260,340), cex = .9,
+             col.palette = futrschwift.pal)
+}
+</code></pre>
+
+<h1 id="maximizing-genetic-environmental-covariance-with-population-structure-constraint-with-co-inertia-analysis">Maximizing genetic-environmental covariance (with population-structure constraint) with Co-inertia Analysis</h1>
+
+<h2 id="high-complexity-low-permeability-landscape">High-complexity low-permeability landscape</h2>
+
+<pre><code class="language-r">library(adegenet)
+
+#plot parameters
+par(mfrow=c(1,1), fg=&quot;gray50&quot;, pty='m', bty='o', mar=c(4,4,4,4), cex.main=1.3, cex.axis=1.1, cex.lab=1.2)
+futr3 &lt;- c(futr(12)[c(12,7,2)])
+
+#genetic data
+gen &lt;- m0.5_hclp_n.s
+
+temp.dapc.obj &lt;- dapc(gen, center=T, scale=F, n.pca=100, n.da=2)
+temp &lt;- optim.a.score(temp.dapc.obj, n=15, n.sim=30)
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-7-1.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">best.n.pca &lt;- temp$best
+dapc.obj &lt;- dapc(gen, center=T, scale=F, n.pca=best.n.pca, n.da=2)
+
+dfenv &lt;- extract(fa_stk, gen$other)
+dfenv.obj &lt;- dfenv
+dfgen.obj &lt;- gen$tab
+dfgenenv &lt;- cbind(dfgen.obj, dfenv.obj)
+dfgenenv &lt;- na.omit(dfgenenv)
+n.alleles &lt;- length(dfgen.obj[1,])
+n.env &lt;- length(dfenv.obj[1,])
+env.var &lt;- seq(n.alleles + 1, n.alleles + n.env)
+dfgen &lt;- dfgenenv[,1:n.alleles]
+dfenv &lt;- dfgenenv[,env.var]
+
+##Clusters##
+clust &lt;- find.clusters(gen, cent=T, scale=F, n.pca=best.n.pca, method=&quot;kmeans&quot;, n.iter=1e7, n.clust=3, stat=&quot;BIC&quot;)
+cl &lt;- as.factor(as.vector(clust$grp))
+gen$pop &lt;- cl
+sq &lt;- as.character(seq(1,3))
+popNames(gen) &lt;- sq
+
+dapc3 &lt;- dapc(gen, center=T, scale=F, n.pca=best.n.pca, n.da=2)
+scatter(dapc3, col=futr3, ratio.pca=0.3, bg=&quot;white&quot;, 
+    pch=c(16,15,18,17), cell=0, cstar=0, solid=0.9, cex=1.8, clab=0, 
+    mstree=TRUE, lwd=3, scree.da=FALSE, leg=TRUE, txt.leg=popNames(gen))
+par(xpd=TRUE)
+points(dapc3$grp.coord[,1], dapc3$grp.coord[,2], pch=21:24, cex=2, lwd=3, col=&quot;black&quot;, bg=futr3)
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-7-2.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">dap3 &lt;- as.data.frame(dapc3$assign)
+dfdap3 &lt;- cbind(dap3, dfenv.obj)
+dfdap3 &lt;- na.omit(dfdap3)
+dfenv3 &lt;- dfdap3[,2:length(dfdap3[1,])]
+dfdap3 &lt;- dfdap3[,1]
+
+dfgenenv3 &lt;- cbind(dap3, dfgen.obj, dfenv.obj)
+dfgenenv3 &lt;- na.omit(dfgenenv3)
+dfdap3 &lt;- dfgenenv3[,1]
+dfgenenv3.gen &lt;- dfgenenv3[,2:n.alleles+1]
+dfgenenv3.env &lt;- dfgenenv3[,env.var+1]
+</code></pre>
+
+<p>Accounting for population structure</p>
+
+<pre><code class="language-r">pcenv3 &lt;- dudi.pca(dfenv3, cent=T, scale=T, scannf=F, nf=2)
+bet1 &lt;- bca(pcenv3, dfdap3, scannf=F, nf=2)
+pcgen3 &lt;- dudi.pca(dfgen, cent=T, scale=F, scannf=F, nf=2)
+bet2 &lt;- bca(pcgen3, dfdap3, scannf=F, nf=2)
+coi3 &lt;- coinertia(bet1, bet2, scan=F, nf=2)
+plot(coi3, col=&quot;gray30&quot;)
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-8-1.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">summary(coi3)
+</code></pre>
+
+<pre><code>## Coinertia analysis
+## 
+## Class: coinertia dudi
+## Call: coinertia(dudiX = bet1, dudiY = bet2, scannf = F, nf = 2)
+## 
+## Total inertia: 17.69
+## 
+## Eigenvalues:
+##     Ax1     Ax2 
+##  15.708   1.984 
+## 
+## Projected inertia (%):
+##     Ax1     Ax2 
+##   88.79   11.21 
+## 
+## Cumulative projected inertia (%):
+##     Ax1   Ax1:2 
+##   88.79  100.00 
+## 
+## Eigenvalues decomposition:
+##         eig    covar       sdX      sdY      corr
+## 1 15.708356 3.963377 1.3465110 2.948251 0.9983689
+## 2  1.983529 1.408378 0.5264643 2.679534 0.9983689
+## 
+## Inertia &amp; coinertia X (bet1):
+##     inertia      max     ratio
+## 1  1.813092 1.814158 0.9994126
+## 12 2.090256 2.090256 1.0000000
+## 
+## Inertia &amp; coinertia Y (bet2):
+##      inertia       max     ratio
+## 1   8.692183  8.816482 0.9859015
+## 12 15.872087 15.872087 1.0000000
+## 
+## RV:
+##  0.8537908
+</code></pre>
+
+<h2 id="high-complexity-high-permeability-landscape">High-complexity high-permeability landscape</h2>
+
+<pre><code class="language-r">library(adegenet)
+
+#plot parameters
+par(mfrow=c(1,1), fg=&quot;gray50&quot;, pty='m', bty='o', mar=c(4,4,4,4), cex.main=1.3, cex.axis=1.1, cex.lab=1.2)
+futr3 &lt;- c(futr(12)[c(12,7,2)])
+
+#genetic data
+gen &lt;- m0.5_hchp_n.s
+
+temp.dapc.obj &lt;- dapc(gen, center=T, scale=F, n.pca=100, n.da=2)
+temp &lt;- optim.a.score(temp.dapc.obj, n=15, n.sim=30)
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-9-1.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">best.n.pca &lt;- temp$best
+dapc.obj &lt;- dapc(gen, center=T, scale=F, n.pca=best.n.pca, n.da=2)
+
+dfenv &lt;- extract(fa_stk, gen$other)
+dfenv.obj &lt;- dfenv
+dfgen.obj &lt;- gen$tab
+dfgenenv &lt;- cbind(dfgen.obj, dfenv.obj)
+dfgenenv &lt;- na.omit(dfgenenv)
+n.alleles &lt;- length(dfgen.obj[1,])
+n.env &lt;- length(dfenv.obj[1,])
+env.var &lt;- seq(n.alleles + 1, n.alleles + n.env)
+dfgen &lt;- dfgenenv[,1:n.alleles]
+dfenv &lt;- dfgenenv[,env.var]
+
+##Clusters##
+clust &lt;- find.clusters(gen, cent=T, scale=F, n.pca=best.n.pca, method=&quot;kmeans&quot;, n.iter=1e7, n.clust=3, stat=&quot;BIC&quot;)
+cl &lt;- as.factor(as.vector(clust$grp))
+gen$pop &lt;- cl
+sq &lt;- as.character(seq(1,3))
+popNames(gen) &lt;- sq
+
+dapc3 &lt;- dapc(gen, center=T, scale=F, n.pca=best.n.pca, n.da=2)
+scatter(dapc3, col=futr3, ratio.pca=0.3, bg=&quot;white&quot;, 
+    pch=c(16,15,18,17), cell=0, cstar=0, solid=0.9, cex=1.8, clab=0, 
+    mstree=TRUE, lwd=3, scree.da=FALSE, leg=TRUE, txt.leg=popNames(gen))
+par(xpd=TRUE)
+points(dapc3$grp.coord[,1], dapc3$grp.coord[,2], pch=21:24, cex=2, lwd=3, col=&quot;black&quot;, bg=futr3)
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-9-2.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">dap3 &lt;- as.data.frame(dapc3$assign)
+dfdap3 &lt;- cbind(dap3, dfenv.obj)
+dfdap3 &lt;- na.omit(dfdap3)
+dfenv3 &lt;- dfdap3[,2:length(dfdap3[1,])]
+dfdap3 &lt;- dfdap3[,1]
+
+dfgenenv3 &lt;- cbind(dap3, dfgen.obj, dfenv.obj)
+dfgenenv3 &lt;- na.omit(dfgenenv3)
+dfdap3 &lt;- dfgenenv3[,1]
+dfgenenv3.gen &lt;- dfgenenv3[,2:n.alleles+1]
+dfgenenv3.env &lt;- dfgenenv3[,env.var+1]
+</code></pre>
+
+<p>Accounting for population structure</p>
+
+<pre><code class="language-r">pcenv3 &lt;- dudi.pca(dfenv3, cent=T, scale=T, scannf=F, nf=2)
+bet1 &lt;- bca(pcenv3, dfdap3, scannf=F, nf=2)
+pcgen3 &lt;- dudi.pca(dfgen, cent=T, scale=F, scannf=F, nf=2)
+bet2 &lt;- bca(pcgen3, dfdap3, scannf=F, nf=2)
+coi3 &lt;- coinertia(bet1, bet2, scan=F, nf=2)
+plot(coi3, col=&quot;gray30&quot;)
+</code></pre>
+
+<p><img src="../../md-files/multivariate-analysis/figure-html/unnamed-chunk-10-1.png" alt="" /><!-- --></p>
+
+<pre><code class="language-r">summary(coi3)
+</code></pre>
+
+<pre><code>## Coinertia analysis
+## 
+## Class: coinertia dudi
+## Call: coinertia(dudiX = bet1, dudiY = bet2, scannf = F, nf = 2)
+## 
+## Total inertia: 4.337
+## 
+## Eigenvalues:
+##     Ax1     Ax2 
+##   2.490   1.847 
+## 
+## Projected inertia (%):
+##     Ax1     Ax2 
+##    57.4    42.6 
+## 
+## Cumulative projected inertia (%):
+##     Ax1   Ax1:2 
+##    57.4   100.0 
+## 
+## Eigenvalues decomposition:
+##        eig    covar       sdX      sdY      corr
+## 1 2.489521 1.577822 0.5476020 2.926720 0.9844908
+## 2 1.847450 1.359209 0.4952117 2.787942 0.9844908
+## 
+## Inertia &amp; coinertia X (bet1):
+##      inertia       max     ratio
+## 1  0.2998679 0.3274106 0.9158774
+## 12 0.5451026 0.5451026 1.0000000
+## 
+## Inertia &amp; coinertia Y (bet2):
+##      inertia       max    ratio
+## 1   8.565692  9.654541 0.887219
+## 12 16.338314 16.338314 1.000000
+## 
+## RV:
+##  0.9393858
+</code></pre>
+		</div>
+		
+<div class="post__tags tags clearfix">
+	<svg class="tags__icon icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5 0 11V3C0 1.5.8.8.8.8S1.5 0 3 0h8c1.5 0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/></svg>
+	<ul class="tags__list">
+		<li class="tags__item"><a class="tags__link btn" href="/NALgen/tags/multivariate-ordination/" rel="tag">Multivariate Ordination</a></li>
+		<li class="tags__item"><a class="tags__link btn" href="/NALgen/tags/discriminant-analysis-of-principal-components/" rel="tag">Discriminant Analysis of Principal Components</a></li>
+		<li class="tags__item"><a class="tags__link btn" href="/NALgen/tags/co-inertia-analysis/" rel="tag">Co-inertia Analysis</a></li>
+		<li class="tags__item"><a class="tags__link btn" href="/NALgen/tags/population-structure/" rel="tag">Population Structure</a></li>
+		<li class="tags__item"><a class="tags__link btn" href="/NALgen/tags/genetic-environmental-covariance/" rel="tag">Genetic-Environmental Covariance</a></li>
+	</ul>
+</div>
+	</article>
+</main>
+
+<div class="authorbox clearfix">
+	<figure class="authorbox__avatar">
+		<img alt="Chaz Hyseni avatar" src="/NALgen/img/SpEcEvGen.png" class="avatar" height="90" width="90">
+	</figure>
+	<div class="authorbox__header">
+		<span class="authorbox__name">About Chaz Hyseni</span>
+	</div>
+	<div class="authorbox__description">
+		Chaz has been doing research in the field of Population Genetics since 2006. He is interested in the distribution of genetic variation (both neutral and adaptive) in natural environments, at different spatial and temporal scales (from Landscape Genetics to Phylogeography). To understand pattern and process, Chaz uses empirical data as well as spatial eco-evolutionary modeling.
+	</div>
+</div>
+
+<nav class="post-nav flex">
+	<div class="post-nav__item post-nav__item--prev">
+		<a class="post-nav__link" href="/NALgen/post/multivariate-analysis_simulated-data/" rel="prev"><span class="post-nav__caption">«&thinsp;Previous</span><p class="post-nav__post-title">NALgen Analysis Pt.1</p></a>
+	</div>
+</nav>
+
+
+			</div>
+			<aside class="sidebar">
+<div class="widget-recent widget">
+	<h4 class="widget__title">Recent Posts</h4>
+	<div class="widget__content">
+		<ul class="widget__list">
+			<li class="widget__item"><a class="widget__link" href="/NALgen/post/nalgen-analysis_pt1_recap/">NALgen Analysis Pt.1 - Recap</a></li>
+			<li class="widget__item"><a class="widget__link" href="/NALgen/post/multivariate-analysis_simulated-data/">NALgen Analysis Pt.1</a></li>
+			<li class="widget__item"><a class="widget__link" href="/NALgen/post/landscape-genetic-simulations/">Landscape Genetic Simulations</a></li>
+		</ul>
+	</div>
+</div>
+<div class="widget-categories widget">
+	<h4 class="widget__title">Categories</h4>
+	<div class="widget__content">
+		<ul class="widget__list">
+			<li class="widget__item"><a class="widget__link" href="/NALgen/categories/analysis">Analysis</a></li>
+			<li class="widget__item"><a class="widget__link" href="/NALgen/categories/recap">Recap</a></li>
+			<li class="widget__item"><a class="widget__link" href="/NALgen/categories/simulations">Simulations</a></li>
+		</ul>
+	</div>
+</div>
+<div class="widget-taglist widget">
+	<h4 class="widget__title">Tags</h4>
+	<div class="widget__content">
+		<a class="widget-taglist__link widget__link btn" href="/NALgen/tags/co-inertia-analysis" title="Co inertia analysis">Co inertia analysis</a>
+		<a class="widget-taglist__link widget__link btn" href="/NALgen/tags/discriminant-analysis-of-principal-components" title="Discriminant analysis of principal components">Discriminant analysis of principal components</a>
+		<a class="widget-taglist__link widget__link btn" href="/NALgen/tags/genetic-environmental-covariance" title="Genetic environmental covariance">Genetic environmental covariance</a>
+		<a class="widget-taglist__link widget__link btn" href="/NALgen/tags/genotype-simulations" title="Genotype simulations">Genotype simulations</a>
+		<a class="widget-taglist__link widget__link btn" href="/NALgen/tags/landscape-genetics" title="Landscape genetics">Landscape genetics</a>
+		<a class="widget-taglist__link widget__link btn" href="/NALgen/tags/landscape-simulations" title="Landscape simulations">Landscape simulations</a>
+		<a class="widget-taglist__link widget__link btn" href="/NALgen/tags/multivariate-ordination" title="Multivariate ordination">Multivariate ordination</a>
+		<a class="widget-taglist__link widget__link btn" href="/NALgen/tags/population-structure" title="Population structure">Population structure</a>
+	</div>
+</div>
+</aside>
+		</div>
+		<footer class="footer">
+	<div class="container footer__container flex">
+		
+		<div class="footer__copyright">
+			&copy; 2019 NALgen.
+			<span class="footer__copyright-credits">Generated with <a href="https://gohugo.io/" rel="nofollow noopener" target="_blank">Hugo</a> and <a href="https://github.com/Vimux/Mainroad/" rel="nofollow noopener" target="_blank">Mainroad</a> theme.</span>
+		</div>
+	</div>
+</footer>
+	</div>
+<script async defer src="/NALgen/js/menu.js"></script></body>
+</html>

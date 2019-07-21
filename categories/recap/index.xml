@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Recap on NALgen</title>
+    <link>/NALgen/categories/recap/</link>
+    <description>Recent content in Recap on NALgen</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 21 Jul 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/NALgen/categories/recap/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>NALgen Analysis Pt.1 - Recap</title>
+      <link>/NALgen/post/nalgen-analysis_pt1_recap/</link>
+      <pubDate>Sun, 21 Jul 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/NALgen/post/nalgen-analysis_pt1_recap/</guid>
+      <description>&lt;p&gt;The output of multivariate analyses in the &lt;a href=&#34;https://github.com/chazhyseni/NALgen/tree/master/data&#34;&gt;NALgen Analysis Pt.1&lt;/a&gt; post was dense (935 lines of code, 121 figures). In this recap, I wanted to highlight some of the results. Furthermore, I wanted to mention that the population structure inference (i.e., classification) methods I compared were all &amp;ldquo;simple&amp;rdquo; machine learning algorithms.&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>
