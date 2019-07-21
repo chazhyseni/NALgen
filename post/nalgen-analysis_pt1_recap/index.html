@@ -88,23 +88,16 @@ if (!doNotTrack) {
 		</figure><div class="content post__content clearfix">
 			<p>The output of multivariate analyses in the <a href="https://github.com/chazhyseni/NALgen/tree/master/data">NALgen Analysis Pt.1</a> post was dense (935 lines of code, 121 figures). In this recap, I wanted to highlight some of the results. Furthermore, I wanted to mention that the population structure inference methods I compared were all machine learning (classification) algorithms.</p>
 
-<ol>
-<li>DAPC, an unsupervised-supervised learning algorithm (principal components analysis being unsupervised, and the supervised discriminant analysis step),<br />
-
-<ol>
-<li>Non-negative matrix factorization algorithms implemented in the <em>LEA</em> and <em>tess3r</em> packages (both cases of unsupervised machine learning), which use least-squares estimates of ancestry coefficients, which are geographically constrained in <em>tess3r</em> (i.e., spatial/geographic weights are used).
-<br /></li>
-</ol></li>
-</ol>
+<p>DAPC is an unsupervised-supervised learning algorithm (principal components analysis = unsupervised, discriminant analysis = supervised). Non-negative matrix factorization algorithms implemented in the <em>LEA</em> and <em>tess3r</em> packages are both cases of unsupervised machine learning; both use least-squares estimates of ancestry coefficients, which are geographically constrained in <em>tess3r</em> (i.e., spatial/geographic weights are used).</p>
 
 <p>All three methods are rather fast and produced similar results.</p>
 
-<ol>
+<ul>
 <li>DAPC went through 24 data sets in 17 mins,<br /></li>
 <li><em>LEA</em> processed 8 in 38 mins (however, it should be noted that this included 5 replicates x 15 values of K = 75),<br /></li>
 <li><em>tess3r</em> processed 8 in 122 mins (also 5 replicates x 15 values of K).<br />
 <br /></li>
-</ol>
+</ul>
 
 <p>The NALgen method leverages the flexibility of the co-inertia method (N.B. other multivariated ordination techniques can be used) to incorporate genetic clustering information from any algorithm (see the co-inertia section below). The idea behind this is to account for population structure while maximizing covariance between genetic and environmental data.</p>
 
