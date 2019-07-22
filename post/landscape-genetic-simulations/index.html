@@ -453,43 +453,43 @@ par(mfrow=c(1,1),fg=&quot;gray50&quot;,pty='m',bty='o',mar=c(4,4,4,4),cex.main=1
 
 ##Low Permeability##
 
-PCA_distrib_N &lt;- generateSpFromPCA(raster.stack=stk60[[rc_stk60]], axes=c(1:2), sample.points=TRUE, nb.points=850, means=c(3.5,2.5), sds=c(1,1), plot=FALSE)
-PCA_distrib_C &lt;- generateSpFromPCA(raster.stack=stk60[[rc_stk60]], axes=c(1:2), sample.points=TRUE, nb.points=850, means=c(0,-2.2), sds=c(1,1), plot=FALSE)
-PCA_distrib_S &lt;- generateSpFromPCA(raster.stack=stk60[[rc_stk60]], axes=c(1:2), sample.points=TRUE, nb.points=850, means=c(-2.5,2.5), sds=c(1,1), plot=FALSE)
+PCA_distrib_C &lt;- generateSpFromPCA(raster.stack=stk60[[rc_stk60]], axes=c(1:2), sample.points=TRUE, nb.points=850, means=c(3.5,2.5), sds=c(1,1), plot=FALSE)
+PCA_distrib_S &lt;- generateSpFromPCA(raster.stack=stk60[[rc_stk60]], axes=c(1:2), sample.points=TRUE, nb.points=850, means=c(0,-2.2), sds=c(1,1), plot=FALSE)
+PCA_distrib_N &lt;- generateSpFromPCA(raster.stack=stk60[[rc_stk60]], axes=c(1:2), sample.points=TRUE, nb.points=850, means=c(-2.5,2.5), sds=c(1,1), plot=FALSE)
 
 
-spN &lt;- convertToPA(PCA_distrib_N, species.prevalence=NULL, alpha=-0.002, beta=0.2)
+spC &lt;- convertToPA(PCA_distrib_C, species.prevalence=NULL, alpha=-0.002, beta=0.2)
 </code></pre>
 
 <p><strong>Occurrence probability of metapopulation 1 (out of 3):</strong>
 <img src="../../md-files/landgen-simulations/figure-html/unnamed-chunk-7-2.png" alt="" /><!-- --></p>
 
-<pre><code class="language-r">spC &lt;- convertToPA(PCA_distrib_C, species.prevalence=NULL, alpha=-0.002, beta=0.2)
+<pre><code class="language-r">spS &lt;- convertToPA(PCA_distrib_S, species.prevalence=NULL, alpha=-0.002, beta=0.2)
 </code></pre>
 
 <p><strong>Occurrence probability of metapopulation 2 (out of 3):</strong>
 <img src="../../md-files/landgen-simulations/figure-html/unnamed-chunk-7-3.png" alt="" /><!-- --></p>
 
-<pre><code class="language-r">spS &lt;- convertToPA(PCA_distrib_S, species.prevalence=NULL, alpha=-0.002, beta=0.2)
+<pre><code class="language-r">spN &lt;- convertToPA(PCA_distrib_N, species.prevalence=NULL, alpha=-0.002, beta=0.2)
 </code></pre>
 
 <p><strong>Occurrence probability of metapopulation 3 (out of 3):</strong>
 <img src="../../md-files/landgen-simulations/figure-html/unnamed-chunk-7-4.png" alt="" /><!-- --></p>
 
-<pre><code class="language-r">pop3.complex.lowperm.PA &lt;- 1*spN$pa.raster + 2*spC$pa.raster + 3*spS$pa.raster
+<pre><code class="language-r">pop3.complex.lowperm.PA &lt;- 2*spC$pa.raster + 3*spS$pa.raster + 1*spN$pa.raster
 pop3.complex.lowperm.PA &lt;- round(pop3.complex.lowperm.PA, 0)
 pop3.complex.lowperm.PA[pop3.complex.lowperm.PA&gt;3] &lt;- 0
 pop3.complex.lowperm.PA[is.na(pop3.complex.lowperm.PA)] &lt;- 0
 
-spN$suitab.raster[spN$suitab.raster&lt;0.25] &lt;- 0
 spC$suitab.raster[spC$suitab.raster&lt;0.25] &lt;- 0
 spS$suitab.raster[spS$suitab.raster&lt;0.25] &lt;- 0
+spN$suitab.raster[spN$suitab.raster&lt;0.25] &lt;- 0
 
-spN_suitab &lt;- 100*spN$pa.raster*spN$suitab.raster
 spC_suitab &lt;- 100*spC$pa.raster*spC$suitab.raster
 spS_suitab &lt;- 100*spS$pa.raster*spS$suitab.raster
+spN_suitab &lt;- 100*spN$pa.raster*spN$suitab.raster
 
-pop3.complex.lowperm.Suitab &lt;- spN_suitab + spC_suitab + spS_suitab
+pop3.complex.lowperm.Suitab &lt;- spC_suitab + spS_suitab + spN_suitab
 pop3.complex.lowperm.Suitab[pop3.complex.lowperm.Suitab&gt;100] &lt;- 100
 pop3.complex.lowperm.Suitab[is.na(pop3.complex.lowperm.Suitab)] &lt;- 0
 pop3.complex.lowperm.Suitab[pop3.complex.lowperm.Suitab&lt;5] &lt;- 0
@@ -524,42 +524,42 @@ colnames(pop3.complex.lowperm.Sel.df)=c(&quot;start&quot;,&quot;end&quot;,&quot;
 
 ##High Permeability##
 
-PCA_distrib_N &lt;- generateSpFromPCA(raster.stack=stk60[[rc_stk60]], axes=c(1:2), sample.points=TRUE, nb.points=850, means=c(2.5,1), sds=c(1.2,1.2), plot=FALSE)
-PCA_distrib_C &lt;- generateSpFromPCA(raster.stack=stk60[[rc_stk60]], axes=c(1:2), sample.points=TRUE, nb.points=850, means=c(-0.5,-0.5), sds=c(1.2,1.2), plot=FALSE)
-PCA_distrib_S &lt;- generateSpFromPCA(raster.stack=stk60[[rc_stk60]], axes=c(1:2), sample.points=TRUE, nb.points=850, means=c(-2.5,2), sds=c(1.2,1.2), plot=FALSE)
+PCA_distrib_C &lt;- generateSpFromPCA(raster.stack=stk60[[rc_stk60]], axes=c(1:2), sample.points=TRUE, nb.points=850, means=c(2.5,1), sds=c(1.2,1.2), plot=FALSE)
+PCA_distrib_S &lt;- generateSpFromPCA(raster.stack=stk60[[rc_stk60]], axes=c(1:2), sample.points=TRUE, nb.points=850, means=c(-0.5,-0.5), sds=c(1.2,1.2), plot=FALSE)
+PCA_distrib_N &lt;- generateSpFromPCA(raster.stack=stk60[[rc_stk60]], axes=c(1:2), sample.points=TRUE, nb.points=850, means=c(-2.5,2), sds=c(1.2,1.2), plot=FALSE)
 
-spN &lt;- convertToPA(PCA_distrib_N, species.prevalence=NULL, alpha=-0.004, beta=0.4)
+spC &lt;- convertToPA(PCA_distrib_C, species.prevalence=NULL, alpha=-0.004, beta=0.4)
 </code></pre>
 
 <p><strong>Occurrence probability of metapopulation 1 (out of 3):</strong>
 <img src="../../md-files/landgen-simulations/figure-html/unnamed-chunk-7-6.png" alt="" /><!-- --></p>
 
-<pre><code class="language-r">spC &lt;- convertToPA(PCA_distrib_C, species.prevalence=NULL, alpha=-0.004, beta=0.4)
+<pre><code class="language-r">spS &lt;- convertToPA(PCA_distrib_S, species.prevalence=NULL, alpha=-0.004, beta=0.4)
 </code></pre>
 
 <p><strong>Occurrence probability of metapopulation 2 (out of 3):</strong>
 <img src="../../md-files/landgen-simulations/figure-html/unnamed-chunk-7-7.png" alt="" /><!-- --></p>
 
-<pre><code class="language-r">spS &lt;- convertToPA(PCA_distrib_S, species.prevalence=NULL, alpha=-0.004, beta=0.4)
+<pre><code class="language-r">spN &lt;- convertToPA(PCA_distrib_N, species.prevalence=NULL, alpha=-0.004, beta=0.4)
 </code></pre>
 
 <p><strong>Occurrence probability of metapopulation 3 (out of 3):</strong>
 <img src="../../md-files/landgen-simulations/figure-html/unnamed-chunk-7-8.png" alt="" /><!-- --></p>
 
-<pre><code class="language-r">pop3.complex.highperm.PA &lt;- 1*spN$pa.raster + 2*spC$pa.raster + 3*spS$pa.raster
+<pre><code class="language-r">pop3.complex.highperm.PA &lt;- 2*spC$pa.raster + 3*spS$pa.raster + 1*spN$pa.raster
 pop3.complex.highperm.PA &lt;- round(pop3.complex.highperm.PA, 0)
 pop3.complex.highperm.PA[pop3.complex.highperm.PA&gt;3] &lt;- 0
 pop3.complex.highperm.PA[is.na(pop3.complex.highperm.PA)] &lt;- 0
 
-spN$suitab.raster[spN$suitab.raster&lt;0.25] &lt;- 0
 spC$suitab.raster[spC$suitab.raster&lt;0.25] &lt;- 0
 spS$suitab.raster[spS$suitab.raster&lt;0.25] &lt;- 0
+spN$suitab.raster[spN$suitab.raster&lt;0.25] &lt;- 0
 
-spN_suitab &lt;- 100*spN$pa.raster*spN$suitab.raster
 spC_suitab &lt;- 100*spC$pa.raster*spC$suitab.raster
 spS_suitab &lt;- 100*spS$pa.raster*spS$suitab.raster
+spN_suitab &lt;- 100*spN$pa.raster*spN$suitab.raster
 
-pop3.complex.highperm.Suitab &lt;- spN_suitab + spC_suitab + spS_suitab
+pop3.complex.highperm.Suitab &lt;- spC_suitab + spS_suitab + spN_suitab
 pop3.complex.highperm.Suitab[pop3.complex.highperm.Suitab&gt;100] &lt;- 100
 pop3.complex.highperm.Suitab[is.na(pop3.complex.highperm.Suitab)] &lt;- 0
 pop3.complex.highperm.Suitab[pop3.complex.highperm.Suitab&lt;5] &lt;- 0
