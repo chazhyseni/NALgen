@@ -17,8 +17,7 @@
       <pubDate>Sat, 27 Jul 2019 00:00:00 +0000</pubDate>
       
       <guid>/NALgen/post/nalgen-analysis_pt0/</guid>
-      <description>Non-negative matrix factorization, as implemented in the LEA package, is a case of unsupervised machine learning; LEA uses least-squares estimates of ancestry coefficients. Presented below are the reference results that the 20-population-subset results will be compared against. The original landscapes used to simulate the genetic data, as well as population structure results obtained from these complete genetic datasets, will be used in evaluating the NALgen method.
-Multivariate analyses: Using machine learning algorithms to infer population structure Loading the environmental data library(raster) library(virtualspecies) setwd(&amp;quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Phylogeography/Geo_Analysis/Data/EnvData/bioclim_FA/east coast/Finalized/current&amp;quot;) fn &amp;lt;- list.</description>
+      <description>&lt;p&gt;Non-negative matrix factorization, as implemented in the &lt;em&gt;LEA&lt;/em&gt; package, is a case of unsupervised machine learning; &lt;em&gt;LEA&lt;/em&gt; uses least-squares estimates of ancestry coefficients.&lt;/p&gt;</description>
     </item>
     
   </channel>

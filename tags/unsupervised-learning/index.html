@@ -91,14 +91,13 @@ if (!doNotTrack) {
 </div>
 	</header>
 	<div class="content list__excerpt post__content clearfix">
-		Non-negative matrix factorization, as implemented in the LEA package, is a case of unsupervised machine learning; LEA uses least-squares estimates of ancestry coefficients. Presented below are the reference results that the 20-population-subset results will be compared against. The original landscapes used to simulate the genetic data, as well as population structure results obtained from these complete genetic datasets, will be used in evaluating the NALgen method.
-Multivariate analyses: Using machine learning algorithms to infer population structure Loading the environmental data library(raster) library(virtualspecies) setwd(&quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Phylogeography/Geo_Analysis/Data/EnvData/bioclim_FA/east coast/Finalized/current&quot;) fn &lt;- list.
+		<p>Non-negative matrix factorization, as implemented in the <em>LEA</em> package, is a case of unsupervised machine learning; <em>LEA</em> uses least-squares estimates of ancestry coefficients.</p>
 	</div>
 </article><article class="list__item post">
 	<header class="list__header">
 		<h3 class="list__title post__title ">
 			<a href="/NALgen/post/determining_bestk/" rel="bookmark">
-			NALgen Analysis Pt.0
+			Cross-Entropy and Clustering
 			</a>
 		</h3>
 		<div class="list__meta meta">
@@ -114,8 +113,9 @@ Multivariate analyses: Using machine learning algorithms to infer population str
 </div>
 	</header>
 	<div class="content list__excerpt post__content clearfix">
-		Minimum Cross-Entropy (MinXEnt) Using minimum cross-entropy to determine the number of genetic clusters (K) is not always straightforward. Sometimes, the difference in minimum cross-entropy from K = n to K = n+1 is negligible. Thus, the minimum cross-entropy leads to an overestimation of K. To fix this, I use minimization of &ldquo;slope.&rdquo; Slope = edifference - 1 (where difference = XEntn+1 - XEntn).
-#determining best K and picking best replicate for best K ce &lt;- list() for(k in 1:maxK) ce[[k]] &lt;- cross.
+		<h2 id="minimum-cross-entropy-minxent">Minimum Cross-Entropy (MinXEnt)</h2>
+
+<p>Using minimum cross-entropy to determine the number of genetic clusters (K) is not always straightforward.</p>
 	</div>
 </article>
 </main>
@@ -129,7 +129,7 @@ Multivariate analyses: Using machine learning algorithms to infer population str
 	<div class="widget__content">
 		<ul class="widget__list">
 			<li class="widget__item"><a class="widget__link" href="/NALgen/post/nalgen-analysis_pt0/">NALgen Analysis Pt.0</a></li>
-			<li class="widget__item"><a class="widget__link" href="/NALgen/post/determining_bestk/">NALgen Analysis Pt.0</a></li>
+			<li class="widget__item"><a class="widget__link" href="/NALgen/post/determining_bestk/">Cross-Entropy and Clustering</a></li>
 			<li class="widget__item"><a class="widget__link" href="/NALgen/post/nalgen-analysis_pt1_recap/">NALgen Analysis Pt.1 - Recap</a></li>
 			<li class="widget__item"><a class="widget__link" href="/NALgen/post/multivariate-analysis_simulated-data/">NALgen Analysis Pt.1</a></li>
 			<li class="widget__item"><a class="widget__link" href="/NALgen/post/landscape-genetic-simulations/">Landscape Genetic Simulations</a></li>
