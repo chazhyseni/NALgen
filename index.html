@@ -13,7 +13,7 @@
 <meta property="og:type" content="website" />
 <meta property="og:url" content="/NALgen/" />
 
-<meta property="og:updated_time" content="2019-07-21T00:00:00&#43;00:00"/>
+<meta property="og:updated_time" content="2019-07-27T00:00:00&#43;00:00"/>
 
 	
 	<link rel="dns-prefetch" href="//fonts.googleapis.com">
@@ -71,6 +71,52 @@ if (!doNotTrack) {
 			
 <main class="main list" role="main">
 	<article class="list__item post">
+	<header class="list__header">
+		<h3 class="list__title post__title ">
+			<a href="/NALgen/post/nalgen-analysis_pt0/" rel="bookmark">
+			NALgen Analysis Pt.0
+			</a>
+		</h3>
+		<div class="list__meta meta">
+<div class="meta__item-datetime meta__item">
+	<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg>
+	<time class="meta__text" datetime="2019-07-27T00:00:00">July 27, 2019</time>
+</div>
+
+<div class="meta__item-categories meta__item">
+	<svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2l1 2h8v11h-16v-13z"/></svg>
+	<span class="meta__text"><a class="meta__link" href="/NALgen/categories/analysis" rel="category">Analysis</a></span>
+</div>
+</div>
+	</header>
+	<div class="content list__excerpt post__content clearfix">
+		Non-negative matrix factorization, as implemented in the LEA package, is a case of unsupervised machine learning; LEA uses least-squares estimates of ancestry coefficients. Presented below are the reference results that the 20-population-subset results will be compared against. The original landscapes used to simulate the genetic data, as well as population structure results obtained from these complete genetic datasets, will be used in evaluating the NALgen method.
+Multivariate analyses: Using machine learning algorithms to infer population structure Loading the environmental data library(raster) library(virtualspecies) setwd(&quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Phylogeography/Geo_Analysis/Data/EnvData/bioclim_FA/east coast/Finalized/current&quot;) fn &lt;- list.
+	</div>
+</article><article class="list__item post">
+	<header class="list__header">
+		<h3 class="list__title post__title ">
+			<a href="/NALgen/post/determining_bestk/" rel="bookmark">
+			NALgen Analysis Pt.0
+			</a>
+		</h3>
+		<div class="list__meta meta">
+<div class="meta__item-datetime meta__item">
+	<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg>
+	<time class="meta__text" datetime="2019-07-25T00:00:00">July 25, 2019</time>
+</div>
+
+<div class="meta__item-categories meta__item">
+	<svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2l1 2h8v11h-16v-13z"/></svg>
+	<span class="meta__text"><a class="meta__link" href="/NALgen/categories/fixes" rel="category">Fixes</a>, <a class="meta__link" href="/NALgen/categories/asides" rel="category">Asides</a></span>
+</div>
+</div>
+	</header>
+	<div class="content list__excerpt post__content clearfix">
+		Minimum Cross-Entropy (MinXEnt) Using minimum cross-entropy to determine the number of genetic clusters (K) is not always straightforward. Sometimes, the difference in minimum cross-entropy from K = n to K = n+1 is negligible. Thus, the minimum cross-entropy leads to an overestimation of K. To fix this, I use minimization of &ldquo;slope.&rdquo; Slope = edifference - 1 (where difference = XEntn+1 - XEntn).
+#determining best K and picking best replicate for best K ce &lt;- list() for(k in 1:maxK) ce[[k]] &lt;- cross.
+	</div>
+</article><article class="list__item post">
 	<figure class="list__thumbnail">
 		<a href="/NALgen/post/nalgen-analysis_pt1_recap/">
 			<img src="/NALgen/img/logo.png" alt="NALgen Analysis Pt.1 - Recap" />
@@ -156,6 +202,8 @@ if (!doNotTrack) {
 	<h4 class="widget__title">Recent Posts</h4>
 	<div class="widget__content">
 		<ul class="widget__list">
+			<li class="widget__item"><a class="widget__link" href="/NALgen/post/nalgen-analysis_pt0/">NALgen Analysis Pt.0</a></li>
+			<li class="widget__item"><a class="widget__link" href="/NALgen/post/determining_bestk/">NALgen Analysis Pt.0</a></li>
 			<li class="widget__item"><a class="widget__link" href="/NALgen/post/nalgen-analysis_pt1_recap/">NALgen Analysis Pt.1 - Recap</a></li>
 			<li class="widget__item"><a class="widget__link" href="/NALgen/post/multivariate-analysis_simulated-data/">NALgen Analysis Pt.1</a></li>
 			<li class="widget__item"><a class="widget__link" href="/NALgen/post/landscape-genetic-simulations/">Landscape Genetic Simulations</a></li>
@@ -167,6 +215,8 @@ if (!doNotTrack) {
 	<div class="widget__content">
 		<ul class="widget__list">
 			<li class="widget__item"><a class="widget__link" href="/NALgen/categories/analysis">Analysis</a></li>
+			<li class="widget__item"><a class="widget__link" href="/NALgen/categories/asides">Asides</a></li>
+			<li class="widget__item"><a class="widget__link" href="/NALgen/categories/fixes">Fixes</a></li>
 			<li class="widget__item"><a class="widget__link" href="/NALgen/categories/recap">Recap</a></li>
 			<li class="widget__item"><a class="widget__link" href="/NALgen/categories/simulations">Simulations</a></li>
 		</ul>
@@ -175,14 +225,18 @@ if (!doNotTrack) {
 <div class="widget-taglist widget">
 	<h4 class="widget__title">Tags</h4>
 	<div class="widget__content">
+		<a class="widget-taglist__link widget__link btn" href="/NALgen/tags/clustering" title="Clustering">Clustering</a>
 		<a class="widget-taglist__link widget__link btn" href="/NALgen/tags/co-inertia-analysis" title="Co inertia analysis">Co inertia analysis</a>
 		<a class="widget-taglist__link widget__link btn" href="/NALgen/tags/discriminant-analysis-of-principal-components" title="Discriminant analysis of principal components">Discriminant analysis of principal components</a>
 		<a class="widget-taglist__link widget__link btn" href="/NALgen/tags/genetic-environmental-covariance" title="Genetic environmental covariance">Genetic environmental covariance</a>
 		<a class="widget-taglist__link widget__link btn" href="/NALgen/tags/genotype-simulations" title="Genotype simulations">Genotype simulations</a>
 		<a class="widget-taglist__link widget__link btn" href="/NALgen/tags/landscape-genetics" title="Landscape genetics">Landscape genetics</a>
 		<a class="widget-taglist__link widget__link btn" href="/NALgen/tags/landscape-simulations" title="Landscape simulations">Landscape simulations</a>
+		<a class="widget-taglist__link widget__link btn" href="/NALgen/tags/machine-learning" title="Machine learning">Machine learning</a>
+		<a class="widget-taglist__link widget__link btn" href="/NALgen/tags/multivariate-analysis" title="Multivariate analysis">Multivariate analysis</a>
 		<a class="widget-taglist__link widget__link btn" href="/NALgen/tags/multivariate-ordination" title="Multivariate ordination">Multivariate ordination</a>
 		<a class="widget-taglist__link widget__link btn" href="/NALgen/tags/population-structure" title="Population structure">Population structure</a>
+		<a class="widget-taglist__link widget__link btn" href="/NALgen/tags/unsupervised-learning" title="Unsupervised learning">Unsupervised learning</a>
 	</div>
 </div>
 </aside>

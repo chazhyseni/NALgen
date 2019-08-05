@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Machine Learning on NALgen</title>
+    <link>/NALgen/tags/machine-learning/</link>
+    <description>Recent content in Machine Learning on NALgen</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 27 Jul 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/NALgen/tags/machine-learning/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>NALgen Analysis Pt.0</title>
+      <link>/NALgen/post/nalgen-analysis_pt0/</link>
+      <pubDate>Sat, 27 Jul 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/NALgen/post/nalgen-analysis_pt0/</guid>
+      <description>Non-negative matrix factorization, as implemented in the LEA package, is a case of unsupervised machine learning; LEA uses least-squares estimates of ancestry coefficients. Presented below are the reference results that the 20-population-subset results will be compared against. The original landscapes used to simulate the genetic data, as well as population structure results obtained from these complete genetic datasets, will be used in evaluating the NALgen method.
+Multivariate analyses: Using machine learning algorithms to infer population structure Loading the environmental data library(raster) library(virtualspecies) setwd(&amp;quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Phylogeography/Geo_Analysis/Data/EnvData/bioclim_FA/east coast/Finalized/current&amp;quot;) fn &amp;lt;- list.</description>
+    </item>
+    
+    <item>
+      <title>NALgen Analysis Pt.0</title>
+      <link>/NALgen/post/determining_bestk/</link>
+      <pubDate>Thu, 25 Jul 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/NALgen/post/determining_bestk/</guid>
+      <description>Minimum Cross-Entropy (MinXEnt) Using minimum cross-entropy to determine the number of genetic clusters (K) is not always straightforward. Sometimes, the difference in minimum cross-entropy from K = n to K = n+1 is negligible. Thus, the minimum cross-entropy leads to an overestimation of K. To fix this, I use minimization of &amp;ldquo;slope.&amp;rdquo; Slope = edifference - 1 (where difference = XEntn+1 - XEntn).
+#determining best K and picking best replicate for best K ce &amp;lt;- list() for(k in 1:maxK) ce[[k]] &amp;lt;- cross.</description>
+    </item>
+    
+  </channel>
+</rss>

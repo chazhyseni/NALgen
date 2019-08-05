@@ -6,10 +6,37 @@
     <description>Recent content in Categories on NALgen</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 21 Jul 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 27 Jul 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/NALgen/categories/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Analysis</title>
+      <link>/NALgen/categories/analysis/</link>
+      <pubDate>Sat, 27 Jul 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/NALgen/categories/analysis/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Asides</title>
+      <link>/NALgen/categories/asides/</link>
+      <pubDate>Thu, 25 Jul 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/NALgen/categories/asides/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Fixes</title>
+      <link>/NALgen/categories/fixes/</link>
+      <pubDate>Thu, 25 Jul 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/NALgen/categories/fixes/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>Recap</title>
@@ -17,15 +44,6 @@
       <pubDate>Sun, 21 Jul 2019 00:00:00 +0000</pubDate>
       
       <guid>/NALgen/categories/recap/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Analysis</title>
-      <link>/NALgen/categories/analysis/</link>
-      <pubDate>Sat, 20 Jul 2019 00:00:00 +0000</pubDate>
-      
-      <guid>/NALgen/categories/analysis/</guid>
       <description></description>
     </item>
     

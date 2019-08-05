@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en-us">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>NALgen Analysis Pt.0 - NALgen</title>
+	<script>(function(d,e){d[e]=d[e].replace("no-js","js");})(document.documentElement,"className");</script>
+	<meta name="description" content="Reference Population Structure Results w/ All Populations">
+	<meta property="og:title" content="NALgen Analysis Pt.0" />
+<meta property="og:description" content="Reference Population Structure Results w/ All Populations" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="/NALgen/post/nalgen-analysis_pt0/" />
+<meta property="article:published_time" content="2019-07-27T00:00:00&#43;00:00"/>
+<meta property="article:modified_time" content="2019-07-27T00:00:00&#43;00:00"/>
+
+	
+	<link rel="dns-prefetch" href="//fonts.googleapis.com">
+	<link rel="dns-prefetch" href="//fonts.gstatic.com">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700">
+	<link rel="stylesheet" href="/NALgen/css/style.css">
+	
+	<link rel="shortcut icon" href="/NALgen/favicon.ico">
+		
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-139514839-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+</head>
+<body class="body">
+	<div class="container container--outer">
+		<header class="header">
+	<div class="container">
+		<div class="logo">
+			<a class="logo__link" href="/NALgen" title="NALgen" rel="home">
+				<div class="logo__title">NALgen</div>
+				<div class="logo__tagline">Neutral and Adaptive Landscape Genetics</div>
+			</a>
+		</div>
+		
+<nav class="menu">
+	<button class="menu__btn" aria-haspopup="true" aria-expanded="false" tabindex="0">
+		<span class="menu__btn-title" tabindex="-1">Menu</span>
+	</button>
+	<ul class="menu__list">
+		<li class="menu__item">
+			<a class="menu__link" href="/NALgen/about/">About</a>
+		</li>
+		<li class="menu__item">
+			<a class="menu__link" href="/NALgen/vignettes/">Vignettes</a>
+		</li>
+		<li class="menu__item">
+			<a class="menu__link" href="/NALgen/tutorials/">Tutorials</a>
+		</li>
+	</ul>
+</nav>
+
+	</div>
+</header>
+		<div class="wrapper flex">
+			<div class="primary">
+			
+<main class="main" role="main">
+	<article class="post">
+		<header class="post__header">
+			<h1 class="post__title">NALgen Analysis Pt.0</h1>
+			<div class="post__meta meta">
+<div class="meta__item-datetime meta__item">
+	<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg>
+	<time class="meta__text" datetime="2019-07-27T00:00:00">July 27, 2019</time>
+</div>
+
+<div class="meta__item-categories meta__item">
+	<svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2l1 2h8v11h-16v-13z"/></svg>
+	<span class="meta__text"><a class="meta__link" href="/NALgen/categories/analysis" rel="category">Analysis</a></span>
+</div>
+</div>
+		</header><div class="content post__content clearfix">
+			
+
+<p>Non-negative matrix factorization, as implemented in the <em>LEA</em> package, is a case of unsupervised machine learning; <em>LEA</em> uses least-squares estimates of ancestry coefficients.
+Presented below are the reference results that the 20-population-subset results will be compared against. The original landscapes used to simulate the genetic data, as well as population structure results obtained from these complete genetic datasets, will be used in evaluating the NALgen method.</p>
+
+<h1 id="multivariate-analyses-using-machine-learning-algorithms-to-infer-population-structure">Multivariate analyses: Using machine learning algorithms to infer population structure</h1>
+
+<h2 id="loading-the-environmental-data">Loading the environmental data</h2>
+
+<pre><code class="language-r">library(raster)
+library(virtualspecies)
+
+setwd(&quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Phylogeography/Geo_Analysis/Data/EnvData/bioclim_FA/east coast/Finalized/current&quot;)
+fn &lt;- list.files(pattern=&quot;.asc&quot;)
+fa_stk &lt;- stack()
+for(i in 1:length(fn)) fa_stk=addLayer(fa_stk,raster(fn[i]))
+
+#names for plot titles
+fa_stk_names &lt;- c(&quot;Annual Temperature Range&quot;, &quot;Dry-Season Precipitation&quot;, &quot;Summer Temperature&quot;, &quot;Wet-Season Precipitation&quot;)
+</code></pre>
+
+<h2 id="loading-the-genetic-data">Loading the genetic data</h2>
+
+<pre><code class="language-r">library(adegenet)
+
+
+setwd(&quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/NALgen_Analysis/Multivariate/&quot;)
+
+#below I define the xyFromRC function: includes a scenario when genind and rastr don't have the same dimensions
+#currently (for my purposes here it's fine) only spits out error when aspect ratio is not the same, but proceeds the same anyway
+#need to fix to apply to other situations
+
+xyFromRC &lt;- function(genind, rastr){
+             coord &lt;- genind$other
+             row.no &lt;- coord[,1]+1
+             col.no &lt;- coord[,2]+1
+             dim.genind.row &lt;- 26 #dim of simulated landscape
+             dim.genind.col &lt;- 34 #dim of simulated landscape
+             dim.rast.row &lt;- dim(rastr)[1]
+             dim.rast.col &lt;- dim(rastr)[2]
+             if(dim.rast.col/dim.genind.col == dim.rast.row/dim.genind.row){
+                print(&quot;raster and genind are the same aspect ratio. proceed.&quot;)
+             }
+             else{
+                print(&quot;error! raster and genind are NOT the same aspect ratio. proceed ANYWAY.&quot;)
+             }
+             rastr &lt;- aggregate(rastr, dim.rast.col/dim.genind.col)
+             cell.no &lt;- cellFromRowCol(rastr, row=row.no, col=col.no)
+             coord &lt;- xyFromCell(rastr, cell.no)
+             as.data.frame(coord)
+         }
+
+#use already aggregated fa_stk to make this go faster
+fa_stk.agg &lt;- aggregate(fa_stk, dim(fa_stk)[1]/26)
+
+
+#folders with full simulated data (not 20-pop subsets)
+full_m0.1_lclp &lt;- &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_1/Simulated_Landscapes/500neutral+50selectedSNPs/Low_Complexity_Landscapes/landscapeR/Low_Permeability&quot;
+full_m0.1_lchp &lt;- &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_1/Simulated_Landscapes/500neutral+50selectedSNPs/Low_Complexity_Landscapes/landscapeR/High_Permeability&quot;
+full_m0.1_hclp &lt;- &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_1/Simulated_Landscapes/500neutral+50selectedSNPs/High_Complexity_Landscapes/virtualspecies/Low_Permeability&quot;
+full_m0.1_hchp &lt;- &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_1/Simulated_Landscapes/500neutral+50selectedSNPs/High_Complexity_Landscapes/virtualspecies/High_Permeability&quot;
+full_m0.5_lclp &lt;- &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_5/Simulated_Landscapes/500neutral+50selectedSNPs/Low_Complexity_Landscapes/landscapeR/Low_Permeability&quot;
+full_m0.5_lchp &lt;- &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_5/Simulated_Landscapes/500neutral+50selectedSNPs/Low_Complexity_Landscapes/landscapeR/High_Permeability&quot;
+full_m0.5_hclp &lt;- &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_5/Simulated_Landscapes/500neutral+50selectedSNPs/High_Complexity_Landscapes/virtualspecies/Low_Permeability&quot;
+full_m0.5_hchp &lt;- &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_5/Simulated_Landscapes/500neutral+50selectedSNPs/High_Complexity_Landscapes/virtualspecies/High_Permeability&quot;
+
+
+setwd(full_m0.1_lclp)
+full_m0.1_lclp_n.s &lt;- read.genepop(&quot;lclp.GENEPOP.gen&quot;)
+full_m0.1_lclp_n.s$other &lt;- read.table(&quot;lclp.GENEPOP.PopCoor.txt&quot;, sep=&quot; &quot;,header=F)
+colnames(full_m0.1_lclp_n.s$other)=c(&quot;x&quot;,&quot;y&quot;)
+full_m0.1_lclp_n.s$other &lt;- xyFromRC(full_m0.1_lclp_n.s, fa_stk.agg)
+
+setwd(full_m0.1_lchp)
+full_m0.1_lchp_n.s &lt;- read.genepop(&quot;lchp.GENEPOP.gen&quot;)
+full_m0.1_lchp_n.s$other &lt;- read.table(&quot;lchp.GENEPOP.PopCoor.txt&quot;, sep=&quot; &quot;,header=F)
+colnames(full_m0.1_lchp_n.s$other)=c(&quot;x&quot;,&quot;y&quot;)
+full_m0.1_lchp_n.s$other &lt;- xyFromRC(full_m0.1_lchp_n.s, fa_stk.agg)
+
+setwd(full_m0.1_hclp)
+full_m0.1_hclp_n.s &lt;- read.genepop(&quot;hclp.GENEPOP.gen&quot;)
+full_m0.1_hclp_n.s$other &lt;- read.table(&quot;hclp.GENEPOP.PopCoor.txt&quot;, sep=&quot; &quot;,header=F)
+colnames(full_m0.1_hclp_n.s$other)=c(&quot;x&quot;,&quot;y&quot;)
+full_m0.1_hclp_n.s$other &lt;- xyFromRC(full_m0.1_hclp_n.s, fa_stk.agg)
+
+setwd(full_m0.1_hchp)
+full_m0.1_hchp_n.s &lt;- read.genepop(&quot;hchp.GENEPOP.gen&quot;)
+full_m0.1_hchp_n.s$other &lt;- read.table(&quot;hchp.GENEPOP.PopCoor.txt&quot;, sep=&quot; &quot;,header=F)
+colnames(full_m0.1_hchp_n.s$other)=c(&quot;x&quot;,&quot;y&quot;)
+full_m0.1_hchp_n.s$other &lt;- xyFromRC(full_m0.1_hchp_n.s, fa_stk.agg)
+
+setwd(full_m0.5_lclp)
+full_m0.5_lclp_n.s &lt;- read.genepop(&quot;lclp.GENEPOP.gen&quot;)
+full_m0.5_lclp_n.s$other &lt;- read.table(&quot;lclp.GENEPOP.PopCoor.txt&quot;, sep=&quot; &quot;,header=F)
+colnames(full_m0.5_lclp_n.s$other)=c(&quot;x&quot;,&quot;y&quot;)
+full_m0.5_lclp_n.s$other &lt;- xyFromRC(full_m0.5_lclp_n.s, fa_stk.agg)
+
+setwd(full_m0.5_lchp)
+full_m0.5_lchp_n.s &lt;- read.genepop(&quot;lchp.GENEPOP.gen&quot;)
+full_m0.5_lchp_n.s$other &lt;- read.table(&quot;lchp.GENEPOP.PopCoor.txt&quot;, sep=&quot; &quot;,header=F)
+colnames(full_m0.5_lchp_n.s$other)=c(&quot;x&quot;,&quot;y&quot;)
+full_m0.5_lchp_n.s$other &lt;- xyFromRC(full_m0.5_lchp_n.s, fa_stk.agg)
+
+setwd(full_m0.5_hclp)
+full_m0.5_hclp_n.s &lt;- read.genepop(&quot;hclp.GENEPOP.gen&quot;)
+full_m0.5_hclp_n.s$other &lt;- read.table(&quot;hclp.GENEPOP.PopCoor.txt&quot;, sep=&quot; &quot;,header=F)
+colnames(full_m0.5_hclp_n.s$other)=c(&quot;x&quot;,&quot;y&quot;)
+full_m0.5_hclp_n.s$other &lt;- xyFromRC(full_m0.5_hclp_n.s, fa_stk.agg)
+
+setwd(full_m0.5_hchp)
+full_m0.5_hchp_n.s &lt;- read.genepop(&quot;hchp.GENEPOP.gen&quot;)
+full_m0.5_hchp_n.s$other &lt;- read.table(&quot;hchp.GENEPOP.PopCoor.txt&quot;, sep=&quot; &quot;,header=F)
+colnames(full_m0.5_hchp_n.s$other)=c(&quot;x&quot;,&quot;y&quot;)
+full_m0.5_hchp_n.s$other &lt;- xyFromRC(full_m0.5_hchp_n.s, fa_stk.agg)
+</code></pre>
+
+<h2 id="unsupervised-classification-inferring-genetic-clusters-using-non-negative-matrix-factorization-lea-package">Unsupervised classification: Inferring genetic clusters using non-negative matrix factorization (<em>LEA</em> package)</h2>
+
+<pre><code class="language-r">library(ggsci)
+library(LEA)
+library(mapplots)
+library(maps)
+library(changepoint)
+
+futr &lt;- pal_futurama()
+schwifty &lt;- pal_rickandmorty()
+futr.cols &lt;- colorRampPalette(futr(12)[c(12,11,3,7,8,6,1,2)])
+schwifty.cols &lt;- colorRampPalette(schwifty(12)[c(3,12,4,6,1,9,8,2)])
+futrschwift.cols &lt;- colorRampPalette(c(&quot;gray15&quot;, schwifty(12)[3], futr(12)[11], schwifty(12)[c(1,9)], futr(12)[c(8,6,2)]))
+cols &lt;- futrschwift.cols(12)
+
+
+#plot parameters
+par(mfrow=c(1,1),fg=&quot;gray50&quot;,pty='m',bty='o',mar=c(4,4,4,4),cex.main=1.3,cex.axis=1.1,cex.lab=1.2)
+
+geninds &lt;- list(full_m0.1_lclp_n.s, 
+         full_m0.1_lchp_n.s, 
+         full_m0.1_hclp_n.s, 
+         full_m0.1_hchp_n.s, 
+         full_m0.5_lclp_n.s, 
+         full_m0.5_lchp_n.s, 
+         full_m0.5_hclp_n.s, 
+         full_m0.5_hchp_n.s)
+
+genind_names &lt;- c(&quot;full_m0.1_lclp_n.s&quot;, 
+         &quot;full_m0.1_lchp_n.s&quot;, 
+         &quot;full_m0.1_hclp_n.s&quot;, 
+         &quot;full_m0.1_hchp_n.s&quot;, 
+         &quot;full_m0.5_lclp_n.s&quot;, 
+         &quot;full_m0.5_lchp_n.s&quot;, 
+         &quot;full_m0.5_hclp_n.s&quot;, 
+         &quot;full_m0.5_hchp_n.s&quot;)
+
+ls_names &lt;- c(&quot;LCLP landscape (m = 0.1)&quot;, 
+          &quot;LCHP landscape (m = 0.1)&quot;, 
+          &quot;HCLP landscape (m = 0.1)&quot;, 
+          &quot;HCHP landscape (m = 0.1)&quot;, 
+          &quot;LCLP landscape (m = 0.5)&quot;, 
+          &quot;LCHP landscape (m = 0.5)&quot;, 
+          &quot;HCLP landscape (m = 0.5)&quot;, 
+          &quot;HCHP landscape (m = 0.5)&quot;)
+
+lea.dir &lt;- c(
+       &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_1/Simulated_Landscapes/500neutral+50selectedSNPs/Low_Complexity_Landscapes/landscapeR/Low_Permeability/&quot;,
+       &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_1/Simulated_Landscapes/500neutral+50selectedSNPs/Low_Complexity_Landscapes/landscapeR/High_Permeability/&quot;,
+       &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_1/Simulated_Landscapes/500neutral+50selectedSNPs/High_Complexity_Landscapes/virtualspecies/Low_Permeability/&quot;,
+           &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_1/Simulated_Landscapes/500neutral+50selectedSNPs/High_Complexity_Landscapes/virtualspecies/High_Permeability/&quot;,
+       &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_5/Simulated_Landscapes/500neutral+50selectedSNPs/Low_Complexity_Landscapes/landscapeR/Low_Permeability/&quot;,
+       &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_5/Simulated_Landscapes/500neutral+50selectedSNPs/Low_Complexity_Landscapes/landscapeR/High_Permeability/&quot;,
+       &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_5/Simulated_Landscapes/500neutral+50selectedSNPs/High_Complexity_Landscapes/virtualspecies/Low_Permeability/&quot;,
+       &quot;C:/Users/chazh/Documents/Research Projects/Reticulitermes/Simulations/popRange/m_0_5/Simulated_Landscapes/500neutral+50selectedSNPs/High_Complexity_Landscapes/virtualspecies/High_Permeability/&quot;
+           )
+
+for (i in 1:8){
+     genind.obj &lt;- geninds[[i]]
+     genotypes &lt;- genind.obj$tab
+     coords &lt;- genind.obj$other
+      
+     setwd(lea.dir[i])
+     write.table(t(as.matrix(genotypes)), sep=&quot;&quot;, row.names=F, col.names=F, paste0(genind_names[i], &quot;.geno&quot;))
+     geno &lt;- read.geno(paste0(genind_names[i],&quot;.geno&quot;))
+     setwd(paste0(lea.dir[i],&quot;LEA&quot;))
+     source(&quot;POPSutilities.r&quot;)
+     setwd(lea.dir[i])
+
+     reps &lt;- 5
+     maxK &lt;- 15
+
+     ##running pop structure inference
+     #snmf.obj &lt;- snmf(paste0(genind_names[i],&quot;.geno&quot;), K=1:maxK, repetitions=reps, project=&quot;new&quot;, 
+     #                alpha=10, iterations=100000,
+     #                 entropy=TRUE, percentage=0.25)
+     #plot(snmf.obj, cex=1.2, col=&quot;lightblue&quot;, pch=19)
+     
+     #if running again, loading saved files
+     snmf.obj &lt;- load.snmfProject(paste0(genind_names[i],&quot;.snmfProject&quot;))
+     plot(snmf.obj, cex=1.2, col=&quot;lightblue&quot;, pch=19)
+     
+     #determining best K and picking best replicate for best K
+     ce &lt;- list()
+     for(k in 1:maxK) ce[[k]] &lt;- cross.entropy(snmf.obj, K=k)
+     ce.K &lt;- c()
+     for(k in 1:maxK) ce.K[k] &lt;- min(ce[[k]])
+     diff &lt;- ce.K[-1] - ce.K[-maxK]
+     slope &lt;- exp(-diff) - 1
+     best.K &lt;- min(which(slope &lt;= median(slope)))
+     best.run &lt;- which.min(ce[[best.K]])
+     
+     barchart(snmf.obj, K=best.K, run=best.run,
+              border=NA, space=0, col=futrschwift.cols(best.K),
+              xlab=&quot;Individuals&quot;, ylab=&quot;Ancestry proportions&quot;,
+              main=paste(&quot;Ancestry bar chart for&quot;, ls_names[i]))
+      
+     qmatrix &lt;- Q(snmf.obj, K=best.K, run=best.run)
+      
+     grid &lt;- createGrid(xmin(fa_stk), xmax(fa_stk),
+                        ymin(fa_stk), ymax(fa_stk), 260, 340)
+     constraints &lt;- NULL
+      
+     shades &lt;- 10
+     
+     futrschwift.gradient &lt;- colorRampPalette(futrschwift.cols(best.K))
+     grad.cols &lt;- futrschwift.gradient(shades*best.K)
+     
+     ColorGradients_bestK &lt;- list()
+     for(j in 1:best.K){ 
+           k.start &lt;- j*shades-shades+1
+           k.fin &lt;- j*shades
+           ColorGradients_bestK[[j]] &lt;- c(&quot;gray95&quot;, grad.cols[k.start:k.fin])
+     }
+
+     maps(qmatrix, coords, grid, constraints, method=&quot;max&quot;,
+          colorGradientsList=ColorGradients_bestK,
+       main=paste(&quot;Mapped ancestry coefficients for&quot;, ls_names[i]), 
+                  xlab=&quot;Longitude&quot;, ylab=&quot;Latitude&quot;, cex=.5)
+     map(add=T, interior=F)
+}
+</code></pre>
+
+<p><img src="../../md-files/nalgen-analysis_pt0/figure-html/unnamed-chunk-3-1.png" alt="" /><!-- --><img src="../../md-files/nalgen-analysis_pt0/figure-html/unnamed-chunk-3-2.png" alt="" /><!-- --><img src="../../md-files/nalgen-analysis_pt0/figure-html/unnamed-chunk-3-3.png" alt="" /><!-- -->
+<img src="../../md-files/nalgen-analysis_pt0/figure-html/unnamed-chunk-3-4.png" alt="" /><!-- --><img src="../../md-files/nalgen-analysis_pt0/figure-html/unnamed-chunk-3-5.png" alt="" /><!-- --><img src="../../md-files/nalgen-analysis_pt0/figure-html/unnamed-chunk-3-6.png" alt="" /><!-- -->
+<img src="../../md-files/nalgen-analysis_pt0/figure-html/unnamed-chunk-3-7.png" alt="" /><!-- --><img src="../../md-files/nalgen-analysis_pt0/figure-html/unnamed-chunk-3-8.png" alt="" /><!-- --><img src="../../md-files/nalgen-analysis_pt0/figure-html/unnamed-chunk-3-9.png" alt="" /><!-- -->
+<img src="../../md-files/nalgen-analysis_pt0/figure-html/unnamed-chunk-3-10.png" alt="" /><!-- --><img src="../../md-files/nalgen-analysis_pt0/figure-html/unnamed-chunk-3-11.png" alt="" /><!-- --><img src="../../md-files/nalgen-analysis_pt0/figure-html/unnamed-chunk-3-12.png" alt="" /><!-- -->
+<img src="../../md-files/nalgen-analysis_pt0/figure-html/unnamed-chunk-3-13.png" alt="" /><!-- --><img src="../../md-files/nalgen-analysis_pt0/figure-html/unnamed-chunk-3-14.png" alt="" /><!-- --><img src="../../md-files/nalgen-analysis_pt0/figure-html/unnamed-chunk-3-15.png" alt="" /><!-- -->
+<img src="../../md-files/nalgen-analysis_pt0/figure-html/unnamed-chunk-3-16.png" alt="" /><!-- --><img src="../../md-files/nalgen-analysis_pt0/figure-html/unnamed-chunk-3-17.png" alt="" /><!-- --><img src="../../md-files/nalgen-analysis_pt0/figure-html/unnamed-chunk-3-18.png" alt="" /><!-- -->
+<img src="../../md-files/nalgen-analysis_pt0/figure-html/unnamed-chunk-3-19.png" alt="" /><!-- --><img src="../../md-files/nalgen-analysis_pt0/figure-html/unnamed-chunk-3-20.png" alt="" /><!-- --><img src="../../md-files/nalgen-analysis_pt0/figure-html/unnamed-chunk-3-21.png" alt="" /><!-- -->
+<img src="../../md-files/nalgen-analysis_pt0/figure-html/unnamed-chunk-3-22.png" alt="" /><!-- --><img src="../../md-files/nalgen-analysis_pt0/figure-html/unnamed-chunk-3-23.png" alt="" /><!-- --><img src="../../md-files/nalgen-analysis_pt0/figure-html/unnamed-chunk-3-24.png" alt="" /><!-- --></p>
+
+		</div>
+		
+<div class="post__tags tags clearfix">
+	<svg class="tags__icon icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5 0 11V3C0 1.5.8.8.8.8S1.5 0 3 0h8c1.5 0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/></svg>
+	<ul class="tags__list">
+		<li class="tags__item"><a class="tags__link btn" href="/NALgen/tags/multivariate-analysis/" rel="tag">Multivariate Analysis</a></li>
+		<li class="tags__item"><a class="tags__link btn" href="/NALgen/tags/unsupervised-learning/" rel="tag">Unsupervised Learning</a></li>
+		<li class="tags__item"><a class="tags__link btn" href="/NALgen/tags/machine-learning/" rel="tag">Machine Learning</a></li>
+		<li class="tags__item"><a class="tags__link btn" href="/NALgen/tags/co-inertia-analysis/" rel="tag">Co-inertia Analysis</a></li>
+		<li class="tags__item"><a class="tags__link btn" href="/NALgen/tags/population-structure/" rel="tag">Population Structure</a></li>
+		<li class="tags__item"><a class="tags__link btn" href="/NALgen/tags/genetic-environmental-covariance/" rel="tag">Genetic-Environmental Covariance</a></li>
+	</ul>
+</div>
+	</article>
+</main>
+
+<div class="authorbox clearfix">
+	<figure class="authorbox__avatar">
+		<img alt="Chaz Hyseni avatar" src="/NALgen/img/SpEcEvGen.png" class="avatar" height="90" width="90">
+	</figure>
+	<div class="authorbox__header">
+		<span class="authorbox__name">About Chaz Hyseni</span>
+	</div>
+	<div class="authorbox__description">
+		Chaz has been doing research in the field of Population Genetics since 2006. He is interested in the distribution of genetic variation (both neutral and adaptive) in natural environments, at different spatial and temporal scales (from Landscape Genetics to Phylogeography). To understand pattern and process, Chaz uses empirical data as well as spatial eco-evolutionary modeling.
+	</div>
+</div>
+
+<nav class="post-nav flex">
+	<div class="post-nav__item post-nav__item--prev">
+		<a class="post-nav__link" href="/NALgen/post/determining_bestk/" rel="prev"><span class="post-nav__caption">«&thinsp;Previous</span><p class="post-nav__post-title">NALgen Analysis Pt.0</p></a>
+	</div>
+</nav>
+
+
+			</div>
+			<aside class="sidebar">
+<div class="widget-recent widget">
+	<h4 class="widget__title">Recent Posts</h4>
+	<div class="widget__content">
+		<ul class="widget__list">
+			<li class="widget__item"><a class="widget__link" href="/NALgen/post/nalgen-analysis_pt0/">NALgen Analysis Pt.0</a></li>
+			<li class="widget__item"><a class="widget__link" href="/NALgen/post/determining_bestk/">NALgen Analysis Pt.0</a></li>
+			<li class="widget__item"><a class="widget__link" href="/NALgen/post/nalgen-analysis_pt1_recap/">NALgen Analysis Pt.1 - Recap</a></li>
+			<li class="widget__item"><a class="widget__link" href="/NALgen/post/multivariate-analysis_simulated-data/">NALgen Analysis Pt.1</a></li>
+			<li class="widget__item"><a class="widget__link" href="/NALgen/post/landscape-genetic-simulations/">Landscape Genetic Simulations</a></li>
+		</ul>
+	</div>
+</div>
+<div class="widget-categories widget">
+	<h4 class="widget__title">Categories</h4>
+	<div class="widget__content">
+		<ul class="widget__list">
+			<li class="widget__item"><a class="widget__link" href="/NALgen/categories/analysis">Analysis</a></li>
+			<li class="widget__item"><a class="widget__link" href="/NALgen/categories/asides">Asides</a></li>
+			<li class="widget__item"><a class="widget__link" href="/NALgen/categories/fixes">Fixes</a></li>
+			<li class="widget__item"><a class="widget__link" href="/NALgen/categories/recap">Recap</a></li>
+			<li class="widget__item"><a class="widget__link" href="/NALgen/categories/simulations">Simulations</a></li>
+		</ul>
+	</div>
+</div>
+<div class="widget-taglist widget">
+	<h4 class="widget__title">Tags</h4>
+	<div class="widget__content">
+		<a class="widget-taglist__link widget__link btn" href="/NALgen/tags/clustering" title="Clustering">Clustering</a>
+		<a class="widget-taglist__link widget__link btn" href="/NALgen/tags/co-inertia-analysis" title="Co inertia analysis">Co inertia analysis</a>
+		<a class="widget-taglist__link widget__link btn" href="/NALgen/tags/discriminant-analysis-of-principal-components" title="Discriminant analysis of principal components">Discriminant analysis of principal components</a>
+		<a class="widget-taglist__link widget__link btn" href="/NALgen/tags/genetic-environmental-covariance" title="Genetic environmental covariance">Genetic environmental covariance</a>
+		<a class="widget-taglist__link widget__link btn" href="/NALgen/tags/genotype-simulations" title="Genotype simulations">Genotype simulations</a>
+		<a class="widget-taglist__link widget__link btn" href="/NALgen/tags/landscape-genetics" title="Landscape genetics">Landscape genetics</a>
+		<a class="widget-taglist__link widget__link btn" href="/NALgen/tags/landscape-simulations" title="Landscape simulations">Landscape simulations</a>
+		<a class="widget-taglist__link widget__link btn" href="/NALgen/tags/machine-learning" title="Machine learning">Machine learning</a>
+		<a class="widget-taglist__link widget__link btn" href="/NALgen/tags/multivariate-analysis" title="Multivariate analysis">Multivariate analysis</a>
+		<a class="widget-taglist__link widget__link btn" href="/NALgen/tags/multivariate-ordination" title="Multivariate ordination">Multivariate ordination</a>
+		<a class="widget-taglist__link widget__link btn" href="/NALgen/tags/population-structure" title="Population structure">Population structure</a>
+		<a class="widget-taglist__link widget__link btn" href="/NALgen/tags/unsupervised-learning" title="Unsupervised learning">Unsupervised learning</a>
+	</div>
+</div>
+</aside>
+		</div>
+		<footer class="footer">
+	<div class="container footer__container flex">
+		
+		<div class="footer__copyright">
+			&copy; 2019 NALgen.
+			<span class="footer__copyright-credits">Generated with <a href="https://gohugo.io/" rel="nofollow noopener" target="_blank">Hugo</a> and <a href="https://github.com/Vimux/Mainroad/" rel="nofollow noopener" target="_blank">Mainroad</a> theme.</span>
+		</div>
+	</div>
+</footer>
+	</div>
+<script async defer src="/NALgen/js/menu.js"></script></body>
+</html>
