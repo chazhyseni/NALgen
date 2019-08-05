@@ -26,9 +26,7 @@
       <pubDate>Thu, 25 Jul 2019 00:00:00 +0000</pubDate>
       
       <guid>/NALgen/post/determining_bestk/</guid>
-      <description>&lt;h2 id=&#34;minimum-cross-entropy-minxent&#34;&gt;Minimum Cross-Entropy (MinXEnt)&lt;/h2&gt;
-
-&lt;p&gt;Using minimum cross-entropy to determine the number of genetic clusters (K) is not always straightforward.&lt;/p&gt;</description>
+      <description>&lt;p&gt;Using minimum cross-entropy (MinXEnt) to determine the number of genetic clusters (K) is not always straightforward.&lt;/p&gt;</description>
     </item>
     
     <item>

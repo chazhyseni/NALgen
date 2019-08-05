@@ -83,9 +83,7 @@ if (!doNotTrack) {
 </div>
 </div>
 		</header><div class="content post__content clearfix">
-			<h2 id="minimum-cross-entropy-minxent">Minimum Cross-Entropy (MinXEnt)</h2>
-
-<p>Using minimum cross-entropy to determine the number of genetic clusters (K) is not always straightforward.</p>
+			<p>Using minimum cross-entropy (MinXEnt) to determine the number of genetic clusters (K) is not always straightforward.</p>
 
 <p>Sometimes, the difference in minimum cross-entropy from K = n to K = n+1 is negligible. Thus, the minimum cross-entropy leads to an overestimation of K. To fix this, I use minimization of &ldquo;slope.&rdquo; Slope = <em>e</em><sup>difference</sup> - 1 (where difference = XEnt<sub>n+1</sub> - XEnt<sub>n</sub>).</p>
 
