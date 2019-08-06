@@ -6,7 +6,7 @@
     <description>Recent content in Asides on NALgen</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 25 Jul 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 26 Jul 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/NALgen/categories/asides/index.xml" rel="self" type="application/rss+xml" />
     
@@ -14,7 +14,7 @@
     <item>
       <title>Cross-Entropy and Clustering</title>
       <link>/NALgen/post/determining_bestk/</link>
-      <pubDate>Thu, 25 Jul 2019 00:00:00 +0000</pubDate>
+      <pubDate>Fri, 26 Jul 2019 00:00:00 +0000</pubDate>
       
       <guid>/NALgen/post/determining_bestk/</guid>
       <description>&lt;p&gt;Using minimum cross-entropy (MinXEnt) to determine the number of genetic clusters (K) is not always straightforward.&lt;/p&gt;</description>

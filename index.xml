@@ -6,7 +6,7 @@
     <description>Recent content on NALgen</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 27 Jul 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 28 Jul 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/NALgen/index.xml" rel="self" type="application/rss+xml" />
     
@@ -14,7 +14,7 @@
     <item>
       <title>NALgen Analysis Pt.0</title>
       <link>/NALgen/post/nalgen-analysis_pt0/</link>
-      <pubDate>Sat, 27 Jul 2019 00:00:00 +0000</pubDate>
+      <pubDate>Sun, 28 Jul 2019 00:00:00 +0000</pubDate>
       
       <guid>/NALgen/post/nalgen-analysis_pt0/</guid>
       <description>&lt;p&gt;Non-negative matrix factorization, as implemented in the &lt;em&gt;LEA&lt;/em&gt; package, is a case of unsupervised machine learning; &lt;em&gt;LEA&lt;/em&gt; uses least-squares estimates of ancestry coefficients.&lt;/p&gt;</description>
@@ -23,7 +23,7 @@
     <item>
       <title>Cross-Entropy and Clustering</title>
       <link>/NALgen/post/determining_bestk/</link>
-      <pubDate>Thu, 25 Jul 2019 00:00:00 +0000</pubDate>
+      <pubDate>Fri, 26 Jul 2019 00:00:00 +0000</pubDate>
       
       <guid>/NALgen/post/determining_bestk/</guid>
       <description>&lt;p&gt;Using minimum cross-entropy (MinXEnt) to determine the number of genetic clusters (K) is not always straightforward.&lt;/p&gt;</description>

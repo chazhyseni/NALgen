@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Machine Learning on NALgen</title>
-    <link>/NALgen/tags/machine-learning/</link>
-    <description>Recent content in Machine Learning on NALgen</description>
+    <title>Non-negative Matrix Factorization on NALgen</title>
+    <link>/NALgen/tags/non-negative-matrix-factorization/</link>
+    <description>Recent content in Non-negative Matrix Factorization on NALgen</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Sun, 28 Jul 2019 00:00:00 +0000</lastBuildDate>
     
-	<atom:link href="/NALgen/tags/machine-learning/index.xml" rel="self" type="application/rss+xml" />
+	<atom:link href="/NALgen/tags/non-negative-matrix-factorization/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
@@ -18,15 +18,6 @@
       
       <guid>/NALgen/post/nalgen-analysis_pt0/</guid>
       <description>&lt;p&gt;Non-negative matrix factorization, as implemented in the &lt;em&gt;LEA&lt;/em&gt; package, is a case of unsupervised machine learning; &lt;em&gt;LEA&lt;/em&gt; uses least-squares estimates of ancestry coefficients.&lt;/p&gt;</description>
-    </item>
-    
-    <item>
-      <title>Cross-Entropy and Clustering</title>
-      <link>/NALgen/post/determining_bestk/</link>
-      <pubDate>Fri, 26 Jul 2019 00:00:00 +0000</pubDate>
-      
-      <guid>/NALgen/post/determining_bestk/</guid>
-      <description>&lt;p&gt;Using minimum cross-entropy (MinXEnt) to determine the number of genetic clusters (K) is not always straightforward.&lt;/p&gt;</description>
     </item>
     
   </channel>
