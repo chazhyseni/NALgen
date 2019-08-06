@@ -79,162 +79,31 @@ if (!doNotTrack) {
 		</header><div class="content post__content clearfix">
 			<p>Description of the NALgen method and summary of analyses.</p>
 
-<p><img src="/img/nalgen-summary/ppt/image1.png" alt="" /></p>
+<p><img src="/img/nalgen-summary/ppt/img0.png" alt="" /></p>
 
-<blockquote>
-<p>NALgen</p>
+<p><img src="/img/nalgen-summary/ppt/img1.png" alt="" /></p>
 
-<p>NALgen (Neutral and Adaptive Landscape Genetics) is a method for
-modeling the process of gene flow and predicting the resulting pattern
-of (neutral and adaptive) genetic variation across (continuous)
-landscapes.</p>
-</blockquote>
+<p><img src="/img/nalgen-summary/ppt/img2.png" alt="" /></p>
 
-<p><img src="/img/nalgen-summary/ppt/image2.png" alt="" />{width=&ldquo;5.656666666666666in&rdquo;
-height=&ldquo;7.491456692913386in&rdquo;}</p>
+<p><img src="/img/nalgen-summary/ppt/img3.png" alt="" /></p>
 
-<blockquote>
-<p>NALgen: Analysis Steps</p>
-</blockquote>
+<p><img src="/img/nalgen-summary/ppt/img4.png" alt="" /></p>
 
-<ul>
-<li><p><strong><br />
-To evaluate the NALgen method of modeling neutral and adaptive
-genetic variation across continuous landscapes:</strong></p>
+<p><img src="/img/nalgen-summary/ppt/img5.png" alt="" /></p>
 
-<ul>
-<li><p><em>Generated several landscapes, and then simulated genotypes
-based on the generated landscapes</em></p></li>
+<p><img src="/img/nalgen-summary/ppt/img6.png" alt="" /></p>
 
-<li><p><em>Used multivariate analyses</em></p>
+<p><img src="/img/nalgen-summary/ppt/img7.png" alt="" /></p>
 
-<ul>
-<li><p>to infer population structure in the simulated data</p></li>
+<p><img src="/img/nalgen-summary/ppt/img8.png" alt="" /></p>
 
-<li><p>to find covariance between genetic and environmental data.</p></li>
-</ul></li>
+<p><img src="/img/nalgen-summary/ppt/img9.png" alt="" /></p>
 
-<li><p><em>Modeled neutral and adaptive genetic variation across
-continuous landscapes</em></p>
+<p><img src="/img/nalgen-summary/ppt/img10.png" alt="" /></p>
 
-<ul>
-<li><p>Information about population structure used to create
-response variable</p></li>
+<p><img src="/img/nalgen-summary/ppt/img11.png" alt="" /></p>
 
-<li><p>Transformed environmental data (based on
-genetic-environmental covariance) used as predictors</p></li>
-</ul></li>
-
-<li><p><em>Evaluated performance of model (using subsets of 20
-randomly-distributed populations)</em></p>
-
-<ul>
-<li><p>Compared against original landscape used to simulate
-genotypes</p></li>
-
-<li><p>Compared against inferred map of ancestry based on genotypes
-simulated for each cell (all 884 populations)</p></li>
-</ul></li>
-</ul></li>
-</ul>
-
-<blockquote>
-<p>Landscape Genetic Simulations</p>
-</blockquote>
-
-<ul>
-<li><h3 id="generating-simple-low-complexity-landscapes-and-simulating-genotypes">Generating simple (low-complexity) landscapes and simulating genotypes</h3>
-
-<ul>
-<li><p><em>landscapeR</em> package: simulating simple landscapes (barrier and
-two different values of carrying capacity/habitat suitability):
-landscape 1 has low permeability cells (carrying capacity = 5)
-between habitable patches (carrying capacity = 100), while
-landscape 2 has high permeability cells (carrying capacity =
-25), in addition to barriers (carrying capacity = 0)</p></li>
-
-<li><p><em>popRange</em> package: simulating 50 <strong>selected</strong> and 500
-<strong>neutral</strong> SNPs based on the <em>landscapeR</em>-generated landscape.</p></li>
-</ul></li>
-
-<li><h3 id="generating-high-complexity-landscapes-and-simulating-genotypes">Generating high-complexity landscapes and simulating genotypes</h3>
-
-<ul>
-<li><p><em>virtualspecies</em> package: landscape generation based on Bioclim
-data</p>
-
-<ul>
-<li><p>Collinearity removed from climatic variables,</p></li>
-
-<li><p>PCA of remaining variables performed,</p></li>
-
-<li><p>Ranges of PCA values specified (for three metapopulations).</p></li>
-</ul></li>
-
-<li><p><em>popRange</em> package: simulating 50 <em>selected</em> and 500 <strong>neutral</strong>
-SNPs based on the <em>virtualspecies</em>-generated landscape.</p></li>
-</ul></li>
-</ul>
-
-<p><img src="/img/nalgen-summary/ppt/image3.png" alt="" />{width=&ldquo;5.656666666666666in&rdquo;
-height=&ldquo;7.496666666666667in&rdquo;}<img src="/img/nalgen-summary/ppt/image4.png" alt="" /></p>
-
-<p><img src="/img/nalgen-summary/ppt/image5.png" alt="" /></p>
-
-<h1 id="low-complexity-low-permeability-lclp-landscape">Low-Complexity Low-Permeability (LCLP) landscape</h1>
-
-<p><img src="/img/nalgen-summary/ppt/image5.png" alt="" /></p>
-
-<blockquote>
-<p>Low-Complexity High-Permeability (LCHP) landscape</p>
-</blockquote>
-
-<p><img src="/img/nalgen-summary/ppt/image5.png" alt="" /></p>
-
-<blockquote>
-<p>High-Complexity Low-Permeability (HCLP) landscape</p>
-</blockquote>
-
-<p><img src="/img/nalgen-summary/ppt/image5.png" alt="" /></p>
-
-<blockquote>
-<p>High-Complexity High-Permeability (HCHP) landscape</p>
-
-<p>Setup of Evaluation Step: <em>884-population reference</em></p>
-
-<p><img src="/img/nalgen-summary/ppt/image2.png" alt="" />{width=&ldquo;5.656666666666666in&rdquo;
-height=&ldquo;7.491456692913386in&rdquo;}<img src="/img/nalgen-summary/ppt/image11.png" alt="" />{width=&ldquo;6.3966666666666665in&rdquo;
-height=&ldquo;7.496666666666667in&rdquo;}The original landscapes used to simulate
-the genetic data, as well as population structure results obtained
-from these complete genetic datasets, will be used in evaluating the
-NALgen method.</p>
-
-<p>Presented hereinafter are the reference results (mapped ancestry
-coefficients) that NALgen modeling based on 20 randomly-distributed
-populations will be compared against.</p>
-</blockquote>
-
-<p><img src="/img/nalgen-summary/ppt/image12.png" alt="" /></p>
-
-<p><img src="/img/nalgen-summary/ppt/image12.png" alt="" /></p>
-
-<p><img src="/img/nalgen-summary/ppt/image12.png" alt="" /></p>
-
-<p><img src="/img/nalgen-summary/ppt/image12.png" alt="" /></p>
-
-<blockquote>
-<p><img src="/img/nalgen-summary/ppt/image2.png" alt="" />{width=&ldquo;5.656666666666666in&rdquo;
-height=&ldquo;7.491456692913386in&rdquo;}<img src="/img/nalgen-summary/ppt/image18.png" alt="" /></p>
-
-<p>NALgen Method</p>
-</blockquote>
-
-<h2 id="to-determine-the-maximum-genetic-environmental-covariance-the-raw-data-is-first-transformed-these-transformed-environmental-scores-form-the-predictors-in-nalgen-modeling">To determine the maximum genetic- environmental covariance, the raw data is first transformed: these transformed environmental scores form the predictors in NALgen modeling</h2>
-
-<blockquote>
-<p><strong>The response variables are measures of genetic variation (neutral
-and adaptive): these are newly-developed metrics</strong></p>
-</blockquote>
+<p><img src="/img/nalgen-summary/ppt/img12.png" alt="" /></p>
 		</div>
 		
 	</article>
