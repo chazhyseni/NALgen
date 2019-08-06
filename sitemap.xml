@@ -160,12 +160,16 @@
   </url>
   
   <url>
-    <loc>/NALgen/post/nalgen_summary/</loc>
-    <priority>0</priority>
+    <loc>/NALgen/about/</loc>
   </url>
   
   <url>
-    <loc>/NALgen/about/</loc>
+    <loc>/NALgen/post/nalgen_summary/</loc>
+  </url>
+  
+  <url>
+    <loc>/NALgen/categories/summaries/</loc>
+    <priority>0</priority>
   </url>
   
   <url>

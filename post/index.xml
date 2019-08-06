@@ -57,13 +57,12 @@
     </item>
     
     <item>
-      <title></title>
+      <title>NALgen Summary</title>
       <link>/NALgen/post/nalgen_summary/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>/NALgen/post/nalgen_summary/</guid>
-      <description>NALgen NALgen (Neutral and Adaptive Landscape Genetics) is a method for modeling the process of gene flow and predicting the resulting pattern of (neutral and adaptive) genetic variation across (continuous) landscapes.
-# NALgen: Analysis Steps  ??** To *evaluate* the *NALgen* method *of* modeling *neutral* and *adaptive* genetic *variation across continuous* landscapes:**  Generated several landscapes, and then simulated genotypes based on the generated landscapes _Used multivariate_analyses to infer population structure in the simulateddata to find covariance between genetic and environmental _Modeled neutral and adaptive genetic variation across continuous_landscapes Information about population structure used to create responsevariable Transformedenvironmentaldata(basedngenetic-environmentalcovariance) used aspredictors _Evaluated performance of model (using subsets of 20 randomly-distributed_populations) Compared against original landscape used to simulategenotypes - ?</description>
+      <description>&lt;p&gt;Description of the NALgen method and summary of analyses.&lt;/p&gt;</description>
     </item>
     
   </channel>
