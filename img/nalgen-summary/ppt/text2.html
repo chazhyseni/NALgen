@@ -1,0 +1,31 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+     "http://www.w3.org/TR/html4/transitional.dtd">
+<html>
+<head>
+  <meta HTTP-EQUIV=CONTENT-TYPE CONTENT="text/html; charset=utf-8">
+  <title>Landscape Genetic Simulations</title>
+</head>
+<body text="#000000" bgcolor="#FFFFFF" link="#000080" vlink="#0000CC" alink="#000080">
+<center>
+<a href="text0.html">First page</a> <a href="text1.html">Back</a> <a href="text3.html">Continue</a> <a href="text12.html">Last page</a> <a href="NALgen_Summary.htm">Overview</a> <a href="img2.html">Image</a></center><br>
+<h1>Landscape Genetic Simulations</h1>
+<ul>
+<li><b>Generating simple (low-complexity) landscapes and simulating genotypes</b></li>
+<ul>
+<li><i>landscapeR</i>&nbsp;package: simulating simple landscapes (barrier and two different values of carrying capacity/habitat suitability): landscape 1 has low permeability cells (carrying capacity = 5) between habitable patches (carrying capacity = 100), while landscape 2 has high permeability cells (carrying capacity = 25), in addition to barriers (carrying capacity = 0)</li>
+<li><i>popRange</i>&nbsp;package: simulating 50&nbsp;<b>selected</b>&nbsp;and 500&nbsp;<b>neutral</b>&nbsp;SNPs based on the&nbsp;<i>landscapeR</i>-generated landscape.</li>
+</ul>
+<li><b>Generating high-complexity landscapes and simulating genotypes</b></li>
+<ul>
+<li><i>virtualspecies</i>&nbsp;package: landscape generation based on Bioclim data</li>
+<ul>
+<li>Collinearity removed from climatic variables,</li>
+<li>PCA of remaining variables performed,</li>
+<li>Ranges of PCA values specified (for three metapopulations).</li>
+</ul>
+<li><i>popRange</i>&nbsp;package: simulating 50&nbsp;<i>selected</i>&nbsp;and 500&nbsp;<b>neutral</b>&nbsp;SNPs based on the&nbsp;<i>virtualspecies</i>-generated landscape.</li>
+</ul>
+</ul>
+<p><a href="https://github.com/chazhyseni/NALgen/tree/master/data"><u><b><font color="#7CDE25">Simulated genotypes (50 selected and 500 neutral biallelic loci (SNPs), separately and combined): two migration coefficients (m=0.1 and 0.5) x two levels of landscape complexity (low and high) x two levels of landscape permeability (low and high)</b></u></font></a></p>
+</body>
+</html>
